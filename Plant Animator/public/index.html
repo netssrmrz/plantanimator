@@ -4,10 +4,122 @@
   <head>
     <meta charset="utf-8" />
     <title>Plant Animator</title>
+    <style>
+      #canvas
+      {
+        border: solid 1px #f00;
+      }
+      </style>
+    <script>
+      window.onload = Main;
+
+      class Plant
+      {
+        constructor()
+        {
+          this.maturity = 0;
+        }
+
+        Animate()
+        {
+          Plant_Animate.plant = this;
+          Plant_Animate();
+        }
+
+        Next_Frame()
+        {
+          let res = false;
+
+          this.canvas_ctx.clearRect(0, 0, this.canvas_ctx.canvas.width, this.canvas_ctx.canvas.height);
+          this.Render_All();
+
+          if (this.maturity < 1)
+          {
+            this.Grow();
+
+            res = true;
+          }
+
+          return res;
+        }
+
+        Grow()
+        {
+          this.maturity += this.maturity_rate;
+          if (this.maturity > 1)
+            this.maturity = 1;
+
+          if (this.branches)
+            for (var c = 0; c < this.branches.length; c++)
+              this.branches[c].Grow();
+        }
+
+        Render_All()
+        {
+          this.Render();
+          if (this.branches)
+            for (var c = 0; c < this.branches.length; c++)
+              this.branches[c].Render_All();
+        }
+
+        Render()
+        {
+          const size = 100 * this.maturity;
+          const x1 = this.x - size * 0.5;
+          const y1 = this.y - size * 0.5;
+          this.canvas_ctx.strokeRect(x1, y1, size, size);
+
+          if (this.Equal(this.maturity, 0.25) && this.branch_level > 0)
+          {
+            const plant = new Plant();
+            plant.x = x1;
+            plant.y = y1;
+            plant.angle = 0;
+            plant.maturity_rate = 0.01;
+            plant.branch_level = this.branch_level - 1;
+            plant.canvas_ctx = this.canvas_ctx;
+            if (!this.branches)
+              this.branches = [];
+            this.branches.push(plant);
+          }
+        }
+
+        Equal(a, b)
+        {
+          return Math.abs(a - b) <= Number.EPSILON;
+        }
+      }
+
+      function Plant_Animate()
+      {
+        if (Plant_Animate.plant.Next_Frame())
+          window.requestAnimationFrame(Plant_Animate);
+      };
+
+      function Main() 
+      {
+        let plant, canvas, canvas_ctx;
+
+        canvas = document.getElementById("canvas");
+        canvas_ctx = canvas.getContext("2d", { alpha: false });
+        canvas_ctx.fillStyle = "green";
+        canvas_ctx.strokeStyle = "green";
+
+        plant = new Plant();
+        plant.x = 320;
+        plant.y = 240;
+        plant.angle = 0;
+        plant.maturity_rate = 0.01;
+        plant.branch_level = 4;
+        plant.canvas_ctx = canvas_ctx;
+        plant.Animate();
+      }
+      </script>
     </head>
 
   <body>
-    Plant Animator
+    <div>Plant Animator</div>
+    <canvas id="canvas" width="640" height="480"></canvas>
     </body>
 
   </html>
