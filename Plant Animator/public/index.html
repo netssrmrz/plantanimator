@@ -5,13 +5,22 @@
     <meta charset="utf-8" />
     <title>Plant Animator</title>
     <style>
+      html, body
+      {
+        margin: 0 0 0 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
       #canvas
       {
-        border: solid 1px #f00;
+        xborder: solid 1px #f00;
+        width: 100%;
+        height: 100%;
       }
       </style>
     <script type="module">
-      import { Plant2 as Plant } from "./lib/pa.js";
+      import { Plant_Stem as Plant } from "./lib/pa.js";
 
       window.onload = Main;
       function Main() 
@@ -24,11 +33,11 @@
         canvas_ctx.strokeStyle = "green";
 
         plant = new Plant();
-        plant.x = 160;
-        plant.y = 120;
+        plant.x = 0;
+        plant.y = 0;
         plant.angle = 0;
-        plant.maturity_rate = 1;
-        plant.level = 4;
+        plant.maturity_rate = 0.25;
+        plant.level = 5;
         plant.scale = 1;
         plant.canvas_ctx = canvas_ctx;
         plant.Animate();
@@ -37,8 +46,7 @@
     </head>
 
   <body>
-    <div>Plant Animator</div>
-    <canvas id="canvas" width="640" height="480"></canvas>
+    <canvas id="canvas" width="2000" height="1000"></canvas>
     <div id="log"></div>
   </body>
 
