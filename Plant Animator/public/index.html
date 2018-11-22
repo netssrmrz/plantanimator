@@ -1,52 +1,55 @@
 ﻿<!DOCTYPE html>
 <html>
 
-  <head>
-    <meta charset="utf-8" />
-    <title>Plant Animator</title>
-    <style>
-      html, body
-      {
-        margin: 0 0 0 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-      }
-      #canvas
-      {
-        xborder: solid 1px #f00;
-        width: 100%;
-        height: 100%;
-      }
-      </style>
-    <script type="module">
-      import { Plant_Stem as Plant } from "./lib/pa.js";
+<head>
+  <meta charset="utf-8" />
+  <title>Plant Animator</title>
+  <style>
+    html, body
+    {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #fff;
+    }
 
-      window.onload = Main;
-      function Main() 
-      {
-        let plant, canvas, canvas_ctx;
+    #canvas
+    {
+      border: 1px solid #f00;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+  <script type="module">
+    import { Plant_Stem as Plant } from "./lib/pa.js";
 
-        canvas = document.getElementById("canvas");
-        canvas_ctx = canvas.getContext("2d", { alpha: false });
-        canvas_ctx.fillStyle = "green";
-        canvas_ctx.strokeStyle = "green";
+    window.onload = Main;
+    function Main()
+    {
+      let plant, canvas, canvas_ctx;
 
-        plant = new Plant();
-        plant.x = 0;
-        plant.y = 0;
-        plant.angle = 0;
-        plant.maturity_rate = 0.25;
-        plant.level = 5;
-        plant.scale = 1;
-        plant.canvas_ctx = canvas_ctx;
-        plant.Animate();
-      }
-      </script>
-    </head>
+      canvas = document.getElementById("canvas");
+      canvas_ctx = canvas.getContext("2d");
+      canvas_ctx.shadowColor = "#ccc";
+      canvas_ctx.shadowBlur = 20;
+      canvas_ctx.shadowOffsetX = 20;
+      canvas_ctx.shadowOffsetY = 20;
+
+      plant = new Plant(1);
+      plant.maturity_rate = 0.25;
+      plant.level = 5;
+      plant.canvas_ctx = canvas_ctx;
+      plant.Animate();
+    }
+
+  </script>
+  <script>
+  </script>
+</head>
 
   <body>
-    <canvas id="canvas" width="2000" height="1000"></canvas>
+    <canvas id="canvas" width="1800" height="1000"></canvas>
     <div id="log"></div>
   </body>
 

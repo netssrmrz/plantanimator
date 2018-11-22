@@ -5,6 +5,11 @@ class Plant
   constructor()
   {
     this.level = 0;
+    this.canvas_ctx = null;
+    this.branches = null;
+    this.x = 0;
+    this.y = 0;
+    this.angle = 0;
   }
 
   Animate()
@@ -26,12 +31,12 @@ class Plant
 
   Grow_All()
   {
-    var res = false, branch_res;
+    var res = false, branch_res, c;
 
     res = this.Grow();
 
     if (this.branches)
-      for (var c = 0; c < this.branches.length; c++)
+      for (c = 0; c < this.branches.length; c++)
       {
         branch_res = this.branches[c].Grow_All();
         res = res || branch_res;
@@ -42,16 +47,15 @@ class Plant
 
   Render_All()
   {
-    var branch;
+    var branch, c;
 
     this.canvas_ctx.save();
     this.canvas_ctx.translate(this.x, this.y);
     this.canvas_ctx.rotate(this.angle);
-    this.canvas_ctx.scale(this.scale, this.scale);
 
     this.Render();
     if (this.branches)
-      for (var c = 0; c < this.branches.length; c++)
+      for (c = 0; c < this.branches.length; c++)
       {
         branch = this.branches[c];
         branch.Render_All();
@@ -111,6 +115,7 @@ class Plant_Maturing extends Plant
   {
     super();
     this.maturity = 0;
+    this.maturity_rate = 1;
   }
 
   Grow()
@@ -136,12 +141,39 @@ class Plant_Maturing extends Plant
   }
 }
 
+class Plant_Flower extends Plant_Maturing
+{
+  Render()
+  {
+    this.canvas_ctx.fillStyle = "yellow";
+    this.canvas_ctx.beginPath();
+    this.canvas_ctx.moveTo(0, 0);
+    this.canvas_ctx.quadraticCurveTo(this.maturity / 2, this.maturity / 2, 0, this.maturity);
+    this.canvas_ctx.quadraticCurveTo(-this.maturity / 2, this.maturity / 2, 0, 0);
+    this.canvas_ctx.fill();
+  }
+}
+
+class Plant_Leaf extends Plant_Maturing
+{
+  Render()
+  {
+    this.canvas_ctx.fillStyle = "green";
+    this.canvas_ctx.beginPath();
+    this.canvas_ctx.moveTo(0, 0);
+    this.canvas_ctx.quadraticCurveTo(this.maturity/2, this.maturity / 2, 0, this.maturity);
+    this.canvas_ctx.quadraticCurveTo(-this.maturity/2, this.maturity / 2, 0, 0);
+    this.canvas_ctx.fill();
+  }
+}
+
 export class Plant_Stem extends Plant_Maturing
 {
-  constructor()
+  constructor(scale)
   {
     super();
-    this.curve = new Bezier(0, 0, 0, 1000, 1000, 0, 1000, 1000);
+    this.scale = scale;
+    this.curve = new Bezier(0, 0, 0, 1000 * this.scale, 1000 * this.scale, 0, 1000 * this.scale, 1000 * this.scale);
     this.curve_pts = this.curve.getLUT(100);
   }
 
@@ -149,12 +181,13 @@ export class Plant_Stem extends Plant_Maturing
   {
     var c;
 
-    //this.canvas_ctx.moveTo(this.curve_pts[0].x, this.curve_pts[0].y);
     this.canvas_ctx.lineCap = 'round';
+    this.canvas_ctx.strokeStyle = "brown";
+
     for (c = 1; c < this.maturity; c++)
     {
       this.canvas_ctx.beginPath();
-      this.canvas_ctx.lineWidth = (this.maturity - c) / 10;
+      this.canvas_ctx.lineWidth = ((this.maturity - c) / 10) * this.scale;
       this.canvas_ctx.moveTo(this.curve_pts[c - 1].x, this.curve_pts[c - 1].y);
       this.canvas_ctx.lineTo(this.curve_pts[c].x, this.curve_pts[c].y);
       this.canvas_ctx.stroke();
@@ -163,20 +196,34 @@ export class Plant_Stem extends Plant_Maturing
 
   Grow_Maturing()
   {
-    if (this.Equal(this.maturity, 25) && this.level > 0)
-      this.Add_Stem(6.5, 0.5);
-    if (this.Equal(this.maturity, 75) && this.level > 0)
-      this.Add_Stem(5, 0.25);
+    if (this.level > 1)
+    {
+      if (this.Equal(this.maturity, 25))
+        this.Add_Stem(6.5, this.scale / 2);
+      if (this.Equal(this.maturity, 50))
+        this.Add_Leaf(6.5);
+      if (this.Equal(this.maturity, 75))
+        this.Add_Stem(5, this.scale / 3);
+    }
   }
 
-  Add_Stem(angle, scale)
+  Add_Leaf(angle)
   {
-    const plant = new Plant_Stem();
+    const plant = new Plant_Leaf();
     plant.x = this.curve_pts[this.maturity].x;
     plant.y = this.curve_pts[this.maturity].y;
     plant.angle = angle;
     plant.maturity_rate = this.maturity_rate;
-    plant.scale = scale;
+    this.Add_Branch(plant);
+  }
+
+  Add_Stem(angle, scale)
+  {
+    const plant = new Plant_Stem(scale);
+    plant.x = this.curve_pts[this.maturity].x;
+    plant.y = this.curve_pts[this.maturity].y;
+    plant.angle = angle;
+    plant.maturity_rate = this.maturity_rate;
     this.Add_Branch(plant);
   }
 }
