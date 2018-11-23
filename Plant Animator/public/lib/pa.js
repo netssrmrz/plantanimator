@@ -1,5 +1,10 @@
 ﻿import { Bezier } from "./bezierjs/bezier.js";
 
+export function Random(base, delta)
+{
+  return base + (Math.random() - 0.5) * delta;
+}
+
 class Plant
 {
   constructor()
@@ -12,17 +17,10 @@ class Plant
     this.angle = 0;
   }
 
-  Animate()
-  {
-    Plant_Animate.plant = this;
-    Plant_Animate();
-  }
-
   Next_Frame()
   {
     let res = false;
 
-    this.canvas_ctx.clearRect(0, 0, this.canvas_ctx.canvas.width, this.canvas_ctx.canvas.height);
     this.Render_All();
     res = this.Grow_All();
 
@@ -102,13 +100,6 @@ class Plant
   }
 }
 
-function Plant_Animate()
-{
-  //document.getElementById("log").innerHTML = Plant_Animate.plant.Dump(0);
-  if (Plant_Animate.plant.Next_Frame())
-    window.requestAnimationFrame(Plant_Animate);
-};
-
 class Plant_Maturing extends Plant
 {
   constructor()
@@ -147,10 +138,10 @@ class Plant_Flower extends Plant_Maturing
   {
     var c;
 
-    this.canvas_ctx.fillStyle = "#ffa";
+    this.canvas_ctx.fillStyle = "#fea";
     this.canvas_ctx.beginPath();
     for (c = 0; c < 4; c++)
-      this.canvas_ctx.ellipse(0, 0, this.maturity / 8, this.maturity / 2, (this.maturity / 100) * (c * Math.PI / 4), 0, 2 * Math.PI);
+      this.canvas_ctx.ellipse(0, 0, this.maturity / 10, this.maturity / 2, (this.maturity / 100) * (c * Math.PI / 4), 0, 2 * Math.PI);
     this.canvas_ctx.fill();
   }
 }
@@ -174,7 +165,9 @@ export class Plant_Stem extends Plant_Maturing
   {
     super();
     this.scale = scale;
-    this.curve = new Bezier(0, 0, 0, 1000 * this.scale, 1000 * this.scale, 0, 1000 * this.scale, 1000 * this.scale);
+    this.curve = new Bezier(
+      0, 0, 0, 1000 * this.scale,
+      1000 * this.scale, 0, 1000 * this.scale, 1000 * this.scale);
     this.curve_pts = this.curve.getLUT(100);
   }
 
@@ -200,19 +193,14 @@ export class Plant_Stem extends Plant_Maturing
     if (this.level > 1)
     {
       if (this.Equal(this.maturity, 25))
-        this.Add_Stem(this.Random(6.5, 2), this.scale / 2);
+        this.Add_Stem(Random(6.5, 2), this.scale / 2);
       if (this.Equal(this.maturity, 50))
-        this.Add_Leaf(this.Random(6.5, 2));
+        this.Add_Leaf(Random(6.5, 2));
       if (this.Equal(this.maturity, 75))
-        this.Add_Stem(this.Random(5, 2), this.scale / 3);
+        this.Add_Stem(Random(5, 2), this.scale / 3);
       if (this.Equal(this.maturity, 95))
-        this.Add_Flower(this.Random(0, 2));
+        this.Add_Flower(Random(0, 2));
     }
-  }
-
-  Random(base, delta)
-  {
-    return base + (Math.random() - 0.5) * delta;
   }
 
   Add_Flower(angle)
@@ -240,5 +228,17 @@ export class Plant_Stem extends Plant_Maturing
     plant.angle = angle;
     plant.maturity_rate = this.maturity_rate;
     this.Add_Branch(plant);
+  }
+}
+
+export class Plant_Border_Stem extends Plant_Stem
+{
+  constructor(scale)
+  {
+    super(scale);
+    this.curve = new Bezier(
+      0, 0, 500 * this.scale, 500 * this.scale,
+      1000 * this.scale, 0, 1000 * this.scale, 1000 * this.scale);
+    this.curve_pts = this.curve.getLUT(100);
   }
 }

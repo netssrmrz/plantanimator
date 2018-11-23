@@ -22,23 +22,47 @@
     }
   </style>
   <script type="module">
-    import { Plant_Stem as Plant } from "./lib/pa.js";
+    import { Plant_Border_Stem as Plant, Random } from "./lib/pa.js";
 
     window.onload = Main;
     function Main()
     {
-      let plant, canvas, canvas_ctx;
+      var c, plant, plants, canvas, canvas_ctx;
 
       canvas = document.getElementById("canvas");
       canvas_ctx = canvas.getContext("2d");
+      plants = [];
 
       plant = new Plant(1);
-      plant.maturity_rate = 0.25;
+      plant.maturity_rate = 0.5;
       plant.level = 5;
       plant.canvas_ctx = canvas_ctx;
-      plant.Animate();
+      plants.push(plant);
+
+      plant = new Plant(0.75);
+      plant.maturity_rate = 1;
+      plant.level = 5;
+      plant.canvas_ctx = canvas_ctx;
+      plants.push(plant);
+
+      Animate.canvas_ctx = canvas_ctx;
+      Animate.plants = plants;
+      Animate();
     }
 
+    function Animate()
+    {
+      var c, next_frame = false, next_plant_frame;
+
+      Animate.canvas_ctx.clearRect(0, 0, Animate.canvas_ctx.canvas.width, Animate.canvas_ctx.canvas.height);
+      for (c = 0; c < Animate.plants.length; c++)
+      {
+        next_plant_frame = Animate.plants[c].Next_Frame();
+        next_frame = next_frame || next_plant_frame;
+      }
+      if (next_frame)
+        window.requestAnimationFrame(Animate);
+    };
   </script>
   <script>
   </script>
