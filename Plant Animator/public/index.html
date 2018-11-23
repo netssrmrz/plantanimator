@@ -16,7 +16,7 @@
 
     #canvas
     {
-      border: 1px solid #f00;
+      xborder: 1px solid #f00;
       width: 100%;
       height: 100%;
     }
@@ -31,10 +31,6 @@
 
       canvas = document.getElementById("canvas");
       canvas_ctx = canvas.getContext("2d");
-      canvas_ctx.shadowColor = "#ccc";
-      canvas_ctx.shadowBlur = 20;
-      canvas_ctx.shadowOffsetX = 20;
-      canvas_ctx.shadowOffsetY = 20;
 
       plant = new Plant(1);
       plant.maturity_rate = 0.25;

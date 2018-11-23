@@ -145,11 +145,12 @@ class Plant_Flower extends Plant_Maturing
 {
   Render()
   {
-    this.canvas_ctx.fillStyle = "yellow";
+    var c;
+
+    this.canvas_ctx.fillStyle = "#ffa";
     this.canvas_ctx.beginPath();
-    this.canvas_ctx.moveTo(0, 0);
-    this.canvas_ctx.quadraticCurveTo(this.maturity / 2, this.maturity / 2, 0, this.maturity);
-    this.canvas_ctx.quadraticCurveTo(-this.maturity / 2, this.maturity / 2, 0, 0);
+    for (c = 0; c < 4; c++)
+      this.canvas_ctx.ellipse(0, 0, this.maturity / 8, this.maturity / 2, (this.maturity / 100) * (c * Math.PI / 4), 0, 2 * Math.PI);
     this.canvas_ctx.fill();
   }
 }
@@ -158,7 +159,7 @@ class Plant_Leaf extends Plant_Maturing
 {
   Render()
   {
-    this.canvas_ctx.fillStyle = "green";
+    this.canvas_ctx.fillStyle = "#afa";
     this.canvas_ctx.beginPath();
     this.canvas_ctx.moveTo(0, 0);
     this.canvas_ctx.quadraticCurveTo(this.maturity/2, this.maturity / 2, 0, this.maturity);
@@ -182,7 +183,7 @@ export class Plant_Stem extends Plant_Maturing
     var c;
 
     this.canvas_ctx.lineCap = 'round';
-    this.canvas_ctx.strokeStyle = "brown";
+    this.canvas_ctx.strokeStyle = "#aaa";
 
     for (c = 1; c < this.maturity; c++)
     {
@@ -199,27 +200,41 @@ export class Plant_Stem extends Plant_Maturing
     if (this.level > 1)
     {
       if (this.Equal(this.maturity, 25))
-        this.Add_Stem(6.5, this.scale / 2);
+        this.Add_Stem(this.Random(6.5, 2), this.scale / 2);
       if (this.Equal(this.maturity, 50))
-        this.Add_Leaf(6.5);
+        this.Add_Leaf(this.Random(6.5, 2));
       if (this.Equal(this.maturity, 75))
-        this.Add_Stem(5, this.scale / 3);
+        this.Add_Stem(this.Random(5, 2), this.scale / 3);
+      if (this.Equal(this.maturity, 95))
+        this.Add_Flower(this.Random(0, 2));
     }
+  }
+
+  Random(base, delta)
+  {
+    return base + (Math.random() - 0.5) * delta;
+  }
+
+  Add_Flower(angle)
+  {
+    const plant = new Plant_Flower();
+    this.Add_Plant(angle, plant);
   }
 
   Add_Leaf(angle)
   {
     const plant = new Plant_Leaf();
-    plant.x = this.curve_pts[this.maturity].x;
-    plant.y = this.curve_pts[this.maturity].y;
-    plant.angle = angle;
-    plant.maturity_rate = this.maturity_rate;
-    this.Add_Branch(plant);
+    this.Add_Plant(angle, plant);
   }
 
   Add_Stem(angle, scale)
   {
     const plant = new Plant_Stem(scale);
+    this.Add_Plant(angle, plant);
+  }
+
+  Add_Plant(angle, plant)
+  {
     plant.x = this.curve_pts[this.maturity].x;
     plant.y = this.curve_pts[this.maturity].y;
     plant.angle = angle;
