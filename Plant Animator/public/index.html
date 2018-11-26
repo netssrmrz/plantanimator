@@ -22,7 +22,7 @@
     }
   </style>
   <script type="module">
-    import { Plant_Border_Stem as Plant, Random } from "./lib/pa.js";
+    import { Plant_Stem as Plant, Random } from "./lib/pa.js";
 
     window.onload = Main;
     function Main()
@@ -31,18 +31,29 @@
 
       canvas = document.getElementById("canvas");
       canvas_ctx = canvas.getContext("2d");
+      canvas_ctx.strokeStyle = "#aaa";
+      canvas_ctx.fillStyle = "#aaa";
+      canvas_ctx.lineWidth = 4;
+      canvas_ctx.lineCap = 'round';
+
       plants = [];
 
-      plant = new Plant(1);
+      plant = new Plant(1, 1, 1);
       plant.maturity_rate = 0.5;
-      plant.level = 5;
+      plant.level = 4;
       plant.canvas_ctx = canvas_ctx;
+      plant.x = 900;
+      plant.y = 500;
+      plant.x_scale = 0.75;
       plants.push(plant);
 
-      plant = new Plant(0.75);
-      plant.maturity_rate = 1;
-      plant.level = 5;
+      plant = new Plant(1, 1, 1);
+      plant.maturity_rate = 0.5;
+      plant.level = 4;
       plant.canvas_ctx = canvas_ctx;
+      plant.x = 900;
+      plant.y = 500;
+      plant.x_scale = -0.75;
       plants.push(plant);
 
       Animate.canvas_ctx = canvas_ctx;

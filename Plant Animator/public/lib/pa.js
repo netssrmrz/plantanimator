@@ -9,12 +9,14 @@ class Plant
 {
   constructor()
   {
-    this.level = 0;
+    this.curr_level = 0;
     this.canvas_ctx = null;
     this.branches = null;
     this.x = 0;
     this.y = 0;
     this.angle = 0;
+    this.x_scale = 1;
+    this.y_scale = 1;
   }
 
   Next_Frame()
@@ -50,6 +52,7 @@ class Plant
     this.canvas_ctx.save();
     this.canvas_ctx.translate(this.x, this.y);
     this.canvas_ctx.rotate(this.angle);
+    this.canvas_ctx.scale(this.x_scale, this.y_scale);
 
     this.Render();
     if (this.branches)
@@ -65,7 +68,8 @@ class Plant
   Add_Branch(plant)
   {
     plant.canvas_ctx = this.canvas_ctx;
-    plant.level = this.level - 1;
+    plant.level = this.level;
+    plant.curr_level = this.curr_level + 1;
 
     if (!this.branches)
       this.branches = [];
@@ -136,13 +140,17 @@ class Plant_Flower extends Plant_Maturing
 {
   Render()
   {
-    var c;
+    var c, p = 4;
 
-    this.canvas_ctx.fillStyle = "#fea";
+    this.canvas_ctx.lineWidth = 2;
     this.canvas_ctx.beginPath();
-    for (c = 0; c < 4; c++)
-      this.canvas_ctx.ellipse(0, 0, this.maturity / 10, this.maturity / 2, (this.maturity / 100) * (c * Math.PI / 4), 0, 2 * Math.PI);
-    this.canvas_ctx.fill();
+    for (c = 0; c < p; c++)
+    {
+      this.canvas_ctx.moveTo(0, 0);
+      this.canvas_ctx.bezierCurveTo(this.maturity / 4, this.maturity / 4, this.maturity / 4, -this.maturity / 4, 0, 0);
+      this.canvas_ctx.rotate(2 * Math.PI / p);
+    }
+    this.canvas_ctx.stroke();
   }
 }
 
@@ -150,24 +158,40 @@ class Plant_Leaf extends Plant_Maturing
 {
   Render()
   {
-    this.canvas_ctx.fillStyle = "#afa";
+    this.canvas_ctx.lineWidth = 2;
     this.canvas_ctx.beginPath();
     this.canvas_ctx.moveTo(0, 0);
-    this.canvas_ctx.quadraticCurveTo(this.maturity/2, this.maturity / 2, 0, this.maturity);
-    this.canvas_ctx.quadraticCurveTo(-this.maturity/2, this.maturity / 2, 0, 0);
-    this.canvas_ctx.fill();
+    this.canvas_ctx.quadraticCurveTo(this.maturity/4, this.maturity/4, 0, this.maturity/2);
+    this.canvas_ctx.quadraticCurveTo(-this.maturity/4, this.maturity/4, 0, 0);
+    this.canvas_ctx.stroke();
   }
 }
 
 export class Plant_Stem extends Plant_Maturing
 {
-  constructor(scale)
+  constructor()
   {
+    var x1, y1, x2, y2, cx1, cy1, cx2, cy2;
+
     super();
-    this.scale = scale;
+    //this.scale_x = scale_x;
+    //this.scale_y = scale_y;
+    //this.scale_x = 1;
+    //this.scale_y = 1;
+    this.width = 1;
+
+    x1 = 0; y1 = 0;
+    x2 = 1000; y2 = 0;
+
+    cx1 = 200; cy1 = -250;
+    cx2 = 800; cy2 = 250;
+
+    //this.curve = new Bezier(
+      //x1 * this.scale_x, y1 * this.scale_y, cx1 * this.scale_x, cy1 * this.scale_y,
+      //cx2 * this.scale_x, cy2 * this.scale_y, x2 * this.scale_x, y2 * this.scale_y);
     this.curve = new Bezier(
-      0, 0, 0, 1000 * this.scale,
-      1000 * this.scale, 0, 1000 * this.scale, 1000 * this.scale);
+      x1, y1, cx1, cy1,
+      cx2, cy2, x2, y2);
     this.curve_pts = this.curve.getLUT(100);
   }
 
@@ -175,13 +199,10 @@ export class Plant_Stem extends Plant_Maturing
   {
     var c;
 
-    this.canvas_ctx.lineCap = 'round';
-    this.canvas_ctx.strokeStyle = "#aaa";
-
     for (c = 1; c < this.maturity; c++)
     {
       this.canvas_ctx.beginPath();
-      this.canvas_ctx.lineWidth = ((this.maturity - c) / 10) * this.scale;
+      this.canvas_ctx.lineWidth = ((this.maturity - c) / 10) * this.width;
       this.canvas_ctx.moveTo(this.curve_pts[c - 1].x, this.curve_pts[c - 1].y);
       this.canvas_ctx.lineTo(this.curve_pts[c].x, this.curve_pts[c].y);
       this.canvas_ctx.stroke();
@@ -190,15 +211,18 @@ export class Plant_Stem extends Plant_Maturing
 
   Grow_Maturing()
   {
-    if (this.level > 1)
+    if (this.curr_level <= this.level)
     {
-      if (this.Equal(this.maturity, 25))
-        this.Add_Stem(Random(6.5, 2), this.scale / 2);
-      if (this.Equal(this.maturity, 50))
-        this.Add_Leaf(Random(6.5, 2));
-      if (this.Equal(this.maturity, 75))
-        this.Add_Stem(Random(5, 2), this.scale / 3);
-      if (this.Equal(this.maturity, 95))
+      if (this.maturity >= 10 && !this.branches)
+        this.Add_Stem(Random(0, 0.5), 0.5, -0.5, 0.5);
+
+      if (this.maturity >= 20 && this.branches.length == 1)
+        this.Add_Leaf(Random(4.7, 1), (this.curr_level+1)*2);
+
+      if (this.maturity >= 50 && this.branches.length == 2)
+        this.Add_Stem(Random(0, 0.5), 0.25, 0.25, 0.25);
+
+      if (this.maturity >= 90 && this.branches.length == 3)
         this.Add_Flower(Random(0, 2));
     }
   }
@@ -206,39 +230,29 @@ export class Plant_Stem extends Plant_Maturing
   Add_Flower(angle)
   {
     const plant = new Plant_Flower();
-    this.Add_Plant(angle, plant);
+    this.Add_Plant(angle, plant, this.x_scale, this.y_scale);
   }
 
-  Add_Leaf(angle)
+  Add_Leaf(angle, scale)
   {
     const plant = new Plant_Leaf();
-    this.Add_Plant(angle, plant);
+    this.Add_Plant(angle, plant, this.x_scale * scale, this.y_scale * scale);
   }
 
-  Add_Stem(angle, scale)
+  Add_Stem(angle, x_scale, y_scale, scale_width)
   {
-    const plant = new Plant_Stem(scale);
-    this.Add_Plant(angle, plant);
+    const plant = new Plant_Stem();
+    this.Add_Plant(angle, plant, x_scale, y_scale);
   }
 
-  Add_Plant(angle, plant)
+  Add_Plant(angle, plant, x_scale, y_scale)
   {
     plant.x = this.curve_pts[this.maturity].x;
     plant.y = this.curve_pts[this.maturity].y;
+    plant.x_scale = x_scale;
+    plant.y_scale = y_scale;
     plant.angle = angle;
     plant.maturity_rate = this.maturity_rate;
     this.Add_Branch(plant);
-  }
-}
-
-export class Plant_Border_Stem extends Plant_Stem
-{
-  constructor(scale)
-  {
-    super(scale);
-    this.curve = new Bezier(
-      0, 0, 500 * this.scale, 500 * this.scale,
-      1000 * this.scale, 0, 1000 * this.scale, 1000 * this.scale);
-    this.curve_pts = this.curve.getLUT(100);
   }
 }
