@@ -32,33 +32,75 @@
       canvas = document.getElementById("canvas");
       canvas_ctx = canvas.getContext("2d");
       canvas_ctx.strokeStyle = "#aaa";
-      canvas_ctx.fillStyle = "#aaa";
+      canvas_ctx.fillStyle = "#fff";
       canvas_ctx.lineWidth = 4;
       canvas_ctx.lineCap = 'round';
 
       plants = [];
-
-      plant = new Plant(1, 1, 1);
-      plant.maturity_rate = 0.5;
-      plant.level = 4;
-      plant.canvas_ctx = canvas_ctx;
-      plant.x = 900;
-      plant.y = 500;
-      plant.x_scale = 0.75;
-      plants.push(plant);
-
-      plant = new Plant(1, 1, 1);
-      plant.maturity_rate = 0.5;
-      plant.level = 4;
-      plant.canvas_ctx = canvas_ctx;
-      plant.x = 900;
-      plant.y = 500;
-      plant.x_scale = -0.75;
-      plants.push(plant);
+      plants.push(New_Top_Border(canvas_ctx));
+      plants.push(New_Left_Border(canvas_ctx));
+      plants.push(New_Bottom_Border(canvas_ctx));
+      plants.push(New_Right_Border(canvas_ctx));
 
       Animate.canvas_ctx = canvas_ctx;
       Animate.plants = plants;
       Animate();
+    }
+
+    function New_Top_Border(canvas_ctx)
+    {
+      var plant = new Plant();
+      plant.maturity_rate = 0.25;
+      plant.level = 3;
+      plant.canvas_ctx = canvas_ctx;
+      plant.x = 0;
+      plant.y = 0;
+      plant.x_scale = 1;
+      plant.y_scale = -1;
+      plant.angle = 0.14;
+      return plant;
+    }
+
+    function New_Bottom_Border(canvas_ctx)
+    {
+      var plant = new Plant();
+      plant.maturity_rate = 0.25;
+      plant.level = 3;
+      plant.canvas_ctx = canvas_ctx;
+      plant.x = 2000;
+      plant.y = 1000;
+      plant.x_scale = -1;
+      plant.y_scale = 1;
+      plant.angle = 0.14;
+      return plant;
+    }
+
+    function New_Left_Border(canvas_ctx)
+    {
+      var plant = new Plant();
+      plant.maturity_rate = 0.25;
+      plant.level = 4;
+      plant.canvas_ctx = canvas_ctx;
+      plant.x = 0;
+      plant.y = 0;
+      plant.x_scale = -1;
+      plant.y_scale = -1;
+      plant.angle = -1.7;
+      return plant;
+    }
+
+    function New_Right_Border(canvas_ctx)
+    {
+      var plant = new Plant();
+      plant.maturity_rate = 0.25;
+      plant.level = 4;
+      plant.canvas_ctx = canvas_ctx;
+      plant.x = 2000;
+      plant.y = 1000;
+      plant.x_scale = 1;
+      plant.y_scale = 1;
+      plant.angle = -1.7;
+      return plant;
     }
 
     function Animate()
@@ -73,6 +115,12 @@
       }
       if (next_frame)
         window.requestAnimationFrame(Animate);
+      /*else
+      {
+        Animate.plants.push(New_Top_Border(Animate.canvas_ctx));
+        Animate.plants.push(New_Left_Border(Animate.canvas_ctx));
+        window.requestAnimationFrame(Animate);
+      }*/
     };
   </script>
   <script>
@@ -80,7 +128,7 @@
 </head>
 
   <body>
-    <canvas id="canvas" width="1800" height="1000"></canvas>
+    <canvas id="canvas" width="2000" height="1000"></canvas>
     <div id="log"></div>
   </body>
 
