@@ -1,11 +1,4 @@
-﻿import { Bezier } from "./bezierjs/bezier.js";
-
-export function Random(base, delta)
-{
-  return base + (Math.random() - 0.5) * delta;
-}
-
-class Plant
+﻿class Plant
 {
   constructor()
   {
@@ -83,19 +76,6 @@ class Plant
     return Math.abs(a - b) <= Number.EPSILON;
   }
 
-  Dump(level)
-  {
-    let res = "";
-
-    res = JSON.stringify(this).padStart(res.length + level, "&nbsp;") + "<br>";
-
-    //if (this.branches)
-    //for (var c = 0; c < this.branches.length; c++)
-    //res = res + this.branches[c].Dump(level + 1);
-
-    return res;
-  }
-
   Grow()
   {
     return false;
@@ -132,7 +112,7 @@ class Plant
   }
 }
 
-class Plant_Maturing extends Plant
+export class Plant_Maturing extends Plant
 {
   constructor()
   {
@@ -164,117 +144,16 @@ class Plant_Maturing extends Plant
   }
 }
 
-class Plant_Flower extends Plant_Maturing
+export function Animate(canvas_ctx, plants)
 {
-  Render()
+  var c, next_frame = false, next_plant_frame;
+
+  canvas_ctx.clearRect(0, 0, canvas_ctx.canvas.width, canvas_ctx.canvas.height);
+  for (c = 0; c < plants.length; c++)
   {
-    var c, p = 4;
-
-    this.canvas_ctx.lineWidth = 2;
-    this.canvas_ctx.beginPath();
-    for (c = 0; c < p; c++)
-    {
-      this.canvas_ctx.moveTo(0, 0);
-      this.canvas_ctx.bezierCurveTo(this.maturity / 4, this.maturity / 4, this.maturity / 4, -this.maturity / 4, 0, 0);
-      this.canvas_ctx.rotate(2 * Math.PI / p);
-    }
-    this.canvas_ctx.fill();
-    this.canvas_ctx.stroke();
+    next_plant_frame = plants[c].Next_Frame();
+    next_frame = next_frame || next_plant_frame;
   }
-}
-
-class Plant_Leaf extends Plant_Maturing
-{
-  Render()
-  {
-    this.canvas_ctx.lineWidth = 2;
-    this.canvas_ctx.beginPath();
-    this.canvas_ctx.moveTo(0, 0);
-    this.canvas_ctx.quadraticCurveTo(this.maturity/4, this.maturity/4, 0, this.maturity/2);
-    this.canvas_ctx.quadraticCurveTo(-this.maturity/4, this.maturity/4, 0, 0);
-    this.canvas_ctx.fill();
-    this.canvas_ctx.stroke();
-  }
-}
-
-export class Plant_Stem extends Plant_Maturing
-{
-  constructor()
-  {
-    var x1, y1, x2, y2, cx1, cy1, cx2, cy2;
-
-    super();
-
-    x1 = 0; y1 = 0;
-    x2 = 1000; y2 = 0;
-
-    cx1 = 200; cy1 = -250;
-    cx2 = 800; cy2 = 250;
-
-    this.curve = new Bezier(
-      x1, y1, cx1, cy1,
-      cx2, cy2, x2, y2);
-    this.curve_pts = this.curve.getLUT(100);
-  }
-
-  Render()
-  {
-    var c;
-
-    for (c = 1; c < this.maturity; c++)
-    {
-      this.canvas_ctx.beginPath();
-      this.canvas_ctx.lineWidth = (this.maturity - c) / 10;
-      this.canvas_ctx.moveTo(this.curve_pts[c - 1].x, this.curve_pts[c - 1].y);
-      this.canvas_ctx.lineTo(this.curve_pts[c].x, this.curve_pts[c].y);
-      this.canvas_ctx.stroke();
-    }
-  }
-
-  Grow_Maturing()
-  {
-    if (this.curr_level < this.level)
-    {
-      if (this.maturity >= 10 && !this.branches)
-        this.Add_Stem(Random(0, 0.5), 0.5, -0.5);
-
-      if (this.maturity >= 20 && this.branches.length == 1)
-        this.Add_Leaf(Random(4.7, 1));
-
-      if (this.maturity >= 50 && this.branches.length == 2)
-        this.Add_Stem(Random(0, 0.5), 0.25, 0.25);
-
-      if (this.maturity >= 90 && this.branches.length == 3)
-        this.Add_Flower(Random(0, 2));
-    }
-  }
-
-  Add_Flower(angle)
-  {
-    const plant = new Plant_Flower();
-    this.Add_Plant(angle, plant, 1 / this.Total_X_Scale(), 1 / this.Total_Y_Scale());
-  }
-
-  Add_Leaf(angle)
-  {
-    const plant = new Plant_Leaf();
-    this.Add_Plant(angle, plant, 1 / this.Total_X_Scale(), 1 / this.Total_Y_Scale());
-  }
-
-  Add_Stem(angle, x_scale, y_scale)
-  {
-    const plant = new Plant_Stem();
-    this.Add_Plant(angle, plant, x_scale, y_scale);
-  }
-
-  Add_Plant(angle, plant, x_scale, y_scale)
-  {
-    plant.x = this.curve_pts[Math.trunc(this.maturity)].x;
-    plant.y = this.curve_pts[Math.trunc(this.maturity)].y;
-    plant.x_scale = x_scale;
-    plant.y_scale = y_scale;
-    plant.angle = angle;
-    plant.maturity_rate = this.maturity_rate;
-    this.Add_Branch(plant);
-  }
-}
+  if (next_frame)
+    window.requestAnimationFrame(() => Animate(canvas_ctx, plants));
+};
