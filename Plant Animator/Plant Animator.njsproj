@@ -41,6 +41,10 @@
     <Content Include="public\index.html">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="public\sample2.html" />
+    <Content Include="public\sample1.html">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="public\lib\pa.js" />
     <Content Include="README.md" />
   </ItemGroup>
