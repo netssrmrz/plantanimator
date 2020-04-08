@@ -17,11 +17,11 @@
     #canvas
     {
       width: 100%;
-      height: 100%;
       z-index: 0;
       position: absolute;
-      left: 0px;
-      top: 0px;
+      top: 0;
+      bottom: 0;
+      margin: auto;
     }
 
     #title
@@ -56,29 +56,12 @@
       canvas_ctx.lineCap = 'round';
 
       plants = [];
-      //plants.push(New_Test_Plant(canvas_ctx));
-      
       plants.push(New_Top_Border(canvas_ctx));
       plants.push(New_Left_Border(canvas_ctx));
       plants.push(New_Bottom_Border(canvas_ctx));
       plants.push(New_Right_Border(canvas_ctx));
-      
-      Animate(canvas_ctx, plants);
-    }
 
-    function New_Test_Plant(canvas_ctx)
-    {
-      var plant = new Plant_Leaf5();
-      plant.maturity_rate = 0;
-      plant.maturity_rate = 100;
-      plant.level = 0;
-      plant.canvas_ctx = canvas_ctx;
-      plant.x = 1000;
-      plant.y = 500;
-      plant.x_scale = 10;
-      plant.y_scale = 10;
-      plant.angle = 0;
-      return plant;
+      Animate(canvas_ctx, plants);
     }
 
     function New_Top_Border(canvas_ctx)
@@ -87,11 +70,11 @@
       plant.maturity_rate = 0.25;
       plant.level = 3;
       plant.canvas_ctx = canvas_ctx;
-      plant.x = 0;
-      plant.y = 0;
+      plant.x = 500;
+      plant.y = 1000;
       plant.x_scale = 1;
-      plant.y_scale = -1;
-      plant.angle = 0.14;
+      plant.y_scale = 1;
+      plant.angle = -Math.PI/2;
       return plant;
     }
 
@@ -175,77 +158,6 @@
       }
     }
 
-    class Plant_Leaf2 extends Plant_Maturing
-    {
-      Render()
-      {
-        const size = this.maturity / 2;
-
-        this.canvas_ctx.lineWidth = 2;
-        this.canvas_ctx.beginPath();
-        this.canvas_ctx.moveTo(0, 0);
-        this.canvas_ctx.bezierCurveTo(size, size, -size, size, 0, 0);
-        this.canvas_ctx.fill();
-        this.canvas_ctx.stroke();
-      }
-    }
-
-    class Plant_Leaf3 extends Plant_Maturing
-    {
-      Render()
-      {
-        const size = this.maturity / 2;
-
-        this.canvas_ctx.lineWidth = 2;
-        this.canvas_ctx.beginPath();
-        this.canvas_ctx.moveTo(0, 0);
-        this.canvas_ctx.bezierCurveTo(0, size / 2, size / 2, size / 2, 0, size);
-        this.canvas_ctx.bezierCurveTo(-size / 2, size / 2, 0, size / 2, 0, 0);
-        this.canvas_ctx.fill();
-        this.canvas_ctx.stroke();
-      }
-    }
-
-    class Plant_Leaf4 extends Plant_Maturing
-    {
-      Render()
-      {
-        const size = this.maturity / 2;
-        const x1 = 0, y1 = 0;
-        const x2 = size / 6, y2 = size / 2;
-        const x3 = x1, y3 = size;
-        const x4 = -x2, y4 = y2;
-
-        this.canvas_ctx.lineWidth = 2;
-        this.canvas_ctx.beginPath();
-        this.canvas_ctx.moveTo(x1, y1);
-        this.canvas_ctx.bezierCurveTo(x1, y1 + size / 4, x2, y2 - size / 4, x2, y2);
-        this.canvas_ctx.bezierCurveTo(x2, y2 + size / 4, x3, y3 - size / 4, x3, y3);
-        this.canvas_ctx.bezierCurveTo(x3, y3 - size / 4, x4, y4 + size / 4, x4, y4);
-        this.canvas_ctx.bezierCurveTo(x4, y4 - size / 4, x1, y1 + size / 4, x1, y1);
-        this.canvas_ctx.fill();
-        this.canvas_ctx.stroke();
-      }
-    }
-
-    class Plant_Leaf5 extends Plant_Maturing
-    {
-      Render()
-      {
-        const size = this.maturity / 2;
-        const x1 = 0, y1 = 0;
-        const x2 = x1, y2 = size;
-
-        this.canvas_ctx.lineWidth = 2;
-        this.canvas_ctx.beginPath();
-        this.canvas_ctx.moveTo(x1, y1);
-        this.canvas_ctx.bezierCurveTo(x1 - size / 6, y1 + size / 4, x2 + size / 2, y2 - size / 4, x2, y2);
-        this.canvas_ctx.bezierCurveTo(x2 + size / 6, y2 - size / 4, x1 - size / 2, y1 + size / 4, x1, y1);
-        this.canvas_ctx.fill();
-        this.canvas_ctx.stroke();
-      }
-    }
-
     class Plant_Stem extends Plant_Maturing
     {
       constructor()
@@ -255,10 +167,10 @@
         super();
 
         x1 = 0; y1 = 0;
-        x2 = 1000; y2 = 0;
+        x2 = 800; y2 = 0;
 
-        cx1 = 200; cy1 = -250;
-        cx2 = 800; cy2 = 250;
+        cx1 = Random(200, 400); cy1 = Random(-250, 500);
+        cx2 = Random(800, 1600); cy2 = Random(250, 500);
 
         this.curve = new Bezier(
           x1, y1, cx1, cy1,
@@ -273,14 +185,14 @@
         for (c = 1; c < this.maturity; c++)
         {
           this.canvas_ctx.beginPath();
-          this.canvas_ctx.lineWidth = (this.maturity - c) / 10;
+          this.canvas_ctx.lineWidth = 3;
           this.canvas_ctx.moveTo(this.curve_pts[c - 1].x, this.curve_pts[c - 1].y);
           this.canvas_ctx.lineTo(this.curve_pts[c].x, this.curve_pts[c].y);
           this.canvas_ctx.stroke();
         }
       }
 
-      Grow_Maturing()
+      /*Grow_Maturing()
       {
         if (this.curr_level < this.level)
         {
@@ -296,7 +208,7 @@
           if (this.maturity >= 90 && this.branches.length == 3)
             this.Add_Flower(Random(0, 2));
         }
-      }
+      }*/
 
       Add_Flower(angle)
       {
@@ -306,7 +218,7 @@
 
       Add_Leaf(angle)
       {
-        const plant = new Plant_Leaf5();
+        const plant = new Plant_Leaf();
         this.Add_Plant(angle, plant, 1 / this.Total_X_Scale(), 1 / this.Total_Y_Scale());
       }
 
@@ -332,7 +244,7 @@
 </head>
 
 <body>
-  <div id="title">Floral Animation - Sample 1</div>
+  <div id="title">Floral Animation - Sample 2</div>
   <canvas id="canvas" width="2000" height="1000"></canvas>
 </body>
 

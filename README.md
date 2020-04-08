@@ -1,2 +1,5 @@
-# plantanimator
-Animates the growth of a plant for purely aesthetic purposes.
+﻿# Plant Animator
+
+To run
+- npm start
+- Browse to http://localhost:3000/

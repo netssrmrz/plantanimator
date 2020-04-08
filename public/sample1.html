@@ -1,0 +1,152 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Plant Animator</title>
+  <style>
+    html, body
+    {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #fff;
+    }
+
+    #canvas
+    {
+      width: 100%;
+      z-index: 0;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      margin: auto;
+    }
+
+    #title
+    {
+      width: 1000px;
+      height: 100px;
+      text-align: center;
+      font-size: 60px;
+      color: #aaa;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: auto;
+    }
+  </style>
+  <script type="module">
+    import * as pl from "./lib/pa.js";
+    import { Bezier } from "./lib/bezierjs/bezier.js";
+
+    //const testing = true;
+    const testing = false;
+
+    window.onload = Main;
+    function Main()
+    {
+      var c, plant, plants, canvas, canvas_ctx;
+
+      canvas = document.getElementById("canvas");
+      canvas_ctx = canvas.getContext("2d");
+      canvas_ctx.strokeStyle = "#aaa";
+      canvas_ctx.fillStyle = "#fff";
+      canvas_ctx.lineWidth = 4;
+      canvas_ctx.lineCap = 'round';
+      canvas_ctx.lineJoin = 'round';
+
+      plants = [];
+      if (testing)
+        plants.push(New_Test_Plant(new Plant_Branch(), canvas_ctx));
+      else
+      {
+        plants.push(New_Top_Border(canvas_ctx));
+        plants.push(New_Left_Border(canvas_ctx));
+        plants.push(New_Bottom_Border(canvas_ctx));
+        plants.push(New_Right_Border(canvas_ctx));
+      }
+      pl.Animate(canvas_ctx, plants);
+    }
+
+    function New_Test_Plant(plant, canvas_ctx)
+    {
+      plant.maturity_rate = 0;
+      plant.maturity_rate = 100;
+      plant.level = 0;
+      plant.canvas_ctx = canvas_ctx;
+      plant.x = 1000;
+      plant.y = 750;
+      plant.x_scale = 1;
+      plant.y_scale = -1;
+      plant.angle = 0;
+      return plant;
+    }
+
+    function New_Top_Border(canvas_ctx)
+    {
+      var plant = new pl.Plant1();
+      plant.maturity_rate = 1;
+      plant.level = 3;
+      plant.canvas_ctx = canvas_ctx;
+      plant.x = 0;
+      plant.y = 0;
+      plant.x_scale = 1;
+      plant.y_scale = -1;
+      plant.angle = 0.14;
+      return plant;
+    }
+
+    function New_Bottom_Border(canvas_ctx)
+    {
+      var plant = new pl.Plant1();
+      plant.maturity_rate = 1;
+      plant.level = 3;
+      plant.canvas_ctx = canvas_ctx;
+      plant.x = 2000;
+      plant.y = 1000;
+      plant.x_scale = -1;
+      plant.y_scale = 1;
+      plant.angle = 0.14;
+      return plant;
+    }
+
+    function New_Left_Border(canvas_ctx)
+    {
+      var plant = new pl.Plant1();
+      plant.maturity_rate = 1;
+      plant.level = 4;
+      plant.canvas_ctx = canvas_ctx;
+      plant.x = 0;
+      plant.y = 0;
+      plant.x_scale = -1;
+      plant.y_scale = -1;
+      plant.angle = -1.7;
+      return plant;
+    }
+
+    function New_Right_Border(canvas_ctx)
+    {
+      var plant = new pl.Plant1();
+      plant.maturity_rate = 1;
+      plant.level = 4;
+      plant.canvas_ctx = canvas_ctx;
+      plant.x = 2000;
+      plant.y = 1000;
+      plant.x_scale = 1;
+      plant.y_scale = 1;
+      plant.angle = -1.7;
+      return plant;
+    }
+  </script>
+</head>
+
+<body>
+  <div id="title">Floral Animation - Sample 1</div>
+  <canvas id="canvas" width="2000" height="1000"></canvas>
+</body>
+
+  </html>
