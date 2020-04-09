@@ -41,10 +41,6 @@
   </style>
   <script type="module">
     import * as pl from "./lib/pa.js";
-    import { Bezier } from "./lib/bezierjs/bezier.js";
-
-    //const testing = true;
-    const testing = false;
 
     window.onload = Main;
     function Main()
@@ -60,30 +56,11 @@
       canvas_ctx.lineJoin = 'round';
 
       plants = [];
-      if (testing)
-        plants.push(New_Test_Plant(new Plant_Branch(), canvas_ctx));
-      else
-      {
-        plants.push(New_Top_Border(canvas_ctx));
-        plants.push(New_Left_Border(canvas_ctx));
-        plants.push(New_Bottom_Border(canvas_ctx));
-        plants.push(New_Right_Border(canvas_ctx));
-      }
+      plants.push(New_Top_Border(canvas_ctx));
+      plants.push(New_Left_Border(canvas_ctx));
+      plants.push(New_Bottom_Border(canvas_ctx));
+      plants.push(New_Right_Border(canvas_ctx));
       pl.Animate(canvas_ctx, plants);
-    }
-
-    function New_Test_Plant(plant, canvas_ctx)
-    {
-      plant.maturity_rate = 0;
-      plant.maturity_rate = 100;
-      plant.level = 0;
-      plant.canvas_ctx = canvas_ctx;
-      plant.x = 1000;
-      plant.y = 750;
-      plant.x_scale = 1;
-      plant.y_scale = -1;
-      plant.angle = 0;
-      return plant;
     }
 
     function New_Top_Border(canvas_ctx)

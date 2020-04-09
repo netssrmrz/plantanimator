@@ -1,0 +1,247 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Plant Animator</title>
+  <style>
+    html, body
+    {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #fff;
+    }
+
+    #canvas
+    {
+      width: 100%;
+      z-index: 0;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      margin: auto;
+    }
+
+    #title
+    {
+      width: 1000px;
+      height: 100px;
+      text-align: center;
+      font-size: 60px;
+      color: #aaa;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: auto;
+    }
+  </style>
+  <script type="module">
+    import * as pl from "./lib/pa.js";
+    import { Bezier } from "./lib/bezierjs/bezier.js";
+
+    const testing = true;
+    //const testing = false;
+
+    window.onload = Main;
+    function Main()
+    {
+      var c, plant, plants, canvas, canvas_ctx;
+
+      canvas = document.getElementById("canvas");
+      canvas_ctx = canvas.getContext("2d");
+      canvas_ctx.strokeStyle = "#aaa";
+      canvas_ctx.fillStyle = "#fff";
+      canvas_ctx.lineWidth = 4;
+      canvas_ctx.lineCap = 'round';
+      canvas_ctx.lineJoin = 'round';
+
+      plants = [];
+      if (testing)
+        plants.push(New_Test_Plant(new Plant_Branch(), canvas_ctx));
+      else
+      {
+        plants.push(New_Top_Border(canvas_ctx));
+        plants.push(New_Left_Border(canvas_ctx));
+        plants.push(New_Bottom_Border(canvas_ctx));
+        plants.push(New_Right_Border(canvas_ctx));
+      }
+      pl.Animate(canvas_ctx, plants);
+    }
+
+    function New_Test_Plant(plant, canvas_ctx)
+    {
+      plant.maturity_rate = 0;
+      plant.maturity_rate = 100;
+      plant.level = 0;
+      plant.canvas_ctx = canvas_ctx;
+      plant.x = 1000;
+      plant.y = 750;
+      plant.x_scale = 1;
+      plant.y_scale = -1;
+      plant.angle = 0;
+      return plant;
+    }
+
+    function New_Top_Border(canvas_ctx)
+    {
+      var plant = new pl.Plant1();
+      plant.maturity_rate = 1;
+      plant.level = 3;
+      plant.canvas_ctx = canvas_ctx;
+      plant.x = 0;
+      plant.y = 0;
+      plant.x_scale = 1;
+      plant.y_scale = -1;
+      plant.angle = 0.14;
+      return plant;
+    }
+
+    function New_Bottom_Border(canvas_ctx)
+    {
+      var plant = new pl.Plant1();
+      plant.maturity_rate = 1;
+      plant.level = 3;
+      plant.canvas_ctx = canvas_ctx;
+      plant.x = 2000;
+      plant.y = 1000;
+      plant.x_scale = -1;
+      plant.y_scale = 1;
+      plant.angle = 0.14;
+      return plant;
+    }
+
+    function New_Left_Border(canvas_ctx)
+    {
+      var plant = new pl.Plant1();
+      plant.maturity_rate = 1;
+      plant.level = 4;
+      plant.canvas_ctx = canvas_ctx;
+      plant.x = 0;
+      plant.y = 0;
+      plant.x_scale = -1;
+      plant.y_scale = -1;
+      plant.angle = -1.7;
+      return plant;
+    }
+
+    function New_Right_Border(canvas_ctx)
+    {
+      var plant = new pl.Plant1();
+      plant.maturity_rate = 1;
+      plant.level = 4;
+      plant.canvas_ctx = canvas_ctx;
+      plant.x = 2000;
+      plant.y = 1000;
+      plant.x_scale = 1;
+      plant.y_scale = 1;
+      plant.angle = -1.7;
+      return plant;
+    }
+
+    class xPlant_Branch extends Plant_Maturing
+{
+  constructor()
+  {
+    var x1, y1, x2, y2, cx1, cy1, cx2, cy2;
+
+    super();
+
+    x1 = 0; y1 = 0;
+    x2 = 0; y2 = 50;
+
+    cx1 = 10; cy1 = y2/2;
+    cx2 = -cx1; cy2 = y2-cy1;
+
+    this.curve = new Bezier(x1, y1, cx1, cy1, cx2, cy2, x2, y2);
+    this.curve_pts = this.curve.getLUT(100);
+  }
+
+  Render()
+  {
+    var c;
+
+    this.canvas_ctx.lineWidth = 2;
+    this.canvas_ctx.beginPath();
+    this.canvas_ctx.moveTo(this.curve_pts[0].x, this.curve_pts[0].y);
+    for (c = 1; c < this.maturity; c++)
+    {
+      this.canvas_ctx.lineTo(this.curve_pts[c].x, this.curve_pts[c].y);
+    }
+    this.canvas_ctx.stroke();
+  }
+
+  Grow_Maturing()
+  {
+    if (this.maturity == 100)
+    {
+      const plant = new pl.Plant_Leaf3();
+      const xs = 1 / this.Total_X_Scale(), ys = Math.abs(1 / this.Total_Y_Scale());
+
+      this.Add_Plant(-0.5, plant, xs, ys);
+    }
+    /*if (this.curr_level < this.level)
+    {
+      if (this.maturity >= 10 && !this.branches)
+        this.Add_Stem(Random(0, 0.5), 0.5, -0.5);
+
+      if (this.maturity >= 20 && this.branches.length == 1)
+        this.Add_Leaf(Random(4.7, 1));
+
+      if (this.maturity >= 50 && this.branches.length == 2)
+        this.Add_Stem(Random(0, 0.5), 0.25, 0.25);
+
+      if (this.maturity >= 90 && this.branches.length == 3)
+        this.Add_Flower(Random(0, 2));
+    }*/
+  }
+
+  Add_Leaf(angle)
+  {
+    const plant = new pl.Plant_Leaf5();
+    this.Add_Plant(angle, plant, 1 / this.Total_X_Scale(), 1 / this.Total_Y_Scale());
+  }
+
+  Add_Stem(angle, x_scale, y_scale)
+  {
+    const plant = new Plant_Stem();
+    this.Add_Plant(angle, plant, x_scale, y_scale);
+  }
+
+  Add_Plant(angle, plant, x_scale, y_scale)
+  {
+    plant.x = Get_Point(this.curve_pts, this.maturity).x;
+    plant.y = Get_Point(this.curve_pts, this.maturity).y;
+    plant.x_scale = x_scale;
+    plant.y_scale = y_scale;
+    plant.angle = angle;
+    plant.maturity_rate = this.maturity_rate;
+    this.Add_Branch(plant);
+  }
+}
+
+function xGet_Point(pts, p)
+{
+  var res = null; 
+  
+  if (p < 0)
+    res = pts[0];
+  else if (p >= 100)
+    res = pts[pts.length - 1];
+  else
+    res = pts[Math.trunc(p)];
+
+  return res;
+}
+  </script>
+</head>
+
+<body>
+  <div id="title">Floral Animation - Sample 1</div>
+  <canvas id="canvas" width="2000" height="1000"></canvas>
+</body>
+
+  </html>
