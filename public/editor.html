@@ -1,93 +1,207 @@
 ﻿<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-  <meta charset="utf-8" />
-  <title>Plant Animator - Home</title>
-  <style>
-    canvas
-    {
-      border: 4px solid #eee;
-      margin-right: 3px;
-      padding: 3px;
-    }
-  </style>
-  <script type="module">
-    import * as pl from "./lib/pa.js";
+  <head>
+    <meta charset="utf-8" />
+    <title>Plant Animator - Home</title>
+    <style>
+      canvas
+      {
+        border: 4px solid #eee;
+        margin-right: 3px;
+        padding: 3px;
+      }
 
-    window.onload = Main;
+      #plant_props_div
+      {
+        display: none;
+      }
 
-    function Main()
-    {
-      var c, plant, plants, canvas, canvas_ctx;
+      #palette_div
+      {
+        display: none;
+      }
+    </style>
+    <script type="module">
+      import * as pl from "./lib/pa.js";
 
-      New_Plant("Plant_Flower").Render_All();
-      New_Plant("Plant_Flower2").Render_All();
-      New_Plant("Plant_Flower3").Render_All();
-      New_Plant("Plant_Flower4").Render_All();
-      New_Plant("Plant_Flower5").Render_All();
-      New_Plant("Plant_Flower6").Render_All();
-      New_Plant("Plant_Flower7").Render_All();
-      New_Plant("Plant_Flower8").Render_All();
-      New_Plant("Plant_Flower9").Render_All();
-      New_Plant("Plant_Flower10").Render_All();
-      New_Plant("Plant_Flower11").Render_All();
-      New_Plant("Plant_Flower12").Render_All();
-      New_Plant("Plant_Leaf").Render_All();
-      New_Plant("Plant_Leaf2").Render_All();
-      New_Plant("Plant_Leaf3").Render_All();
-      New_Plant("Plant_Leaf4").Render_All();
-      New_Plant("Plant_Leaf5").Render_All();
-      New_Plant("Plant_Leaf6").Render_All();
-      New_Plant("Plant_Leaf7").Render_All();
-      New_Plant("Plant_Leaf8").Render_All();
-      New_Plant("Plant_Leaf9").Render_All();
-    }
+      const plants = [];
+      window.onload = Main;
 
-    function Init_Canvas(class_name)
-    {
-      const canvas = document.createElement("canvas");
-      canvas.id = class_name + "_canvas";
-      canvas.width = "200";
-      canvas.height = "200";
-      document.body.appendChild(canvas);
+      function Main()
+      {
+        var c, plant, plants, canvas, canvas_ctx;
 
-      const canvas_ctx = canvas.getContext("2d");
+        document.getElementById("new_plant_btn").onclick=OnClick_New_Plant;
+        document.getElementById("new_plant_ok_btn").onclick=OnClick_New_Plant_Ok;
+        document.getElementById("new_plant_cancel_btn").onclick=OnClick_New_Plant_Cancel;
 
-      canvas_ctx.font = "12px sans-serif";
-      canvas_ctx.strokeText(class_name, 10, 20);
+        New_Plant("Plant_Flower").Render_All();
+        New_Plant("Plant_Flower2").Render_All();
+        New_Plant("Plant_Flower3").Render_All();
+        New_Plant("Plant_Flower4").Render_All();
+        New_Plant("Plant_Flower5").Render_All();
+        New_Plant("Plant_Flower6").Render_All();
+        New_Plant("Plant_Flower7").Render_All();
+        New_Plant("Plant_Flower8").Render_All();
+        New_Plant("Plant_Flower9").Render_All();
+        New_Plant("Plant_Flower10").Render_All();
+        New_Plant("Plant_Flower11").Render_All();
+        New_Plant("Plant_Flower12").Render_All();
+        New_Plant("Plant_Leaf").Render_All();
+        New_Plant("Plant_Leaf2").Render_All();
+        New_Plant("Plant_Leaf3").Render_All();
+        New_Plant("Plant_Leaf4").Render_All();
+        New_Plant("Plant_Leaf5").Render_All();
+        New_Plant("Plant_Leaf6").Render_All();
+        New_Plant("Plant_Leaf7").Render_All();
+        New_Plant("Plant_Leaf8").Render_All();
+        New_Plant("Plant_Leaf9").Render_All();
+      }
 
-      canvas_ctx.strokeStyle = "#aaa";
-      canvas_ctx.fillStyle = "#fff";
-      canvas_ctx.lineWidth = 4;
-      canvas_ctx.lineCap = 'round';
-      canvas_ctx.lineJoin = 'round';
+      function Init_Canvas(class_name)
+      {
+        const canvas = document.createElement("canvas");
+        canvas.id = class_name + "_canvas";
+        canvas.width = "200";
+        canvas.height = "200";
+        document.getElementById("palette_div").appendChild(canvas);
 
-      return canvas_ctx;
-    }
+        const canvas_ctx = canvas.getContext("2d");
 
-    function New_Plant(class_name)
-    {
-      var plant = new pl[class_name];
-      plant.maturity_rate = 1;
-      plant.maturity = 100;
-      plant.level = 1;
-      plant.canvas_ctx = Init_Canvas(class_name);
-      plant.x = 100;
-      plant.y = 100;
-      plant.x_scale = 1;
-      plant.y_scale = -1;
-      plant.angle = 0;
-      return plant;
-    }
-  </script>
-</head>
-<body>
+        canvas_ctx.font = "12px sans-serif";
+        canvas_ctx.strokeText(class_name, 10, 20);
 
-</body>
-<ul>
-  <li><a href="editor.html">Editor</a></li>
-  <li><a href="sample1.html">Sample 1</a></li>
-  <li><a href="sample2.html">Sample 2</a></li>
-</ul>
+        canvas_ctx.strokeStyle = "#aaa";
+        canvas_ctx.fillStyle = "#fff";
+        canvas_ctx.lineWidth = 4;
+        canvas_ctx.lineCap = 'round';
+        canvas_ctx.lineJoin = 'round';
+
+        return canvas_ctx;
+      }
+
+      function New_Plant(class_name)
+      {
+        var plant = new pl[class_name];
+        plant.maturity_rate = 1;
+        plant.maturity = 100;
+        plant.level = 1;
+        plant.canvas_ctx = Init_Canvas(class_name);
+        plant.x = 100;
+        plant.y = 100;
+        plant.x_scale = 1;
+        plant.y_scale = -1;
+        plant.angle = 0;
+        return plant;
+      }
+
+      // button bar ===============================================================================
+
+      function OnClick_New_Plant()
+      {
+        document.getElementById("plant_class").value = "Plant";
+        document.getElementById("plant_x_pos").value = 0;
+        document.getElementById("plant_y_pos").value = 0;
+        document.getElementById("plant_x_scale").value = 1;
+        document.getElementById("plant_y_scale").value = 1;
+        document.getElementById("angle").value = 0;
+        New_Plant_Show();
+      }
+
+      // new plant dialog =========================================================================
+
+      function OnClick_New_Plant_Ok()
+      {
+        var plant = new pl[class_name];
+        plant.maturity_rate = 1;
+        plant.maturity = 100;
+        plant.level = 1;
+        plant.canvas_ctx = Init_Canvas(class_name);
+        plant.x = 100;
+        plant.y = 100;
+        plant.x_scale = 1;
+        plant.y_scale = -1;
+        plant.angle = 0;
+        New_Plant_Hide();
+      }
+
+      function OnClick_New_Plant_Cancel()
+      {
+        New_Plant_Hide();
+      }
+
+      function New_Plant_Hide()
+      {
+        document.getElementById("plant_props_div").style.display = "none";
+      }
+
+      function New_Plant_Show()
+      {
+        document.getElementById("plant_props_div").style.display = "block";
+      }
+    </script>
+
+    <script type="module">
+      import {LitElement, html} from "./lib/lit-element/lit-element.js";
+      
+      class MyElement extends LitElement 
+      {
+        render() 
+        {
+          return html`<div>yo</div>`;
+        }
+      }
+  
+      customElements.define('my-element', MyElement);
+    </script>
+  </head>
+
+  <body>
+
+    <my-element></my-element>
+    <canvas id="main_canvas" width="1000" height="1000"></canvas>
+
+    <div id="">
+      <button id="new_plant_btn">New</button>
+      <button>Edit</button>
+      <button>Delete</button>
+      <ul></ul>
+    </div>
+
+    <div id="plant_props_div">
+      <div>
+        <div>Class</div>
+        <div><input id="plant_class" type="text"></div>
+      </div>
+      <div>
+        <div>X Position</div>
+        <div><input id="plant_x_pos" type="number"></div>
+      </div>
+      <div>
+        <div>Y Position</div>
+        <div><input id="plant_y_pos" type="number"></div>
+      </div>
+      <div>
+        <div>X Scale</div>
+        <div><input id="plant_x_scale" type="number"></div>
+      </div>
+      <div>
+        <div>Y Scale</div>
+        <div><input id="plant_y_scale" type="number"></div>
+      </div>
+      <div>
+        <div>Angle</div>
+        <div><input id="angle" type="number"></div>
+      </div>
+      <div>
+        <button id="new_plant_ok_btn">Ok</button>
+        <button id="new_plant_cancel_btn">Cancel</button>
+      </div>
+    </div>
+
+    <div id="palette_div">
+    </div>
+
+  </body>
 </html>
