@@ -33,8 +33,6 @@
         var c, plant, plants, canvas, canvas_ctx;
 
         document.getElementById("new_plant_btn").onclick=OnClick_New_Plant;
-        document.getElementById("new_plant_ok_btn").onclick=OnClick_New_Plant_Ok;
-        document.getElementById("new_plant_cancel_btn").onclick=OnClick_New_Plant_Cancel;
 
         New_Plant("Plant_Flower").Render_All();
         New_Plant("Plant_Flower2").Render_All();
@@ -100,66 +98,124 @@
 
       function OnClick_New_Plant()
       {
-        document.getElementById("plant_class").value = "Plant";
-        document.getElementById("plant_x_pos").value = 0;
-        document.getElementById("plant_y_pos").value = 0;
-        document.getElementById("plant_x_scale").value = 1;
-        document.getElementById("plant_y_scale").value = 1;
-        document.getElementById("angle").value = 0;
-        New_Plant_Show();
+        const dlg = document.getElementById("plant_props_dlg")
+        dlg.plant_class = "Plant";
+        dlg.plant_x_pos = 0;
+        dlg.plant_y_pos = 0;
+        dlg.plant_x_scale = 1;
+        dlg.plant_y_scale = 1;
+        dlg.plant_angle = 0;
+        dlg.onclick_ok = OnClick_New_Plant_Ok;
+        dlg.Show();
       }
 
-      // new plant dialog =========================================================================
-
-      function OnClick_New_Plant_Ok()
+      function OnClick_New_Plant_Ok(plant)
       {
-        var plant = new pl[class_name];
-        plant.maturity_rate = 1;
-        plant.maturity = 100;
-        plant.level = 1;
-        plant.canvas_ctx = Init_Canvas(class_name);
-        plant.x = 100;
-        plant.y = 100;
-        plant.x_scale = 1;
-        plant.y_scale = -1;
-        plant.angle = 0;
-        New_Plant_Hide();
-      }
-
-      function OnClick_New_Plant_Cancel()
-      {
-        New_Plant_Hide();
-      }
-
-      function New_Plant_Hide()
-      {
-        document.getElementById("plant_props_div").style.display = "none";
-      }
-
-      function New_Plant_Show()
-      {
-        document.getElementById("plant_props_div").style.display = "block";
+        plants.push(plant);
+        // render list
       }
     </script>
 
     <script type="module">
-      import {LitElement, html} from "./lib/lit-element/lit-element.js";
-      
-      class MyElement extends LitElement 
+      import {LitElement, html, css} from "./lib/lit-element/lit-element.js";
+      import * as pl from "./lib/pa.js";
+
+      class Plant_Props_Dialog extends LitElement 
       {
+        OnClick_Ok()
+        {
+          var plant = new pl[this.plant_class];
+          plant.maturity_rate = 1;
+          plant.maturity = 100;
+          plant.level = 1;
+          //plant.canvas_ctx = Init_Canvas(class_name);
+          plant.x = this.plant_x_pos;
+          plant.y = this.plant_y_pos;
+          plant.x_scale = this.plant_x_scale;
+          plant.y_scale = this.plant_y_scale;
+          plant.angle = this.plant_angle;
+          this.Hide();
+          this.onclick_ok(plant);
+        }
+
+        OnClick_Cancel()
+        {
+          this.Hide();
+        }
+
+        Hide()
+        {
+          this.style.display = "none";
+        }
+
+        Show()
+        {
+          this.style.display = "block";
+        }
+
+        static get properties()
+        {
+          return { 
+            plant_class: { type: String },
+            plant_x_pos: { type: Number },
+            plant_y_pos: { type: Number },
+            plant_x_scale: { type: Number },
+            plant_y_scale: { type: Number },
+            plant_angle: { type: Number }
+          };
+        }
+
+        static get styles()
+        {
+          return css`
+            :host
+            {
+              display: none;
+            }
+            `;
+        }
+
         render() 
         {
-          return html`<div>yo</div>`;
+          return html`
+            <div>
+              <div>Class</div>
+              <div><input id="plant_class" type="text" value="${this.plant_class}"></div>
+            </div>
+            <div>
+              <div>X Position</div>
+              <div><input id="plant_x_pos" type="number" value="${this.plant_x_pos}"></div>
+            </div>
+            <div>
+              <div>Y Position</div>
+              <div><input id="plant_y_pos" type="number" value="${this.plant_y_pos}"></div>
+            </div>
+            <div>
+              <div>X Scale</div>
+              <div><input id="plant_x_scale" type="number" value="${this.plant_x_scale}"></div>
+            </div>
+            <div>
+              <div>Y Scale</div>
+              <div><input id="plant_y_scale" type="number" value="${this.plant_y_scale}"></div>
+            </div>
+            <div>
+              <div>Angle</div>
+              <div><input id="plant_angle" type="number" value="${this.plant_angle}"></div>
+            </div>
+            <div>
+              <button id="new_plant_ok_btn" @click="${this.OnClick_Ok}">Ok</button>
+              <button id="new_plant_cancel_btn" @click="${this.OnClick_Cancel}">Cancel</button>
+            </div>
+            `;
         }
       }
   
-      customElements.define('my-element', MyElement);
+      customElements.define('plant-props-dlg', Plant_Props_Dialog);
     </script>
   </head>
 
   <body>
 
-    <my-element></my-element>
     <canvas id="main_canvas" width="1000" height="1000"></canvas>
 
     <div id="">
@@ -169,36 +225,7 @@
       <ul></ul>
     </div>
 
-    <div id="plant_props_div">
-      <div>
-        <div>Class</div>
-        <div><input id="plant_class" type="text"></div>
-      </div>
-      <div>
-        <div>X Position</div>
-        <div><input id="plant_x_pos" type="number"></div>
-      </div>
-      <div>
-        <div>Y Position</div>
-        <div><input id="plant_y_pos" type="number"></div>
-      </div>
-      <div>
-        <div>X Scale</div>
-        <div><input id="plant_x_scale" type="number"></div>
-      </div>
-      <div>
-        <div>Y Scale</div>
-        <div><input id="plant_y_scale" type="number"></div>
-      </div>
-      <div>
-        <div>Angle</div>
-        <div><input id="angle" type="number"></div>
-      </div>
-      <div>
-        <button id="new_plant_ok_btn">Ok</button>
-        <button id="new_plant_cancel_btn">Cancel</button>
-      </div>
-    </div>
+    <plant-props-dlg id="plant_props_dlg"></plant-props-dlg>
 
     <div id="palette_div">
     </div>

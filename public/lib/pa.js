@@ -2,7 +2,7 @@
 
 // Base Classes ===================================================================================
 
-class Plant
+export class Plant
 {
   constructor()
   {
