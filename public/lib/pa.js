@@ -6,7 +6,7 @@ class Plant
 {
   constructor()
   {
-    this.curr_level = 0;
+    this.curr_depth = 0;
     this.canvas_ctx = null;
     this.branches = null;
     this.x = 0;
@@ -66,8 +66,8 @@ class Plant
   Add_Branch(plant)
   {
     plant.canvas_ctx = this.canvas_ctx;
-    plant.level = this.level;
-    plant.curr_level = this.curr_level + 1;
+    plant.max_depth = this.max_depth;
+    plant.curr_depth = this.curr_depth + 1;
     plant.parent = this;
 
     if (!this.branches)
@@ -114,7 +114,7 @@ class Plant
   Reset()
   {
     this.branches = null;
-    this.curr_level = 0;
+    this.curr_depth = 0;
   }
 
   Get_X_Scale()
@@ -163,6 +163,116 @@ export class Plant_Maturing extends Plant
 
   Grow_Maturing()
   {
+  }
+}
+
+export class Plant_Maturing2 extends Plant
+{
+  constructor()
+  {
+    super();
+    this.maturity = 0;
+    this.maturity_rate = 1;
+  }
+
+  Init_Branches()
+  {
+  }
+
+  Grow_All()
+  {
+    var res = false, branch_res, c, branch;
+
+    res = this.Grow();
+
+    if (this.branches)
+      for (c = 0; c < this.branches.length; c++)
+      {
+        branch = this.branches[c];
+        if (!branch.render && this.maturity>=branch.sprout_time)
+        {
+          branch.render = true;
+        }
+        if (branch.render)
+        {
+          branch_res = this.branches[c].Grow_All();
+          res = res || branch_res;
+        }
+      }
+
+    return res;
+  }
+
+  Grow()
+  {
+    var res = false;
+
+    if (this.maturity < 100)
+    {
+      this.maturity += this.maturity_rate;
+      if (this.maturity > 100)
+        this.maturity = 100;
+
+      this.Grow_Maturing();
+
+      res = true;
+    }
+
+    return res;
+  }
+
+  Grow_Maturing()
+  {
+  }
+
+  Render_All()
+  {
+    var branch, c;
+
+    if (!this.init)
+    {
+      this.Init_Branches();
+      this.init = true;
+    }
+
+    this.canvas_ctx.save();
+    this.canvas_ctx.translate(this.x, this.y);
+    this.canvas_ctx.rotate(this.angle);
+    this.canvas_ctx.scale(this.Get_X_Scale(), this.Get_Y_Scale());
+
+    this.Render();
+    if (this.branches)
+      for (c = 0; c < this.branches.length; c++)
+      {
+        branch = this.branches[c];
+        if (branch.render)
+        {
+          branch.Render_All();
+        }
+      }
+
+    this.canvas_ctx.restore();
+  }
+
+  Add_Plant_No_Scale(sprout_time, angle, plant)
+  {
+    this.Add_Plant(sprout_time, angle, plant, 1 / this.Total_X_Scale(), 1 / this.Total_Y_Scale())
+  }
+
+  Add_Plant(sprout_time, angle, plant, x_scale, y_scale)
+  {
+    if (this.curr_depth < this.max_depth)
+    {
+      plant.sprout_time = sprout_time;
+      plant.render = false;
+      plant.x = this.curve_pts[Math.trunc(plant.sprout_time)].x;
+      plant.y = this.curve_pts[Math.trunc(plant.sprout_time)].y;
+      plant.x_scale = x_scale;
+      plant.y_scale = y_scale;
+      plant.angle = angle;
+      plant.maturity_rate = this.maturity_rate;
+      this.Add_Branch(plant);
+    }
   }
 }
 
@@ -696,7 +806,7 @@ export class Plant1 extends Plant_Maturing
 
   Grow_Maturing()
   {
-    if (this.curr_level < this.level)
+    if (this.curr_depth < this.max_depth)
     {
       if (this.maturity >= 10 && !this.branches)
         this.Add_Stem(Random(0, 0.5), 0.5, -0.5);
@@ -739,6 +849,49 @@ export class Plant1 extends Plant_Maturing
     plant.angle = angle;
     plant.maturity_rate = this.maturity_rate;
     this.Add_Branch(plant);
+  }
+}
+
+export class Plant2 extends Plant_Maturing2
+{
+  constructor()
+  {
+    var x1, y1, x2, y2, cx1, cy1, cx2, cy2;
+
+    super();
+
+    x1 = 0; y1 = 0;
+    x2 = 1000; y2 = 0;
+
+    cx1 = 200; cy1 = -250;
+    cx2 = 800; cy2 = 250;
+
+    this.curve = new Bezier(
+      x1, y1, cx1, cy1,
+      cx2, cy2, x2, y2);
+    this.curve_pts = this.curve.getLUT(100);
+  }
+
+  Init_Branches()
+  {
+    this.Add_Plant(10, Random(0, 0.5), new Plant2(), 0.5, -0.5);
+    this.Add_Plant_No_Scale(20, Random(4.7, 1), new Plant_Leaf5());
+    this.Add_Plant(50, Random(0, 0.5), new Plant2(), 0.25, 0.25);
+    this.Add_Plant_No_Scale(90, Random(0, 2), new Plant_Flower3());
+  }
+
+  Render()
+  {
+    var c;
+
+    for (c = 1; c < this.maturity; c++)
+    {
+      this.canvas_ctx.beginPath();
+      this.canvas_ctx.lineWidth = (this.maturity - c) / 10;
+      this.canvas_ctx.moveTo(this.curve_pts[c - 1].x, this.curve_pts[c - 1].y);
+      this.canvas_ctx.lineTo(this.curve_pts[c].x, this.curve_pts[c].y);
+      this.canvas_ctx.stroke();
+    }
   }
 }
 
