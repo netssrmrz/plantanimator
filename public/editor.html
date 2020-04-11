@@ -25,14 +25,15 @@
     <script type="module">
       import * as pl from "./lib/pa.js";
 
-      const plants = [];
       window.onload = Main;
 
       function Main()
       {
-        var c, plant, plants, canvas, canvas_ctx;
-
         document.getElementById("new_plant_btn").onclick=OnClick_New_Plant;
+        document.getElementById("edit_plant_btn").onclick=OnClick_Edit_Plant;
+        document.getElementById("del_plant_btn").onclick=OnClick_Del_Plants;
+        document.getElementById("plant_props_dlg").onclick_new_ok = OnClick_New_Plant_Ok;
+        document.getElementById("plant_props_dlg").onclick_edit_ok = OnClick_Edit_Plant_Ok;
 
         New_Plant("Plant_Flower").Render_All();
         New_Plant("Plant_Flower2").Render_All();
@@ -99,48 +100,301 @@
       function OnClick_New_Plant()
       {
         const dlg = document.getElementById("plant_props_dlg")
-        dlg.plant_class = "Plant";
-        dlg.plant_x_pos = 0;
-        dlg.plant_y_pos = 0;
-        dlg.plant_x_scale = 1;
-        dlg.plant_y_scale = 1;
-        dlg.plant_angle = 0;
-        dlg.onclick_ok = OnClick_New_Plant_Ok;
+        dlg.New();
         dlg.Show();
+      }
+
+      function OnClick_Edit_Plant()
+      {
+        const plant_list = document.getElementById("plant_list");
+        const dlg = document.getElementById("plant_props_dlg")
+        dlg.Edit(plant_list.Get_Selected_Plant());
+        dlg.Show();
+      }
+
+      function OnClick_Del_Plants()
+      {
+        const plant_list = document.getElementById("plant_list");
+        plant_list.Del_Plants(plant_list.Get_Selected_Plants());
+        document.getElementById("editor_canvas").Render_Plants();
       }
 
       function OnClick_New_Plant_Ok(plant)
       {
-        plants.push(plant);
-        // render list
+        document.getElementById("plant_list").Add_Plant(plant);
+        document.getElementById("editor_canvas").Render_Plants();
+      }
+
+      function OnClick_Edit_Plant_Ok(plant)
+      {
+        document.getElementById("plant_list").Edit_Plant(plant);
+        document.getElementById("editor_canvas").Render_Plants();
       }
     </script>
 
+    <!-- Editor_Canvas ============================================================================-->
+    <script type="module">
+      import {LitElement, html, css} from "./lib/lit-element/lit-element.js";
+
+      class Editor_Canvas extends LitElement
+      {
+        constructor()
+        {
+          super();
+          this.plant_list_id = null;
+        }
+        
+        firstUpdated(changedProperties)
+        {
+          this.canvas = this.shadowRoot.getElementById("main_canvas");
+          this.ctx = this.canvas.getContext("2d");
+
+          if (this.plant_list_id)
+          {
+            this.plant_list = document.getElementById(this.plant_list_id);
+          }
+        }
+
+        Render_Plants()
+        {
+          let plant;
+
+          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+          if (this.plant_list && this.plant_list.plants.length>0)
+          {
+            for (let i=0; i<this.plant_list.plants.length; i++)
+            {
+              plant = this.plant_list.plants[i];
+              this.Render_Plant(plant);
+            }
+          }
+        }
+
+        Render_Plant(plant)
+        {
+          let sqr_size, btn_size, x, y;
+
+          this.ctx.save();
+          this.ctx.translate(plant.x, plant.y);
+          this.ctx.rotate(plant.angle);
+          this.ctx.scale(plant.x_scale, plant.y_scale);
+
+          sqr_size = 50;
+          x = -(sqr_size/2);
+          y = -(sqr_size/2);
+          this.ctx.strokeRect(x, y, sqr_size, sqr_size);
+
+          // scale btn
+          btn_size = 10;
+          x = (sqr_size/2)-btn_size;
+          y = -(sqr_size/2);
+          this.ctx.strokeRect(x, y, btn_size, btn_size);
+
+          // rotate btn
+          btn_size = 10;
+          x = (sqr_size/2)-btn_size;
+          y = -(btn_size/2);
+          this.ctx.strokeRect(x, y, btn_size, btn_size);
+
+          // translate btn
+          btn_size = 10;
+          x = -(btn_size/2);
+          y = -(btn_size/2);
+          this.ctx.strokeRect(x, y, btn_size, btn_size);
+
+          this.ctx.restore();
+        }
+
+        static get properties()
+        {
+          return {plant_list_id: {type: String}};
+        }
+
+        static get styles()
+        {
+          return css`
+            canvas
+            {
+              border: 4px solid #eee;
+              padding: 3px;
+            }
+          `;
+        }
+
+        render()
+        {
+          return html`<canvas id="main_canvas" width="1000" height="1000"></canvas>`;
+        }
+      }
+
+      customElements.define('editor-canvas', Editor_Canvas);
+    </script>
+
+    <!-- Plant_List ===============================================================================-->
+    <script type="module">
+      import {LitElement, html, css} from "./lib/lit-element/lit-element.js";
+
+      class Plant_List extends LitElement
+      {
+        constructor()
+        {
+          super();
+          this.plants = [];
+        }
+
+        Get_Selected_Plant()
+        {
+          let res;
+
+          const checkbox = this.shadowRoot.querySelector("input[type=checkbox]:checked");
+          if (checkbox)
+          {
+            const i = Number.parseInt(checkbox.value);
+            res = this.plants[i];
+          }
+
+          return res;
+        }
+
+        Add_Plant(plant)
+        {
+          plant.i = this.plants.length;
+          this.plants.push(plant);
+          this.requestUpdate();
+        }
+
+        Edit_Plant(plant)
+        {
+          this.plants[plant.i] = plant;
+          this.requestUpdate();
+        }
+
+        render()
+        {
+          return html`<ul>${this.Render_Items()}</ul>`;
+        }
+
+        Render_Items()
+        {
+          let res = "", plant;
+
+          if (this.plants && this.plants.length>0)
+          {
+            for (let i=0; i<this.plants.length; i++)
+            {
+              plant = this.plants[i];
+              res = html`${res}${this.Render_Item(i, plant)}`;
+            }
+          }
+          return res;
+        }
+
+        Render_Item(i, plant)
+        {
+          return html`
+            <li>
+              <input type="checkbox" value="${i}">
+              ${plant.name}: x = ${plant.x}, y = ${plant.y}
+            </li>
+            `;
+        }
+      }
+  
+      customElements.define('plant-list', Plant_List);
+    </script>
+
+    <!-- Plant_Props_Dialog =======================================================================-->
     <script type="module">
       import {LitElement, html, css} from "./lib/lit-element/lit-element.js";
       import * as pl from "./lib/pa.js";
 
       class Plant_Props_Dialog extends LitElement 
       {
-        OnClick_Ok()
+        constructor()
         {
-          var plant = new pl[this.plant_class];
+          super();
+        }
+
+        firstUpdated(changedProperties)
+        {
+          this.plant_name_elem = this.shadowRoot.getElementById("plant_name");
+          this.plant_class_elem = this.shadowRoot.getElementById("plant_class");
+          this.plant_x_pos_elem = this.shadowRoot.getElementById("plant_x_pos");
+          this.plant_y_pos_elem = this.shadowRoot.getElementById("plant_y_pos");
+          this.plant_x_scale_elem = this.shadowRoot.getElementById("plant_x_scale");
+          this.plant_y_scale_elem = this.shadowRoot.getElementById("plant_y_scale");
+          this.plant_angle_elem = this.shadowRoot.getElementById("plant_angle");
+          this.new_ok_btn = this.shadowRoot.getElementById("new_plant_ok_btn");
+          this.edit_ok_btn = this.shadowRoot.getElementById("edit_plant_ok_btn");
+        }
+
+        OnClick_New_Ok()
+        {
+          var plant = new pl[this.plant_class_elem.value];
+          plant.class_name = this.plant_class_elem.value;
+          plant.name = this.plant_name_elem.value;
           plant.maturity_rate = 1;
           plant.maturity = 100;
           plant.level = 1;
           //plant.canvas_ctx = Init_Canvas(class_name);
-          plant.x = this.plant_x_pos;
-          plant.y = this.plant_y_pos;
-          plant.x_scale = this.plant_x_scale;
-          plant.y_scale = this.plant_y_scale;
-          plant.angle = this.plant_angle;
+          plant.x = this.plant_x_pos_elem.value;
+          plant.y = this.plant_y_pos_elem.value;
+          plant.x_scale = this.plant_x_scale_elem.value;
+          plant.y_scale = this.plant_y_scale_elem.value;
+          plant.angle = this.plant_angle_elem.value;
           this.Hide();
-          this.onclick_ok(plant);
+          this.onclick_new_ok(plant);
+        }
+
+        OnClick_Edit_Ok()
+        {
+          var plant = new pl[this.plant_class_elem.value];
+          plant.i = this.plant_i;
+          plant.class_name = this.plant_class_elem.value;
+          plant.name = this.plant_name_elem.value;
+          plant.maturity_rate = 1;
+          plant.maturity = 100;
+          plant.level = 1;
+          //plant.canvas_ctx = Init_Canvas(class_name);
+          plant.x = this.plant_x_pos_elem.value;
+          plant.y = this.plant_y_pos_elem.value;
+          plant.x_scale = this.plant_x_scale_elem.value;
+          plant.y_scale = this.plant_y_scale_elem.value;
+          plant.angle = this.plant_angle_elem.value;
+          this.Hide();
+          this.onclick_edit_ok(plant);
         }
 
         OnClick_Cancel()
         {
           this.Hide();
+        }
+
+        New()
+        {
+          this.plant_name_elem.value = "Plant 1";
+          this.plant_class_elem.value = "Plant";
+          this.plant_x_pos_elem.value = "100";
+          this.plant_y_pos_elem.value = "100";
+          this.plant_x_scale_elem.value = "1";
+          this.plant_y_scale_elem.value = "1";
+          this.plant_angle_elem.value = "0";
+          this.new_ok_btn.hidden = false;
+          this.edit_ok_btn.hidden = true;
+        }
+
+        Edit(plant)
+        {
+          this.plant_i = plant.i;
+          this.plant_name_elem.value = plant.name;
+          this.plant_class_elem.value = plant.class_name;
+          this.plant_x_pos_elem.value = plant.x;
+          this.plant_y_pos_elem.value = plant.y;
+          this.plant_x_scale_elem.value = plant.x_scale;
+          this.plant_y_scale_elem.value = plant.y_scale;
+          this.plant_angle_elem.value = plant.angle;
+          this.new_ok_btn.hidden = true;
+          this.edit_ok_btn.hidden = false;
         }
 
         Hide()
@@ -151,18 +405,6 @@
         Show()
         {
           this.style.display = "block";
-        }
-
-        static get properties()
-        {
-          return { 
-            plant_class: { type: String },
-            plant_x_pos: { type: Number },
-            plant_y_pos: { type: Number },
-            plant_x_scale: { type: Number },
-            plant_y_scale: { type: Number },
-            plant_angle: { type: Number }
-          };
         }
 
         static get styles()
@@ -179,31 +421,36 @@
         {
           return html`
             <div>
+              <div>Name</div>
+              <div><input id="plant_name" type="text"></div>
+            </div>
+            <div>
               <div>Class</div>
-              <div><input id="plant_class" type="text" value="${this.plant_class}"></div>
+              <div><input id="plant_class" type="text"></div>
             </div>
             <div>
               <div>X Position</div>
-              <div><input id="plant_x_pos" type="number" value="${this.plant_x_pos}"></div>
+              <div><input id="plant_x_pos" type="number"></div>
             </div>
             <div>
               <div>Y Position</div>
-              <div><input id="plant_y_pos" type="number" value="${this.plant_y_pos}"></div>
+              <div><input id="plant_y_pos" type="number"></div>
             </div>
             <div>
               <div>X Scale</div>
-              <div><input id="plant_x_scale" type="number" value="${this.plant_x_scale}"></div>
+              <div><input id="plant_x_scale" type="number"></div>
             </div>
             <div>
               <div>Y Scale</div>
-              <div><input id="plant_y_scale" type="number" value="${this.plant_y_scale}"></div>
+              <div><input id="plant_y_scale" type="number"></div>
             </div>
             <div>
               <div>Angle</div>
-              <div><input id="plant_angle" type="number" value="${this.plant_angle}"></div>
+              <div><input id="plant_angle" type="number"></div>
             </div>
             <div>
-              <button id="new_plant_ok_btn" @click="${this.OnClick_Ok}">Ok</button>
+              <button id="new_plant_ok_btn" @click="${this.OnClick_New_Ok}">Ok</button>
+              <button id="edit_plant_ok_btn" @click="${this.OnClick_Edit_Ok}">Ok</button>
               <button id="new_plant_cancel_btn" @click="${this.OnClick_Cancel}">Cancel</button>
             </div>
             `;
@@ -216,15 +463,16 @@
 
   <body>
 
-    <canvas id="main_canvas" width="1000" height="1000"></canvas>
+    <editor-canvas id="editor_canvas" plant_list_id="plant_list"></editor-canvas>
 
     <div id="">
       <button id="new_plant_btn">New</button>
-      <button>Edit</button>
-      <button>Delete</button>
+      <button id="edit_plant_btn">Edit</button>
+      <button id="del_plant_btn">Delete</button>
       <ul></ul>
     </div>
 
+    <plant-list id="plant_list"></plant-list>
     <plant-props-dlg id="plant_props_dlg"></plant-props-dlg>
 
     <div id="palette_div">
