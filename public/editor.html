@@ -34,6 +34,7 @@
         document.getElementById("del_plant_btn").onclick=OnClick_Del_Plants;
         document.getElementById("plant_props_dlg").onclick_new_ok = OnClick_New_Plant_Ok;
         document.getElementById("plant_props_dlg").onclick_edit_ok = OnClick_Edit_Plant_Ok;
+        document.getElementById("play_btn").onclick = OnClick_Play;
 
         New_Plant("Plant_Flower").Render_All();
         New_Plant("Plant_Flower2").Render_All();
@@ -130,11 +131,19 @@
         document.getElementById("plant_list").Edit_Plant(plant);
         document.getElementById("editor_canvas").Render_Plants();
       }
+    
+      function OnClick_Play()
+      {
+        document.getElementById("editor_canvas").Play();
+      }
     </script>
 
     <!-- Editor_Canvas ============================================================================-->
     <script type="module">
       import {LitElement, html, css} from "./lib/lit-element/lit-element.js";
+      import * as pl from "./lib/pa.js";
+
+      const pot_size = 100;
 
       class Editor_Canvas extends LitElement
       {
@@ -142,16 +151,82 @@
         {
           super();
           this.plant_list_id = null;
+          this.OnMouseMove_Canvas = this.OnMouseMove_Canvas.bind(this);
+          this.OnMouseDown_Canvas = this.OnMouseDown_Canvas.bind(this);
+          this.OnMouseUp_Canvas = this.OnMouseUp_Canvas.bind(this);
         }
         
         firstUpdated(changedProperties)
         {
           this.canvas = this.shadowRoot.getElementById("main_canvas");
+          this.canvas.addEventListener('mousemove', this.OnMouseMove_Canvas);
+          this.canvas.addEventListener('mousedown', this.OnMouseDown_Canvas);
+          this.canvas.addEventListener('mouseup', this.OnMouseUp_Canvas);
           this.ctx = this.canvas.getContext("2d");
 
           if (this.plant_list_id)
           {
             this.plant_list = document.getElementById(this.plant_list_id);
+          }
+        }
+
+        Init_Btns(plant, sqr_size)
+        {
+          let btn_size, x, y;
+
+          // scale btn
+          if (!plant.scale_btn_path)
+          {
+            btn_size = 10;
+            x = (sqr_size/2)-btn_size;
+            y = -(sqr_size/2);
+            plant.scale_btn_path = new Path2D();
+            plant.scale_btn_path.colour = "#f00";
+            plant.scale_btn_path.colour_hover = "#0f0";
+            plant.scale_btn_path.hover = false;
+            plant.scale_btn_path.rect(x, y, btn_size, btn_size);
+          }
+
+          // rotate btn
+          if (!plant.rotate_btn_path)
+          {
+            btn_size = 10;
+            x = (sqr_size/2)-btn_size;
+            y = -(btn_size/2);
+            plant.rotate_btn_path = new Path2D();
+            plant.rotate_btn_path.colour = "#f00";
+            plant.rotate_btn_path.colour_hover = "#0f0";
+            plant.rotate_btn_path.hover = false;
+            plant.rotate_btn_path.rect(x, y, btn_size, btn_size);
+          }
+
+          // translate btn
+          if (!plant.move_btn_path)
+          {
+            btn_size = 10;
+            x = -(btn_size/2);
+            y = -(btn_size/2);
+            plant.move_btn_path = new Path2D();
+            plant.move_btn_path.colour = "#f00";
+            plant.move_btn_path.colour_hover = "#0f0";
+            plant.move_btn_path.hover = false;
+            plant.move_btn_path.rect(x, y, btn_size, btn_size);
+          }
+        }
+
+        Play()
+        {
+          let plant; 
+
+          if (this.plant_list && this.plant_list.plants.length>0)
+          {
+            for (let i=0; i<this.plant_list.plants.length; i++)
+            {
+              plant = this.plant_list.plants[i];
+              plant.canvas_ctx = this.ctx;
+              plant.Reset();
+            }
+            pl.Animate(this.ctx, this.plant_list.plants);
           }
         }
 
@@ -172,37 +247,132 @@
 
         Render_Plant(plant)
         {
-          let sqr_size, btn_size, x, y;
+          let x, y;
+          x = -(pot_size/2);
+          y = -(pot_size/2);
+
+          this.Init_Btns(plant, pot_size);
 
           this.ctx.save();
           this.ctx.translate(plant.x, plant.y);
           this.ctx.rotate(plant.angle);
           this.ctx.scale(plant.x_scale, plant.y_scale);
 
-          sqr_size = 50;
-          x = -(sqr_size/2);
-          y = -(sqr_size/2);
-          this.ctx.strokeRect(x, y, sqr_size, sqr_size);
+          this.ctx.strokeRect(x, y, pot_size, pot_size);
 
-          // scale btn
-          btn_size = 10;
-          x = (sqr_size/2)-btn_size;
-          y = -(sqr_size/2);
-          this.ctx.strokeRect(x, y, btn_size, btn_size);
-
-          // rotate btn
-          btn_size = 10;
-          x = (sqr_size/2)-btn_size;
-          y = -(btn_size/2);
-          this.ctx.strokeRect(x, y, btn_size, btn_size);
-
-          // translate btn
-          btn_size = 10;
-          x = -(btn_size/2);
-          y = -(btn_size/2);
-          this.ctx.strokeRect(x, y, btn_size, btn_size);
+          this.Render_Btn(plant.scale_btn_path);
+          this.Render_Btn(plant.rotate_btn_path);
+          this.Render_Btn(plant.move_btn_path);
 
           this.ctx.restore();
+        }
+
+        Render_Btn(path)
+        {
+          if (path.hover)
+          {
+            this.ctx.fillStyle = path.colour_hover;
+          }
+          else
+          {
+            this.ctx.fillStyle = path.colour;
+          }
+
+          this.ctx.fill(path);
+        }
+
+        OnMouseMove_Canvas(event)
+        {
+          let plant, do_render;
+
+          plant = this.Get_MouseEvent_Plant(event);
+          if (plant)
+          {
+            do_render = true;
+          }
+
+          if (this.move_plant)
+          {
+            this.move_plant.x = event.offsetX;
+            this.move_plant.y = event.offsetY;
+            do_render = true;
+          }
+          if (this.scale_plant)
+          {
+            this.scale_plant.x_scale = (event.offsetX - this.scale_plant.x) / (pot_size/2);
+            this.scale_plant.y_scale = -(event.offsetY - this.scale_plant.y) / (pot_size/2);
+            do_render = true;
+          }
+          if (this.rotate_plant)
+          {
+            this.rotate_plant.angle = Math.atan2
+              (event.offsetY - this.rotate_plant.y, event.offsetX - this.rotate_plant.x);
+            do_render = true;
+          }
+
+          if (do_render)
+          {
+            this.Render_Plants();
+          }
+        }
+
+        Get_MouseEvent_Plant(event)
+        {
+          let plant, i, res;
+
+          if (this.plant_list && this.plant_list.plants.length>0)
+          {
+            for (i=0; i<this.plant_list.plants.length; i++)
+            {
+              plant = this.plant_list.plants[i];
+              this.Set_Plant_MouseEvent(plant, event);
+              if (plant.scale_btn_path.hover || plant.rotate_btn_path.hover || plant.move_btn_path.hover)
+              {
+                res = plant;
+                break;
+              }
+            }
+          }
+
+          return res;
+        }
+
+        Set_Plant_MouseEvent(plant, event)
+        {
+          this.ctx.save();
+          this.ctx.translate(plant.x, plant.y);
+          this.ctx.rotate(plant.angle);
+          this.ctx.scale(plant.x_scale, plant.y_scale);
+          plant.scale_btn_path.hover = this.ctx.isPointInPath(plant.scale_btn_path, event.offsetX, event.offsetY);
+          plant.rotate_btn_path.hover = this.ctx.isPointInPath(plant.rotate_btn_path, event.offsetX, event.offsetY);
+          plant.move_btn_path.hover = this.ctx.isPointInPath(plant.move_btn_path, event.offsetX, event.offsetY);
+          this.ctx.restore();
+        }
+
+        OnMouseDown_Canvas(event)
+        {
+          let plant;
+
+          plant = this.Get_MouseEvent_Plant(event);
+          if (plant && plant.move_btn_path.hover)
+          {
+            this.move_plant = plant;
+          }
+          if (plant && plant.scale_btn_path.hover)
+          {
+            this.scale_plant = plant;
+          }
+          if (plant && plant.rotate_btn_path.hover)
+          {
+            this.rotate_plant = plant;
+          }
+        }
+
+        OnMouseUp_Canvas(event)
+        {
+          this.move_plant = null;
+          this.scale_plant = null;
+          this.rotate_plant = null;
         }
 
         static get properties()
@@ -334,8 +504,8 @@
           plant.class_name = this.plant_class_elem.value;
           plant.name = this.plant_name_elem.value;
           plant.maturity_rate = 1;
-          plant.maturity = 100;
-          plant.level = 1;
+          plant.maturity = 0;
+          plant.max_depth = 3;
           //plant.canvas_ctx = Init_Canvas(class_name);
           plant.x = this.plant_x_pos_elem.value;
           plant.y = this.plant_y_pos_elem.value;
@@ -373,7 +543,7 @@
         New()
         {
           this.plant_name_elem.value = "Plant 1";
-          this.plant_class_elem.value = "Plant";
+          this.plant_class_elem.value = "Plant1";
           this.plant_x_pos_elem.value = "100";
           this.plant_y_pos_elem.value = "100";
           this.plant_x_scale_elem.value = "1";
@@ -469,6 +639,7 @@
       <button id="new_plant_btn">New</button>
       <button id="edit_plant_btn">Edit</button>
       <button id="del_plant_btn">Delete</button>
+      <button id="play_btn">Play</button>
       <ul></ul>
     </div>
 

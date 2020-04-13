@@ -115,6 +115,7 @@ export class Plant
   {
     this.branches = null;
     this.curr_depth = 0;
+    this.maturity = 0;
   }
 
   Get_X_Scale()
