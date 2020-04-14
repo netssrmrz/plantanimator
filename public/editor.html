@@ -81,7 +81,7 @@
         return canvas_ctx;
       }
 
-      function New_Plant(class_name)
+      /*function New_Plant(class_name)
       {
         var plant = new pl[class_name];
         plant.maturity_rate = 1;
@@ -94,15 +94,15 @@
         plant.y_scale = -1;
         plant.angle = 0;
         return plant;
-      }
+      }*/
 
       // button bar ===============================================================================
 
       function OnClick_New_Plant()
       {
-        const dlg = document.getElementById("plant_props_dlg")
-        dlg.New();
-        dlg.Show();
+        const plant = New_Plant();
+        document.getElementById("plant_list").Add_Plant(plant);
+        document.getElementById("editor_canvas").Render_Plants();
       }
 
       function OnClick_Edit_Plant()
@@ -135,6 +135,25 @@
       function OnClick_Play()
       {
         document.getElementById("editor_canvas").Play();
+      }
+
+      function New_Plant()
+      {
+        const class_name = "Plant1";
+
+        const plant = new pl[class_name];
+        plant.class_name = class_name;
+        plant.name = "Plant 1";
+        plant.maturity_rate = 1;
+        plant.maturity = 0;
+        plant.max_depth = 3;
+        plant.x = 500;
+        plant.y = 500;
+        plant.x_scale = 1;
+        plant.y_scale = 1;
+        plant.angle = 0;
+
+        return plant;
       }
     </script>
 
@@ -311,12 +330,15 @@
           }
           if (this.rotate_plant)
           {
+            const x_sign = Math.sign(this.rotate_plant.x_scale);
+            const y_sign = Math.sign(this.rotate_plant.y_scale);
             const m = new DOMMatrix();
             m.translateSelf(this.rotate_plant.x, this.rotate_plant.y);
+            m.scaleSelf(x_sign, y_sign);
             m.invertSelf();
             const p = new DOMPoint(event.offsetX, event.offsetY);
             const tp = p.matrixTransform(m);
-            this.rotate_plant.angle = Math.atan2(tp.y, tp.x);
+            this.rotate_plant.angle = Math.atan2(tp.y, tp.x) * (x_sign*y_sign);
             do_render = true;
           }
 
@@ -560,9 +582,9 @@
           this.plant_class_elem.value = "Plant1";
           this.plant_x_pos_elem.value = "500";
           this.plant_y_pos_elem.value = "500";
-          this.plant_x_scale_elem.value = "2";
+          this.plant_x_scale_elem.value = "1";
           this.plant_y_scale_elem.value = "1";
-          this.plant_angle_elem.value = "0.785398";
+          this.plant_angle_elem.value = "0";
           this.new_ok_btn.hidden = false;
           this.edit_ok_btn.hidden = true;
         }
