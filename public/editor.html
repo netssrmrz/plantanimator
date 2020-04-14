@@ -179,7 +179,7 @@
           {
             btn_size = 10;
             x = (sqr_size/2)-btn_size;
-            y = -(sqr_size/2);
+            y = (sqr_size/2)-btn_size;
             plant.scale_btn_path = new Path2D();
             plant.scale_btn_path.colour = "#f00";
             plant.scale_btn_path.colour_hover = "#0f0";
@@ -299,14 +299,24 @@
           }
           if (this.scale_plant)
           {
-            this.scale_plant.x_scale = (event.offsetX - this.scale_plant.x) / (pot_size/2);
-            this.scale_plant.y_scale = -(event.offsetY - this.scale_plant.y) / (pot_size/2);
+            const m = new DOMMatrix();
+            m.translateSelf(this.scale_plant.x, this.scale_plant.y);
+            m.rotateSelf(this.To_Degrees(this.scale_plant.angle));
+            m.invertSelf();
+            const p = new DOMPoint(event.offsetX, event.offsetY);
+            const tp = p.matrixTransform(m);
+            this.scale_plant.x_scale = tp.x / (pot_size/2);
+            this.scale_plant.y_scale = tp.y / (pot_size/2);
             do_render = true;
           }
           if (this.rotate_plant)
           {
-            this.rotate_plant.angle = Math.atan2
-              (event.offsetY - this.rotate_plant.y, event.offsetX - this.rotate_plant.x);
+            const m = new DOMMatrix();
+            m.translateSelf(this.rotate_plant.x, this.rotate_plant.y);
+            m.invertSelf();
+            const p = new DOMPoint(event.offsetX, event.offsetY);
+            const tp = p.matrixTransform(m);
+            this.rotate_plant.angle = Math.atan2(tp.y, tp.x);
             do_render = true;
           }
 
@@ -314,6 +324,11 @@
           {
             this.Render_Plants();
           }
+        }
+
+        To_Degrees(r)
+        {
+          return r*(180/Math.PI);
         }
 
         Get_MouseEvent_Plant(event)
@@ -506,12 +521,11 @@
           plant.maturity_rate = 1;
           plant.maturity = 0;
           plant.max_depth = 3;
-          //plant.canvas_ctx = Init_Canvas(class_name);
-          plant.x = this.plant_x_pos_elem.value;
-          plant.y = this.plant_y_pos_elem.value;
-          plant.x_scale = this.plant_x_scale_elem.value;
-          plant.y_scale = this.plant_y_scale_elem.value;
-          plant.angle = this.plant_angle_elem.value;
+          plant.x = Number.parseFloat(this.plant_x_pos_elem.value);
+          plant.y = Number.parseFloat(this.plant_y_pos_elem.value);
+          plant.x_scale = Number.parseFloat(this.plant_x_scale_elem.value);
+          plant.y_scale = Number.parseFloat(this.plant_y_scale_elem.value);
+          plant.angle = Number.parseFloat(this.plant_angle_elem.value);
           this.Hide();
           this.onclick_new_ok(plant);
         }
@@ -544,11 +558,11 @@
         {
           this.plant_name_elem.value = "Plant 1";
           this.plant_class_elem.value = "Plant1";
-          this.plant_x_pos_elem.value = "100";
-          this.plant_y_pos_elem.value = "100";
-          this.plant_x_scale_elem.value = "1";
+          this.plant_x_pos_elem.value = "500";
+          this.plant_y_pos_elem.value = "500";
+          this.plant_x_scale_elem.value = "2";
           this.plant_y_scale_elem.value = "1";
-          this.plant_angle_elem.value = "0";
+          this.plant_angle_elem.value = "0.785398";
           this.new_ok_btn.hidden = false;
           this.edit_ok_btn.hidden = true;
         }
