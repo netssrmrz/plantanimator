@@ -907,6 +907,7 @@ export function Animate(canvas_ctx, plants)
     canvas_ctx.clearRect(0, 0, canvas_ctx.canvas.width, canvas_ctx.canvas.height);
     for (c = 0; c < plants.length; c++)
     {
+      plants[c].canvas_ctx = canvas_ctx;
       next_plant_frame = plants[c].Next_Frame();
       next_frame = next_frame || next_plant_frame;
     }
@@ -914,6 +915,7 @@ export function Animate(canvas_ctx, plants)
   else
   {
     plants.canvas_ctx.clearRect(0, 0, plants.canvas_ctx.canvas.width, plants.canvas_ctx.canvas.height);
+    plants.canvas_ctx = canvas_ctx;
     next_frame = plants.Next_Frame();
   }
 

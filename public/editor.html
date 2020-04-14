@@ -35,8 +35,9 @@
         document.getElementById("plant_props_dlg").onclick_new_ok = OnClick_New_Plant_Ok;
         document.getElementById("plant_props_dlg").onclick_edit_ok = OnClick_Edit_Plant_Ok;
         document.getElementById("play_btn").onclick = OnClick_Play;
+        document.getElementById("gen_btn").onclick = OnClick_Gen_Code;
 
-        New_Plant("Plant_Flower").Render_All();
+        /*New_Plant("Plant_Flower").Render_All();
         New_Plant("Plant_Flower2").Render_All();
         New_Plant("Plant_Flower3").Render_All();
         New_Plant("Plant_Flower4").Render_All();
@@ -56,7 +57,7 @@
         New_Plant("Plant_Leaf6").Render_All();
         New_Plant("Plant_Leaf7").Render_All();
         New_Plant("Plant_Leaf8").Render_All();
-        New_Plant("Plant_Leaf9").Render_All();
+        New_Plant("Plant_Leaf9").Render_All();*/
       }
 
       function Init_Canvas(class_name)
@@ -135,6 +136,12 @@
       function OnClick_Play()
       {
         document.getElementById("editor_canvas").Play();
+      }
+
+      function OnClick_Gen_Code()
+      {
+        const plants=document.getElementById("plant_list").plants;
+        document.getElementById("plant_code_gen").Gen_Scene(plants);
       }
 
       function New_Plant()
@@ -277,7 +284,7 @@
           this.ctx.rotate(plant.angle);
           this.ctx.scale(plant.x_scale, plant.y_scale);
 
-          this.ctx.strokeRect(x, y, pot_size, pot_size);
+          this.ctx.strokeRect(x, y, pot_size, pot_size);          
 
           this.Render_Btn(plant.scale_btn_path);
           this.Render_Btn(plant.rotate_btn_path);
@@ -665,6 +672,109 @@
   
       customElements.define('plant-props-dlg', Plant_Props_Dialog);
     </script>
+
+    <!-- Plant_Code_Gen ===========================================================================-->
+    <script type="module">
+      import {LitElement, html, css} from "./lib/lit-element/lit-element.js";
+
+      class Plant_Code_Gen extends LitElement 
+      {
+        constructor()
+        {
+          super();
+        }
+
+        Gen_Scene(plants)
+        {
+          let code, plant, array_code;
+
+          if (plants && plants.length>0)
+          {
+            code = "import * as pl from \"http://localhost:3000/lib/pa.js\";\n";
+            for (let i=0; i<plants.length; i++)
+            {
+              plant = plants[i];
+              code += this.Gen_Plant(plant);
+
+              array_code = this.Append_Str(array_code, "plant"+plant.i, ", ");
+            }
+            code += 
+              "\nconst plants=["+array_code+"];\n"+
+              "const canvas = document.createElement(\"canvas\");\n" +
+              "canvas.width = 1000;\n" +
+              "canvas.height = 1000;\n" +
+              "document.body.appendChild(canvas);\n" +
+              "const ctx = canvas.getContext(\"2d\");\n" +
+              "pl.Animate(ctx, plants);\n";
+            this.shadowRoot.getElementById("txt_area").value = code;
+          }
+        }
+
+        Gen_Plant(plant)
+        {
+          const p = "plant"+plant.i;
+          const res = 
+            "\nconst "+p+" = new pl."+plant.class_name+"();\n" +
+            p+".i = "+plant.i+";\n" +
+            p+".class_name = \""+plant.class_name+"\";\n" +
+            p+".name = \""+p+"\";\n" +
+            p+".maturity_rate = "+plant.maturity_rate+";\n" +
+            p+".maturity = 0;\n" +
+            p+".max_depth = "+plant.max_depth+";\n" +
+            p+".x = "+plant.x+";\n" +
+            p+".y = "+plant.y+";\n" +
+            p+".x_scale = "+plant.x_scale+";\n" +
+            p+".y_scale = "+plant.y_scale+";\n" +
+            p+".angle = "+plant.angle+";\n";
+
+          return res;
+        }
+
+        Gen_Bud()
+        {
+
+        }
+
+        Append_Str(a, b, s)
+        {
+          let res;
+
+          if (a && b)
+          {
+            res = a + s + b;
+          }
+          else if (a && !b)
+          {
+            res = a;
+          }
+          else if (!a && b)
+          {
+            res = b;
+          }
+
+          return res;
+        }
+
+        OnClick_Run()
+        {
+          //eval(this.shadowRoot.getElementById("txt_area").value);
+          const js = this.shadowRoot.getElementById("txt_area").value;
+          const encodedJs = encodeURIComponent(js);
+          const dataUri = 'data:text/javascript;charset=utf-8,' + encodedJs;
+          import(dataUri);
+        }
+
+        render()
+        {
+          return html`
+            <textarea id="txt_area" rows="10" cols="100">yo ho ho</textarea>
+            <button @click="${this.OnClick_Run}">Run</button>
+          `;
+        }
+      }
+  
+      customElements.define('plant-code-gen', Plant_Code_Gen);
+    </script>
   </head>
 
   <body>
@@ -676,11 +786,13 @@
       <button id="edit_plant_btn">Edit</button>
       <button id="del_plant_btn">Delete</button>
       <button id="play_btn">Play</button>
+      <button id="gen_btn">Generate Code</button>
       <ul></ul>
     </div>
 
     <plant-list id="plant_list"></plant-list>
     <plant-props-dlg id="plant_props_dlg"></plant-props-dlg>
+    <plant-code-gen id="plant_code_gen"></plant-code-gen>
 
     <div id="palette_div">
     </div>
