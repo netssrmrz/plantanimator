@@ -521,7 +521,22 @@
 
         Select_Plant(plant)
         {
-          
+          const rows = this.shadowRoot.querySelectorAll("tr[plant-id]");
+          if (rows)
+          {
+            for (let i=0; i<rows.length; i++)
+            {
+              const row = rows[i];
+              if (row.getAttribute("plant-id") == plant.i.toString())
+              {
+                row.style.backgroundColor = "#0f0";
+              }
+              else
+              {
+                row.style.backgroundColor = null;
+              }
+            }
+          }
         }
 
         Get_Plant(id)
@@ -630,7 +645,7 @@
         Render_Item(i, plant)
         {
           return html`
-            <tr>
+            <tr plant-id="${i}">
               <td>${i}</td>
               <td><input type="checkbox" value="${i}"></td>
               <td>${plant.name}</td>
