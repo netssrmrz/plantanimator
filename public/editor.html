@@ -24,104 +24,55 @@
 
       button
       {
-        border: 1px solid #000;
-        padding: 5px 10px;
-        background-color: inherit;
-        font-family: monospace;
         border-radius: 7px;
-        font-size: 16px;
+        border: 1px solid #000;
+        padding: 5px;
         cursor: pointer;
+        width: 36px;
+        height: 36px;
+        background-color: inherit;
       }
-      
-      #plant_code_gen
+      button img
       {
-        display: none;
+        padding: 0;
+        margin: 0;
+        width: 24px;
+        height: 24px;
       }
-      
-      #plant_props_div
+      button:disabled
       {
-        display: none;
-      }
-
-      #palette_div
-      {
-        display: none;
+        opacity: 0.25;
       }
     </style>
     <script type="module">
       import * as pl from "./lib/pa.js";
 
       window.onload = Main;
+      let plant_list, editor;
 
       function Main()
       {
         document.getElementById("new_plant_btn").onclick=OnClick_New_Plant;
-        document.getElementById("edit_plant_btn").onclick=OnClick_Edit_Plant;
-        document.getElementById("del_plant_btn").onclick=OnClick_Del_Plants;
-        document.getElementById("plant_props_dlg").onclick_new_ok = OnClick_New_Plant_Ok;
-        document.getElementById("plant_props_dlg").onclick_edit_ok = OnClick_Edit_Plant_Ok;
         document.getElementById("play_btn").onclick = OnClick_Play;
-        document.getElementById("gen_btn").onclick = OnClick_Gen_Code;
-
-        /*New_Plant("Plant_Flower").Render_All();
-        New_Plant("Plant_Flower2").Render_All();
-        New_Plant("Plant_Flower3").Render_All();
-        New_Plant("Plant_Flower4").Render_All();
-        New_Plant("Plant_Flower5").Render_All();
-        New_Plant("Plant_Flower6").Render_All();
-        New_Plant("Plant_Flower7").Render_All();
-        New_Plant("Plant_Flower8").Render_All();
-        New_Plant("Plant_Flower9").Render_All();
-        New_Plant("Plant_Flower10").Render_All();
-        New_Plant("Plant_Flower11").Render_All();
-        New_Plant("Plant_Flower12").Render_All();
-        New_Plant("Plant_Leaf").Render_All();
-        New_Plant("Plant_Leaf2").Render_All();
-        New_Plant("Plant_Leaf3").Render_All();
-        New_Plant("Plant_Leaf4").Render_All();
-        New_Plant("Plant_Leaf5").Render_All();
-        New_Plant("Plant_Leaf6").Render_All();
-        New_Plant("Plant_Leaf7").Render_All();
-        New_Plant("Plant_Leaf8").Render_All();
-        New_Plant("Plant_Leaf9").Render_All();*/
+        document.getElementById("design_btn").onclick = OnClick_Design;
+        
+        plant_list = document.getElementById("plant_list");
+        plant_list.on_change_fn = Plants_OnChange;
+        
+        editor = document.getElementById("editor_canvas");
+        editor.plants = plant_list.plants;
+        editor.on_change_fn = Editor_OnChange;
       }
 
-      function Init_Canvas(class_name)
+      function Plants_OnChange()
       {
-        const canvas = document.createElement("canvas");
-        canvas.id = class_name + "_canvas";
-        canvas.width = "200";
-        canvas.height = "200";
-        document.getElementById("palette_div").appendChild(canvas);
-
-        const canvas_ctx = canvas.getContext("2d");
-
-        canvas_ctx.font = "12px sans-serif";
-        canvas_ctx.strokeText(class_name, 10, 20);
-
-        canvas_ctx.strokeStyle = "#aaa";
-        canvas_ctx.fillStyle = "#fff";
-        canvas_ctx.lineWidth = 4;
-        canvas_ctx.lineCap = 'round';
-        canvas_ctx.lineJoin = 'round';
-
-        return canvas_ctx;
+        editor.Render_Plants();
       }
 
-      /*function New_Plant(class_name)
+      function Editor_OnChange()
       {
-        var plant = new pl[class_name];
-        plant.maturity_rate = 1;
-        plant.maturity = 100;
-        plant.level = 1;
-        plant.canvas_ctx = Init_Canvas(class_name);
-        plant.x = 100;
-        plant.y = 100;
-        plant.x_scale = 1;
-        plant.y_scale = -1;
-        plant.angle = 0;
-        return plant;
-      }*/
+        
+      }
 
       // button bar ===============================================================================
 
@@ -132,42 +83,40 @@
         document.getElementById("editor_canvas").Render_Plants();
       }
 
-      function OnClick_Edit_Plant()
-      {
-        const plant_list = document.getElementById("plant_list");
-        const dlg = document.getElementById("plant_props_dlg")
-        dlg.Edit(plant_list.Get_Selected_Plant());
-        dlg.Show();
-      }
-
-      function OnClick_Del_Plants()
-      {
-        const plant_list = document.getElementById("plant_list");
-        plant_list.Del_Plants(plant_list.Get_Selected_Plants());
-        document.getElementById("editor_canvas").Render_Plants();
-      }
-
       function OnClick_New_Plant_Ok(plant)
       {
         document.getElementById("plant_list").Add_Plant(plant);
         document.getElementById("editor_canvas").Render_Plants();
       }
-
-      function OnClick_Edit_Plant_Ok(plant)
-      {
-        document.getElementById("plant_list").Edit_Plant(plant);
-        document.getElementById("editor_canvas").Render_Plants();
-      }
     
       function OnClick_Play()
       {
-        document.getElementById("editor_canvas").Play();
+        const editor = document.getElementById("editor_canvas");
+
+        if (editor.is_playing)
+        {
+          editor.Stop();
+          OnStop_Play();
+        }
+        else
+        {
+          editor.Play(OnStop_Play);
+          document.getElementById("new_plant_btn").disabled = true;
+          document.getElementById("design_btn").disabled = true;
+          document.getElementById("plant_list").Set_Disabled(true);
+        }
       }
 
-      function OnClick_Gen_Code()
+      function OnStop_Play()
       {
-        const plants=document.getElementById("plant_list").plants;
-        document.getElementById("plant_code_gen").Gen_Scene(plants);
+        document.getElementById("new_plant_btn").disabled = false;
+        document.getElementById("design_btn").disabled = false;
+        document.getElementById("plant_list").Set_Disabled(false);
+      }
+
+      function OnClick_Design()
+      {
+        document.getElementById("editor_canvas").Render_Plants();
       }
 
       function New_Plant()
@@ -202,10 +151,16 @@
         constructor()
         {
           super();
-          this.plant_list_id = null;
+          this.plants = null;
           this.OnMouseMove_Canvas = this.OnMouseMove_Canvas.bind(this);
           this.OnMouseDown_Canvas = this.OnMouseDown_Canvas.bind(this);
           this.OnMouseUp_Canvas = this.OnMouseUp_Canvas.bind(this);
+          this.Render_Plants = this.Render_Plants.bind(this);
+          this.OnFinish_Play = this.OnFinish_Play.bind(this);
+          this.is_playing = false;
+          this.on_finish_play_fn = null;
+          this.colour = "#000";
+          this.colour_selected = "#0f0";
         }
         
         firstUpdated(changedProperties)
@@ -215,11 +170,6 @@
           this.canvas.addEventListener('mousedown', this.OnMouseDown_Canvas);
           this.canvas.addEventListener('mouseup', this.OnMouseUp_Canvas);
           this.ctx = this.canvas.getContext("2d");
-
-          if (this.plant_list_id)
-          {
-            this.plant_list = document.getElementById(this.plant_list_id);
-          }
         }
 
         Init_Btns(plant, sqr_size)
@@ -266,19 +216,39 @@
           }
         }
 
-        Play()
+        Play(on_finish_play_fn)
         {
           let plant; 
 
-          if (this.plant_list && this.plant_list.plants.length>0)
+          if (this.plants && this.plants.length>0)
           {
-            for (let i=0; i<this.plant_list.plants.length; i++)
+            for (let i=0; i<this.plants.length; i++)
             {
-              plant = this.plant_list.plants[i];
+              plant = this.plants[i];
               plant.canvas_ctx = this.ctx;
               plant.Reset();
             }
-            pl.Animate(this.ctx, this.plant_list.plants);
+            this.is_playing = true;
+            this.on_finish_play_fn = on_finish_play_fn;
+            pl.Animate(this.ctx, this.plants, this.OnFinish_Play, this.Render_Plants);
+          }
+        }
+
+        OnFinish_Play()
+        {
+          this.is_playing = false;
+          if (this.on_finish_play_fn)
+          {
+            this.on_finish_play_fn();
+          }
+        }
+
+        Stop()
+        {
+          if (this.is_playing)
+          {
+            this.ctx.stop = true;
+            this.is_playing = false;
           }
         }
 
@@ -287,11 +257,11 @@
           let plant;
 
           this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-          if (this.plant_list && this.plant_list.plants.length>0)
+          if (this.plants && this.plants.length>0)
           {
-            for (let i=0; i<this.plant_list.plants.length; i++)
+            for (let i=0; i<this.plants.length; i++)
             {
-              plant = this.plant_list.plants[i];
+              plant = this.plants[i];
               this.Render_Plant(plant);
             }
           }
@@ -310,6 +280,14 @@
           this.ctx.rotate(plant.angle);
           this.ctx.scale(plant.x_scale, plant.y_scale);
 
+          if (plant.selected)
+          {
+            this.ctx.strokeStyle = this.colour_selected;
+          }
+          else
+          {
+            this.ctx.strokeStyle = this.colour;
+          }
           this.ctx.strokeRect(x, y, pot_size, pot_size);          
 
           this.Render_Btn(plant.scale_btn_path);
@@ -390,11 +368,11 @@
         {
           let plant, i, res;
 
-          if (this.plant_list && this.plant_list.plants.length>0)
+          if (this.plants && this.plants.length>0)
           {
-            for (i=0; i<this.plant_list.plants.length; i++)
+            for (i=0; i<this.plants.length; i++)
             {
-              plant = this.plant_list.plants[i];
+              plant = this.plants[i];
               this.Set_Plant_MouseEvent(plant, event);
               if (plant.scale_btn_path.hover || plant.rotate_btn_path.hover || plant.move_btn_path.hover)
               {
@@ -437,10 +415,10 @@
             this.rotate_plant = plant;
           }
 
-          if (this.plant_list)
+          /*if (this.plant_list)
           {
             this.plant_list.Select_Plant(plant);
-          }
+          }*/
         }
 
         OnMouseUp_Canvas(event)
@@ -483,6 +461,8 @@
     <!-- Plant_List ===============================================================================-->
     <script type="module">
       import {LitElement, html, css} from "./lib/lit-element/lit-element.js";
+      import "./lib/Plant_Props_Dialog.js";
+      import "./lib/Plant_Code_Gen.js";
 
       class Plant_List extends LitElement
       {
@@ -490,6 +470,15 @@
         {
           super();
           this.plants = [];
+          this.on_change_fn = null;
+          this.OnClick_Edit_Ok = this.OnClick_Edit_Ok.bind(this);
+        }
+        
+        firstUpdated(changedProperties)
+        {
+          const dlg = this.shadowRoot.getElementById("dlg");
+          
+          dlg.onclick_edit_ok = this.OnClick_Edit_Ok;
         }
 
         Get_Selected_Plant()
@@ -506,40 +495,68 @@
           return res;
         }
 
+        Set_Disabled(disabled)
+        {
+          let btns, i;
+
+          btns = this.shadowRoot.querySelectorAll("button");
+          if (btns && btns.length>0)
+          {
+            btns.forEach((btn) => btn.disabled = disabled);
+          }
+        }
+
         Add_Plant(plant)
         {
-          plant.i = this.plants.length;
+          plant.id = this.plants.length;
           this.plants.push(plant);
           this.requestUpdate();
         }
 
         Edit_Plant(plant)
         {
-          this.plants[plant.i] = plant;
+          const i = this.Get_Plant_Idx(plant);
+          this.plants[i] = plant;
           this.requestUpdate();
         }
 
-        Select_Plant(plant)
+        Select_Plant(plant_id)
         {
-          const rows = this.shadowRoot.querySelectorAll("tr[plant-id]");
-          if (rows)
+          let plant;
+
+          if (this.plants && this.plants.length>0)
           {
-            for (let i=0; i<rows.length; i++)
+            for (let i=0; i<this.plants.length; i++)
             {
-              const row = rows[i];
-              if (row.getAttribute("plant-id") == plant.i.toString())
+              plant = this.plants[i];
+              plant.selected = false;
+              if (plant.id == plant_id)
               {
-                row.style.backgroundColor = "#0f0";
-              }
-              else
-              {
-                row.style.backgroundColor = null;
+                plant.selected = true;
               }
             }
+            this.requestUpdate();
+            if (this.on_change_fn)
+              this.on_change_fn();
           }
         }
 
-        Get_Plant(id)
+        Delete_Plant(plant_id)
+        {
+          const msg = "Are you sure you want to delete this plant?";
+          let i;
+
+          if (confirm(msg))
+          {
+            i = this.Get_Plant_Idx(plant_id);
+            this.plants.splice(i, 1);
+            if (this.on_change_fn)
+              this.on_change_fn();
+            this.requestUpdate();
+          }
+        }
+
+        Get_Plant_Idx(plant_id)
         {
           let res = null;
 
@@ -547,10 +564,9 @@
           {
             for (let i=0; i<this.plants.length; i++)
             {
-              plant = this.plants[i];
-              if (plant.i == id)
+              if (this.plants[i].id == plant_id)
               {
-                res = plant;
+                res = i;
                 break;
               }
             }
@@ -559,12 +575,52 @@
           return res;
         }
 
+        OnClick_Delete_Plant(event)
+        {
+          const plant_id = event.currentTarget.getAttribute("plant-id");
+          this.Delete_Plant(plant_id);
+        }
+
+        OnClick_Select_Plant(event)
+        {
+          const plant_id = event.currentTarget.getAttribute("plant-id");
+          this.Select_Plant(plant_id);
+        }
+
+        OnClick_Edit_Plant(event)
+        {
+          const dlg = this.shadowRoot.getElementById("dlg");
+          const id = event.currentTarget.getAttribute("plant-id");
+          const i = this.Get_Plant_Idx(id);
+          const plant = this.plants[i];
+
+          dlg.Show();
+          dlg.Edit(plant);
+        }
+
+        OnClick_Edit_Ok(plant)
+        {
+          const i = this.Get_Plant_Idx(plant.id);
+          this.plants[i] = plant;
+          this.requestUpdate();
+          if (this.on_change_fn)
+            this.on_change_fn();
+        }
+
+        OnClick_Gen_Code()
+        {
+          const code = this.shadowRoot.getElementById("code");
+          code.Show();
+          code.Gen_Scene(this.plants);
+        }
+
         static get styles()
         {
           return css`
             :host
             {
               display: block;  
+              margin-top: 20px;
             }
             table
             {
@@ -585,6 +641,11 @@
               content: " ";
               height: 20px;
             }
+            tbody tr:hover
+            {
+              background-color: #ddd;
+              cursor: pointer;
+            }
             th
             {
               font-weight: 100;
@@ -596,9 +657,38 @@
             }
             td
             {
-              padding: 4px 0px;
+              padding: 4px 12px;
               font-family: monospace;
               font-size: 16px;
+            }
+            #btn_bar
+            {
+              text-align: left;
+            }
+            button
+            {
+              border-radius: 7px;
+              border: 1px solid #000;
+              padding: 5px;
+              cursor: pointer;
+              width: 36px;
+              height: 36px;
+              background-color: inherit;
+            }
+            button:disabled
+            {
+              opacity: 0.25;
+            }
+            button img
+            {
+              padding: 0;
+              margin: 0;
+              width: 24px;
+              height: 24px;
+            }
+            .selected
+            {
+              background-color: #0f0;
             }
           `;
         }
@@ -609,8 +699,8 @@
             <table>
               <thead>
                 <tr>
-                  <th>Id</th>
                   <th>Actions</th>
+                  <th>#</th>
                   <th>Name</th>
                   <th>Class</th>
                   <th>X</th>
@@ -623,7 +713,16 @@
               <tbody>
                 ${this.Render_Items()}
               </tbody>
+              <tfoot>
+                <tr>
+                  <td id="btn_bar" colspan="9">
+                    <button id="gen_btn" @click="${this.OnClick_Gen_Code}"><img src="images/code-json.svg"></button>
+                  </td>
+                </tr>
+              </tfoot>
             </table>
+            <plant-props-dlg id="dlg"></plant-props-dlg>
+            <plant-code-gen id="code"></plant-code-gen>
           `;
         }
 
@@ -644,10 +743,21 @@
 
         Render_Item(i, plant)
         {
+          let row_class = "";
+
+          if (plant.selected)
+          {
+            row_class = "selected";
+          }
+
           return html`
-            <tr plant-id="${i}">
-              <td>${i}</td>
-              <td><input type="checkbox" value="${i}"></td>
+            <tr plant-id="${plant.id}" class="${row_class}">
+              <td>
+                <button plant-id="${plant.id}" @click="${this.OnClick_Select_Plant}"><img src="images/target.svg"></button>
+                <button plant-id="${plant.id}" @click="${this.OnClick_Edit_Plant}"><img src="images/pencil-outline.svg"></button>
+                <button plant-id="${plant.id}" @click="${this.OnClick_Delete_Plant}"><img src="images/delete-outline.svg"></button>
+              </td>
+              <td>${i+1}</td>
               <td>${plant.name}</td>
               <td>${plant.class_name}</td>
               <td>${plant.x}</td>
@@ -662,286 +772,20 @@
   
       customElements.define('plant-list', Plant_List);
     </script>
-
-    <!-- Plant_Props_Dialog =======================================================================-->
-    <script type="module">
-      import {LitElement, html, css} from "./lib/lit-element/lit-element.js";
-      import * as pl from "./lib/pa.js";
-
-      class Plant_Props_Dialog extends LitElement 
-      {
-        constructor()
-        {
-          super();
-        }
-
-        firstUpdated(changedProperties)
-        {
-          this.plant_name_elem = this.shadowRoot.getElementById("plant_name");
-          this.plant_class_elem = this.shadowRoot.getElementById("plant_class");
-          this.plant_x_pos_elem = this.shadowRoot.getElementById("plant_x_pos");
-          this.plant_y_pos_elem = this.shadowRoot.getElementById("plant_y_pos");
-          this.plant_x_scale_elem = this.shadowRoot.getElementById("plant_x_scale");
-          this.plant_y_scale_elem = this.shadowRoot.getElementById("plant_y_scale");
-          this.plant_angle_elem = this.shadowRoot.getElementById("plant_angle");
-          this.new_ok_btn = this.shadowRoot.getElementById("new_plant_ok_btn");
-          this.edit_ok_btn = this.shadowRoot.getElementById("edit_plant_ok_btn");
-        }
-
-        OnClick_New_Ok()
-        {
-          var plant = new pl[this.plant_class_elem.value];
-          plant.class_name = this.plant_class_elem.value;
-          plant.name = this.plant_name_elem.value;
-          plant.maturity_rate = 1;
-          plant.maturity = 0;
-          plant.max_depth = 3;
-          plant.x = Number.parseFloat(this.plant_x_pos_elem.value);
-          plant.y = Number.parseFloat(this.plant_y_pos_elem.value);
-          plant.x_scale = Number.parseFloat(this.plant_x_scale_elem.value);
-          plant.y_scale = Number.parseFloat(this.plant_y_scale_elem.value);
-          plant.angle = Number.parseFloat(this.plant_angle_elem.value);
-          this.Hide();
-          this.onclick_new_ok(plant);
-        }
-
-        OnClick_Edit_Ok()
-        {
-          var plant = new pl[this.plant_class_elem.value];
-          plant.i = this.plant_i;
-          plant.class_name = this.plant_class_elem.value;
-          plant.name = this.plant_name_elem.value;
-          plant.maturity_rate = 1;
-          plant.maturity = 100;
-          plant.level = 1;
-          //plant.canvas_ctx = Init_Canvas(class_name);
-          plant.x = this.plant_x_pos_elem.value;
-          plant.y = this.plant_y_pos_elem.value;
-          plant.x_scale = this.plant_x_scale_elem.value;
-          plant.y_scale = this.plant_y_scale_elem.value;
-          plant.angle = this.plant_angle_elem.value;
-          this.Hide();
-          this.onclick_edit_ok(plant);
-        }
-
-        OnClick_Cancel()
-        {
-          this.Hide();
-        }
-
-        New()
-        {
-          this.plant_name_elem.value = "Plant 1";
-          this.plant_class_elem.value = "Plant1";
-          this.plant_x_pos_elem.value = "500";
-          this.plant_y_pos_elem.value = "500";
-          this.plant_x_scale_elem.value = "1";
-          this.plant_y_scale_elem.value = "1";
-          this.plant_angle_elem.value = "0";
-          this.new_ok_btn.hidden = false;
-          this.edit_ok_btn.hidden = true;
-        }
-
-        Edit(plant)
-        {
-          this.plant_i = plant.i;
-          this.plant_name_elem.value = plant.name;
-          this.plant_class_elem.value = plant.class_name;
-          this.plant_x_pos_elem.value = plant.x;
-          this.plant_y_pos_elem.value = plant.y;
-          this.plant_x_scale_elem.value = plant.x_scale;
-          this.plant_y_scale_elem.value = plant.y_scale;
-          this.plant_angle_elem.value = plant.angle;
-          this.new_ok_btn.hidden = true;
-          this.edit_ok_btn.hidden = false;
-        }
-
-        Hide()
-        {
-          this.style.display = "none";
-        }
-
-        Show()
-        {
-          this.style.display = "block";
-        }
-
-        static get styles()
-        {
-          return css`
-            :host
-            {
-              display: none;
-            }
-            `;
-        }
-
-        render() 
-        {
-          return html`
-            <div>
-              <div>Name</div>
-              <div><input id="plant_name" type="text"></div>
-            </div>
-            <div>
-              <div>Class</div>
-              <div><input id="plant_class" type="text"></div>
-            </div>
-            <div>
-              <div>X Position</div>
-              <div><input id="plant_x_pos" type="number"></div>
-            </div>
-            <div>
-              <div>Y Position</div>
-              <div><input id="plant_y_pos" type="number"></div>
-            </div>
-            <div>
-              <div>X Scale</div>
-              <div><input id="plant_x_scale" type="number"></div>
-            </div>
-            <div>
-              <div>Y Scale</div>
-              <div><input id="plant_y_scale" type="number"></div>
-            </div>
-            <div>
-              <div>Angle</div>
-              <div><input id="plant_angle" type="number"></div>
-            </div>
-            <div>
-              <button id="new_plant_ok_btn" @click="${this.OnClick_New_Ok}">Ok</button>
-              <button id="edit_plant_ok_btn" @click="${this.OnClick_Edit_Ok}">Ok</button>
-              <button id="new_plant_cancel_btn" @click="${this.OnClick_Cancel}">Cancel</button>
-            </div>
-            `;
-        }
-      }
-  
-      customElements.define('plant-props-dlg', Plant_Props_Dialog);
-    </script>
-
-    <!-- Plant_Code_Gen ===========================================================================-->
-    <script type="module">
-      import {LitElement, html, css} from "./lib/lit-element/lit-element.js";
-
-      class Plant_Code_Gen extends LitElement 
-      {
-        constructor()
-        {
-          super();
-        }
-
-        Gen_Scene(plants)
-        {
-          let code, plant, array_code;
-
-          if (plants && plants.length>0)
-          {
-            code = "import * as pl from \"http://localhost:3000/lib/pa.js\";\n";
-            for (let i=0; i<plants.length; i++)
-            {
-              plant = plants[i];
-              code += this.Gen_Plant(plant);
-
-              array_code = this.Append_Str(array_code, "plant"+plant.i, ", ");
-            }
-            code += 
-              "\nconst plants=["+array_code+"];\n"+
-              "const canvas = document.createElement(\"canvas\");\n" +
-              "canvas.width = 1000;\n" +
-              "canvas.height = 1000;\n" +
-              "document.body.appendChild(canvas);\n" +
-              "const ctx = canvas.getContext(\"2d\");\n" +
-              "pl.Animate(ctx, plants);\n";
-            this.shadowRoot.getElementById("txt_area").value = code;
-          }
-        }
-
-        Gen_Plant(plant)
-        {
-          const p = "plant"+plant.i;
-          const res = 
-            "\nconst "+p+" = new pl."+plant.class_name+"();\n" +
-            p+".i = "+plant.i+";\n" +
-            p+".class_name = \""+plant.class_name+"\";\n" +
-            p+".name = \""+p+"\";\n" +
-            p+".maturity_rate = "+plant.maturity_rate+";\n" +
-            p+".maturity = 0;\n" +
-            p+".max_depth = "+plant.max_depth+";\n" +
-            p+".x = "+plant.x+";\n" +
-            p+".y = "+plant.y+";\n" +
-            p+".x_scale = "+plant.x_scale+";\n" +
-            p+".y_scale = "+plant.y_scale+";\n" +
-            p+".angle = "+plant.angle+";\n";
-
-          return res;
-        }
-
-        Gen_Bud()
-        {
-
-        }
-
-        Append_Str(a, b, s)
-        {
-          let res;
-
-          if (a && b)
-          {
-            res = a + s + b;
-          }
-          else if (a && !b)
-          {
-            res = a;
-          }
-          else if (!a && b)
-          {
-            res = b;
-          }
-
-          return res;
-        }
-
-        OnClick_Run()
-        {
-          //eval(this.shadowRoot.getElementById("txt_area").value);
-          const js = this.shadowRoot.getElementById("txt_area").value;
-          const encodedJs = encodeURIComponent(js);
-          const dataUri = 'data:text/javascript;charset=utf-8,' + encodedJs;
-          import(dataUri);
-        }
-
-        render()
-        {
-          return html`
-            <textarea id="txt_area" rows="10" cols="100">yo ho ho</textarea>
-            <button @click="${this.OnClick_Run}">Run</button>
-          `;
-        }
-      }
-  
-      customElements.define('plant-code-gen', Plant_Code_Gen);
-    </script>
   </head>
 
   <body>
     <h1>Plantinator</h1>
+
     <editor-canvas id="editor_canvas" plant_list_id="plant_list"></editor-canvas>
 
-    <div id="">
-      <button id="new_plant_btn">New</button>
-      <button id="edit_plant_btn">Edit</button>
-      <button id="del_plant_btn">Delete</button>
-      <button id="play_btn">Play</button>
-      <button id="gen_btn">Generate Code</button>
-      <ul></ul>
+    <div>
+      <button id="new_plant_btn"><img src="images/plus.svg"></button>
+      <button id="play_btn"><img src="images/play-pause.svg"></button>
+      <button id="design_btn"><img src="images/pencil-ruler.svg"></button>
     </div>
 
     <plant-list id="plant_list"></plant-list>
-    <plant-props-dlg id="plant_props_dlg"></plant-props-dlg>
-    <plant-code-gen id="plant_code_gen"></plant-code-gen>
-
-    <div id="palette_div">
-    </div>
 
   </body>
 </html>

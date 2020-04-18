@@ -898,13 +898,13 @@ export class Plant2 extends Plant_Maturing2
 
 // Utils ==========================================================================================
 
-export function Animate(canvas_ctx, plants)
+export function Animate(canvas_ctx, plants, on_finish_fn, on_stop_fn)
 {
   var c, next_frame = false, next_plant_frame;
 
+  canvas_ctx.clearRect(0, 0, canvas_ctx.canvas.width, canvas_ctx.canvas.height);
   if (Array.isArray(plants))
   {
-    canvas_ctx.clearRect(0, 0, canvas_ctx.canvas.width, canvas_ctx.canvas.height);
     for (c = 0; c < plants.length; c++)
     {
       plants[c].canvas_ctx = canvas_ctx;
@@ -914,13 +914,26 @@ export function Animate(canvas_ctx, plants)
   }
   else
   {
-    plants.canvas_ctx.clearRect(0, 0, plants.canvas_ctx.canvas.width, plants.canvas_ctx.canvas.height);
     plants.canvas_ctx = canvas_ctx;
     next_frame = plants.Next_Frame();
   }
 
-  if (next_frame)
-    window.requestAnimationFrame(() => Animate(canvas_ctx, plants));
+  if (canvas_ctx.stop)
+  {
+    canvas_ctx.stop = false;
+    if (on_stop_fn)
+    {
+      on_stop_fn();
+    }
+  }
+  else if (next_frame)
+  {
+    window.requestAnimationFrame(() => Animate(canvas_ctx, plants, on_finish_fn, on_stop_fn));
+  }
+  else if (on_finish_fn)
+  {
+    on_finish_fn();
+  }
 };
 
 export function Render(plants)
