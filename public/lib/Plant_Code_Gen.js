@@ -32,7 +32,7 @@ class Plant_Code_Gen extends LitElement
       for (let i=0; i<plants.length; i++)
       {
         plant = plants[i];
-        code += this.Gen_Plant(plant);
+        code += this.Gen_Plant(i, plant);
 
         array_code = this.Append_Str(array_code, "plant"+plant.id, ", ");
       }
@@ -52,9 +52,9 @@ class Plant_Code_Gen extends LitElement
     }
   }
 
-  Gen_Plant(plant)
+  Gen_Plant(i, plant)
   {
-    const p = "plant"+plant.id;
+    const p = "plant"+i;
     const res = 
       "\n\t\t\tconst "+p+" = new pl."+plant.class_name+"();\n" +
       "\t\t\t"+p+".id = "+plant.id+";\n" +
@@ -117,6 +117,7 @@ class Plant_Code_Gen extends LitElement
       :host
       {
         display: none;
+        margin-top: 20px;
       }
       h2
       {

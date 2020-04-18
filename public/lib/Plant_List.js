@@ -189,7 +189,6 @@ class Plant_List extends LitElement
       tbody tr:hover
       {
         background-color: #ddd;
-        cursor: pointer;
       }
       th
       {
