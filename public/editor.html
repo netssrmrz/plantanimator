@@ -73,8 +73,6 @@
 
       function Editor_OnChange(plant)
       {
-        //plant_list.Select_Plant(plant.id);
-        //editor.Render_Plants();
         plant_list.requestUpdate();
       }
 
@@ -83,20 +81,12 @@
       function OnClick_New_Plant()
       {
         const plant = New_Plant();
-        document.getElementById("plant_list").Add_Plant(plant);
-        document.getElementById("editor_canvas").Render_Plants();
-      }
-
-      function OnClick_New_Plant_Ok(plant)
-      {
-        document.getElementById("plant_list").Add_Plant(plant);
-        document.getElementById("editor_canvas").Render_Plants();
+        plant_list.Add_Plant(plant);
+        editor.Render_Plants();
       }
     
       function OnClick_Play()
       {
-        const editor = document.getElementById("editor_canvas");
-
         if (editor.is_playing)
         {
           editor.Stop();
@@ -107,7 +97,7 @@
           editor.Play(OnStop_Play);
           document.getElementById("new_plant_btn").disabled = true;
           document.getElementById("design_btn").disabled = true;
-          document.getElementById("plant_list").Set_Disabled(true);
+          plant_list.Set_Disabled(true);
         }
       }
 
@@ -115,12 +105,12 @@
       {
         document.getElementById("new_plant_btn").disabled = false;
         document.getElementById("design_btn").disabled = false;
-        document.getElementById("plant_list").Set_Disabled(false);
+        plant_list.Set_Disabled(false);
       }
 
       function OnClick_Design()
       {
-        document.getElementById("editor_canvas").Render_Plants();
+        editor.Render_Plants();
       }
 
       function New_Plant()

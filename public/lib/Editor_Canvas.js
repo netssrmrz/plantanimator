@@ -32,48 +32,49 @@ class Editor_Canvas extends LitElement
     this.ctx = this.canvas.getContext("2d");
   }
 
-  Init_Btns(plant, sqr_size)
+  Init_Btns(plant, pot_size)
   {
-    let btn_size, x, y;
+    let btn_size = 12, x, y;
 
     // scale btn
     if (!plant.scale_btn_path)
     {
-      btn_size = 10;
-      x = (sqr_size/2)-btn_size;
-      y = (sqr_size/2)-btn_size;
-      plant.scale_btn_path = new Path2D();
-      plant.scale_btn_path.colour = "#f00";
-      plant.scale_btn_path.colour_hover = "#0f0";
-      plant.scale_btn_path.hover = false;
-      plant.scale_btn_path.rect(x, y, btn_size, btn_size);
+      x = (pot_size/2);
+      y = (pot_size/2);
+      plant.scale_btn_path = this.New_Btn_Path(x, y, btn_size);
     }
 
     // rotate btn
     if (!plant.rotate_btn_path)
     {
-      btn_size = 10;
-      x = (sqr_size/2)-btn_size;
-      y = -(btn_size/2);
-      plant.rotate_btn_path = new Path2D();
-      plant.rotate_btn_path.colour = "#f00";
-      plant.rotate_btn_path.colour_hover = "#0f0";
-      plant.rotate_btn_path.hover = false;
-      plant.rotate_btn_path.rect(x, y, btn_size, btn_size);
+      x = (pot_size/2);
+      y = 0;
+      plant.rotate_btn_path = this.New_Btn_Path(x, y, btn_size);
     }
 
     // translate btn
     if (!plant.move_btn_path)
     {
-      btn_size = 10;
-      x = -(btn_size/2);
-      y = -(btn_size/2);
-      plant.move_btn_path = new Path2D();
-      plant.move_btn_path.colour = "#f00";
-      plant.move_btn_path.colour_hover = "#0f0";
-      plant.move_btn_path.hover = false;
-      plant.move_btn_path.rect(x, y, btn_size, btn_size);
+      x = 0;
+      y = 0;
+      plant.move_btn_path = this.New_Btn_Path(x, y, btn_size);
     }
+  }
+
+  New_Btn_Path(x, y, size)
+  {
+    let btn_path;
+
+    btn_path = new Path2D();
+    btn_path.colour = "#f00";
+    btn_path.colour_hover = "#0f0";
+    btn_path.hover = false;
+    btn_path.rect(x-0.5*size, y-0.5*size, size, size);
+    btn_path.x = x;
+    btn_path.y = y;
+    btn_path.size = size;
+
+    return btn_path;
   }
 
   Play(on_finish_play_fn)
@@ -150,15 +151,16 @@ class Editor_Canvas extends LitElement
     }
     this.ctx.strokeRect(x, y, pot_size, pot_size);          
 
-    this.Render_Btn(plant.scale_btn_path);
-    this.Render_Btn(plant.rotate_btn_path);
-    this.Render_Btn(plant.move_btn_path);
+    this.Render_Btn(plant, plant.scale_btn_path);
+    this.Render_Btn(plant, plant.rotate_btn_path);
+    this.Render_Btn(plant, plant.move_btn_path);
 
     this.ctx.restore();
   }
 
-  Render_Btn(path)
+  Render_Btn(plant, path)
   {
+    this.ctx.save();
     if (path.hover)
     {
       this.ctx.fillStyle = path.colour_hover;
@@ -168,7 +170,22 @@ class Editor_Canvas extends LitElement
       this.ctx.fillStyle = path.colour;
     }
 
+    this.ctx.translate(path.x, path.y);
+    this.ctx.scale(1/plant.x_scale, 1/plant.y_scale);
+    this.ctx.translate(-path.x, -path.y);
+
     this.ctx.fill(path);
+    this.ctx.restore();
+  }
+
+  Set_Event_In_Btn(plant, event, path)
+  {
+    this.ctx.save();
+    this.ctx.translate(path.x, path.y);
+    this.ctx.scale(1/plant.x_scale, 1/plant.y_scale);
+    this.ctx.translate(-path.x, -path.y);
+    path.hover = this.ctx.isPointInPath(path, event.offsetX, event.offsetY);
+    this.ctx.restore();
   }
 
   OnMouseMove_Canvas(event)
@@ -251,9 +268,11 @@ class Editor_Canvas extends LitElement
     this.ctx.translate(plant.x, plant.y);
     this.ctx.rotate(plant.angle);
     this.ctx.scale(plant.x_scale, plant.y_scale);
-    plant.scale_btn_path.hover = this.ctx.isPointInPath(plant.scale_btn_path, event.offsetX, event.offsetY);
-    plant.rotate_btn_path.hover = this.ctx.isPointInPath(plant.rotate_btn_path, event.offsetX, event.offsetY);
-    plant.move_btn_path.hover = this.ctx.isPointInPath(plant.move_btn_path, event.offsetX, event.offsetY);
+
+    this.Set_Event_In_Btn(plant, event, plant.scale_btn_path);
+    this.Set_Event_In_Btn(plant, event, plant.rotate_btn_path);
+    this.Set_Event_In_Btn(plant, event, plant.move_btn_path);
+
     this.ctx.restore();
   }
 

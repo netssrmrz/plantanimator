@@ -345,7 +345,7 @@ export class Plant_Flower3 extends Plant_Maturing
     }
     this.canvas_ctx.moveTo(cx + r, cy);
     this.canvas_ctx.arc(cx, cy, r, 0, 2 * Math.PI);
-    this.canvas_ctx.fill();
+    //this.canvas_ctx.fill();
     this.canvas_ctx.stroke();
   }
 }
@@ -702,7 +702,7 @@ export class Plant_Leaf5 extends Plant_Maturing
       x2 + size / 6, y2 - size / 4, 
       x1 - size / 2, y1 + size / 4, 
       x1, y1);
-    this.canvas_ctx.fill();
+    //this.canvas_ctx.fill();
     this.canvas_ctx.stroke();
   }
 }
@@ -826,13 +826,15 @@ export class Plant1 extends Plant_Maturing
   Add_Flower(angle)
   {
     const plant = new Plant_Flower3();
-    this.Add_Plant(angle, plant, 1 / this.Total_X_Scale(), 1 / this.Total_Y_Scale());
+    //this.Add_Plant(angle, plant, 1 / this.Total_X_Scale(), 1 / this.Total_Y_Scale());
+    this.Add_Plant(angle, plant, 1, 1);
   }
 
   Add_Leaf(angle)
   {
     const plant = new Plant_Leaf5();
-    this.Add_Plant(angle, plant, 1 / this.Total_X_Scale(), 1 / this.Total_Y_Scale());
+    //this.Add_Plant(angle, plant, 1 / this.Total_X_Scale(), 1 / this.Total_Y_Scale());
+    this.Add_Plant(angle, plant, 1, 1);
   }
 
   Add_Stem(angle, x_scale, y_scale)
