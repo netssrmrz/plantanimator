@@ -333,11 +333,6 @@ class Editor_Canvas extends LitElement
     }
   }
 
-  static get properties()
-  {
-    return {plant_list_id: {type: String}};
-  }
-
   static get styles()
   {
     return css`

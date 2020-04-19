@@ -1,0 +1,152 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Plant Animator - Home</title>
+    <style>
+      h1
+      {
+        font-family: serif;
+        font-style: italic;
+        font-size: 40px;
+        text-transform: uppercase;
+        font-weight: 100;
+        margin: 10px;
+      }
+
+      body
+      {
+        text-align: center;
+        margin: 0px;
+        background-color: #fffff9;
+      }
+
+      button
+      {
+        border-radius: 7px;
+        border: 1px solid #000;
+        padding: 5px;
+        cursor: pointer;
+        width: 36px;
+        height: 36px;
+        background-color: inherit;
+      }
+      button img
+      {
+        padding: 0;
+        margin: 0;
+        width: 24px;
+        height: 24px;
+      }
+      button:disabled
+      {
+        opacity: 0.25;
+      }
+    </style>
+    <script type="module">
+      import * as pl from "./lib/pa.js";
+      import "./lib/Sprout_Editor.js";
+      import "./lib/Sprout_List.js";
+
+      window.onload = Main;
+      let sprout_list, editor;
+
+      function Main()
+      {
+        document.getElementById("new_plant_btn").onclick=OnClick_New_Plant;
+        document.getElementById("play_btn").onclick = OnClick_Play;
+        document.getElementById("design_btn").onclick = OnClick_Design;
+        
+        sprout_list = document.getElementById("sprout_list");
+        sprout_list.on_change_fn = Plants_OnChange;
+        
+        editor = document.getElementById("sprout_editor");
+        editor.plants = sprout_list.plants;
+        editor.on_change_fn = Editor_OnChange;
+      }
+
+      function Plants_OnChange()
+      {
+        editor.Render_Plants();
+      }
+
+      function Editor_OnChange(plant)
+      {
+        sprout_list.requestUpdate();
+      }
+
+      // button bar ===============================================================================
+
+      function OnClick_New_Plant()
+      {
+        const plant = New_Item();
+        sprout_list.Add_Plant(plant);
+        editor.Render_Plants();
+      }
+    
+      function OnClick_Play()
+      {
+        if (editor.is_playing)
+        {
+          editor.Stop();
+          OnStop_Play();
+        }
+        else
+        {
+          editor.Play(OnStop_Play);
+          document.getElementById("new_plant_btn").disabled = true;
+          document.getElementById("design_btn").disabled = true;
+          sprout_list.Set_Disabled(true);
+        }
+      }
+
+      function OnStop_Play()
+      {
+        document.getElementById("new_plant_btn").disabled = false;
+        document.getElementById("design_btn").disabled = false;
+        sprout_list.Set_Disabled(false);
+      }
+
+      function OnClick_Design()
+      {
+        editor.Render_Plants();
+      }
+
+      function New_Item()
+      {
+        const class_name = "Plant_Leaf";
+
+        const item = new pl[class_name];
+        item.class_name = class_name;
+        item.name = "Sprout 1";
+        item.maturity_rate = 1;
+        item.maturity = 0;
+        item.max_depth = 3;
+        item.x = 0;
+        item.y = 500;
+        item.x_scale = 1;
+        item.y_scale = 1;
+        item.angle = 0;
+        item.sprout_time = 50;
+
+        return item;
+      }
+    </script>
+  </head>
+
+  <body>
+    <h1>Plantinator</h1>
+
+    <sprout-editor id="sprout_editor"></sprout-editor>
+
+    <div>
+      <button id="new_plant_btn"><img src="images/plus.svg"></button>
+      <button id="play_btn"><img src="images/play-pause.svg"></button>
+      <button id="design_btn"><img src="images/pencil-ruler.svg"></button>
+    </div>
+
+    <sprout-list id="sprout_list"></sprout-list>
+
+  </body>
+</html>

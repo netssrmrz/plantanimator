@@ -176,6 +176,10 @@ export class Plant_Maturing2 extends Plant
     this.maturity_rate = 1;
   }
 
+  Init_Trunk()
+  {
+  }
+
   Init_Branches()
   {
   }
@@ -232,6 +236,7 @@ export class Plant_Maturing2 extends Plant
 
     if (!this.init)
     {
+      this.Init_Trunk();
       this.Init_Branches();
       this.init = true;
     }

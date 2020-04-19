@@ -1,7 +1,7 @@
 import {LitElement, html, css} from "./lit-element/lit-element.js";
 import * as pl from "./pa.js";
 
-class Plant_Props_Dialog extends LitElement 
+class Sprout_Props_Dialog extends LitElement 
 {
   constructor()
   {
@@ -14,8 +14,7 @@ class Plant_Props_Dialog extends LitElement
   {
     this.plant_name_elem = this.shadowRoot.getElementById("plant_name");
     this.plant_class_elem = this.shadowRoot.getElementById("plant_class");
-    this.plant_x_pos_elem = this.shadowRoot.getElementById("plant_x_pos");
-    this.plant_y_pos_elem = this.shadowRoot.getElementById("plant_y_pos");
+    this.sprout_time_elem = this.shadowRoot.getElementById("sprout_time");
     this.plant_x_scale_elem = this.shadowRoot.getElementById("plant_x_scale");
     this.plant_y_scale_elem = this.shadowRoot.getElementById("plant_y_scale");
     this.plant_angle_elem = this.shadowRoot.getElementById("plant_angle");
@@ -49,8 +48,7 @@ class Plant_Props_Dialog extends LitElement
     plant.maturity_rate = 1;
     plant.maturity = 100;
     plant.level = 1;
-    plant.x = this.plant_x_pos_elem.value;
-    plant.y = this.plant_y_pos_elem.value;
+    plant.sprout_time = this.sprout_time_elem.value;
     plant.x_scale = this.plant_x_scale_elem.value;
     plant.y_scale = this.plant_y_scale_elem.value;
     plant.angle = this.plant_angle_elem.value;
@@ -84,8 +82,7 @@ class Plant_Props_Dialog extends LitElement
     this.plant_i = plant.id;
     this.plant_name_elem.value = plant.name;
     this.plant_class_elem.value = plant.class_name;
-    this.plant_x_pos_elem.value = plant.x;
-    this.plant_y_pos_elem.value = plant.y;
+    this.sprout_time_elem.value = plant.sprout_time;
     this.plant_x_scale_elem.value = plant.x_scale;
     this.plant_y_scale_elem.value = plant.y_scale;
     this.plant_angle_elem.value = plant.angle;
@@ -178,11 +175,9 @@ class Plant_Props_Dialog extends LitElement
       <label>Name</label>
       <span><input id="plant_name" type="text"></span>
       <label>Class</label>
-      <span><input id="plant_class" type="text" disabled></span>
-      <label>X Position</label>
-      <span><input id="plant_x_pos" type="number"></span>
-      <label>Y Position</label>
-      <span><input id="plant_y_pos" type="number"></span>
+      <span><input id="plant_class" type="text"></span>
+      <label>Sprout Time</label>
+      <span><input id="sprout_time" type="number"></span>
       <label>X Scale</label>
       <span><input id="plant_x_scale" type="number"></span>
       <label>Y Scale</label>
@@ -198,4 +193,4 @@ class Plant_Props_Dialog extends LitElement
   }
 }
 
-customElements.define('plant-props-dlg', Plant_Props_Dialog);
+customElements.define('sprout-props-dlg', Sprout_Props_Dialog);
