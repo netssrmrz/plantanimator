@@ -25,16 +25,18 @@ class Sprout_Props_Dialog extends LitElement
   OnClick_New_Ok()
   {
     var plant = new pl[this.plant_class_elem.value];
-    plant.class_name = this.plant_class_elem.value;
-    plant.name = this.plant_name_elem.value;
     plant.maturity_rate = 1;
     plant.maturity = 0;
     plant.max_depth = 3;
+
+    plant.class_name = this.plant_class_elem.value;
+    plant.name = this.plant_name_elem.value;
     plant.x = Number.parseFloat(this.plant_x_pos_elem.value);
     plant.y = Number.parseFloat(this.plant_y_pos_elem.value);
     plant.x_scale = Number.parseFloat(this.plant_x_scale_elem.value);
     plant.y_scale = Number.parseFloat(this.plant_y_scale_elem.value);
     plant.angle = Number.parseFloat(this.plant_angle_elem.value);
+
     this.Hide();
     this.onclick_new_ok(plant);
   }
@@ -42,16 +44,20 @@ class Sprout_Props_Dialog extends LitElement
   OnClick_Edit_Ok()
   {
     var plant = new pl[this.plant_class_elem.value];
-    plant.id = this.plant_i;
+    plant.id = this.plant.id;
+    plant.x = this.plant.x;
+    plant.y = this.plant.y;
+    plant.maturity_rate = this.plant.maturity_rate;
+    plant.maturity = this.plant.maturity;
+    plant.level = this.plant.level;
+    plant.selected = this.plant.selected;
+
     plant.class_name = this.plant_class_elem.value;
     plant.name = this.plant_name_elem.value;
-    plant.maturity_rate = 1;
-    plant.maturity = 100;
-    plant.level = 1;
     plant.sprout_time = this.sprout_time_elem.value;
-    plant.x_scale = this.plant_x_scale_elem.value;
-    plant.y_scale = this.plant_y_scale_elem.value;
-    plant.angle = this.plant_angle_elem.value;
+    plant.x_scale = Number.parseFloat(this.plant_x_scale_elem.value);
+    plant.y_scale = Number.parseFloat(this.plant_y_scale_elem.value);
+    plant.angle = Number.parseFloat(this.plant_angle_elem.value);
     plant.selected = this.plant.selected;
     
     this.Hide();
@@ -79,13 +85,14 @@ class Sprout_Props_Dialog extends LitElement
   Edit(plant)
   {
     this.plant = plant;
-    this.plant_i = plant.id;
+
     this.plant_name_elem.value = plant.name;
     this.plant_class_elem.value = plant.class_name;
     this.sprout_time_elem.value = plant.sprout_time;
     this.plant_x_scale_elem.value = plant.x_scale;
     this.plant_y_scale_elem.value = plant.y_scale;
     this.plant_angle_elem.value = plant.angle;
+
     this.new_ok_btn.hidden = true;
     this.edit_ok_btn.hidden = false;
   }
@@ -120,6 +127,16 @@ class Sprout_Props_Dialog extends LitElement
         font-family: monospace;
         font-size: 16px;
         width: 200px;
+      }
+      select
+      {
+        border: 0;
+        background-color: inherit;
+        padding: 0;
+        margin: 0;
+        border-bottom: 1px solid #000;
+        font-family: monospace;
+        font-size: 16px;
       }
       label
       {
@@ -175,7 +192,31 @@ class Sprout_Props_Dialog extends LitElement
       <label>Name</label>
       <span><input id="plant_name" type="text"></span>
       <label>Class</label>
-      <span><input id="plant_class" type="text"></span>
+      <span>
+        <select id="plant_class">
+          <option>Plant_Flower</option>
+          <option>Plant_Flower2</option>
+          <option>Plant_Flower3</option>
+          <option>Plant_Flower4</option>
+          <option>Plant_Flower5</option>
+          <option>Plant_Flower6</option>
+          <option>Plant_Flower7</option>
+          <option>Plant_Flower8</option>
+          <option>Plant_Flower9</option>
+          <option>Plant_Flower10</option>
+          <option>Plant_Flower11</option>
+          <option>Plant_Flower12</option>
+          <option>Plant_Leaf</option>
+          <option>Plant_Leaf2</option>
+          <option>Plant_Leaf3</option>
+          <option>Plant_Leaf4</option>
+          <option>Plant_Leaf5</option>
+          <option>Plant_Leaf6</option>
+          <option>Plant_Leaf7</option>
+          <option>Plant_Leaf8</option>
+          <option>Plant_Leaf9</option>
+        </select>
+      </span>
       <label>Sprout Time</label>
       <span><input id="sprout_time" type="number"></span>
       <label>X Scale</label>
