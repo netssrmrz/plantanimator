@@ -17,8 +17,8 @@ class Sprout_Editor extends LitElement
     this.OnFinish_Play = this.OnFinish_Play.bind(this);
     this.is_playing = false;
     this.on_finish_play_fn = null;
-    this.colour = "#000";
-    this.colour_selected = "#0f0";
+    this.colour = "#aaa";
+    this.colour_selected = "#000";
 
     this.move_plant = null;
     this.scale_plant = null;
@@ -333,7 +333,7 @@ class Sprout_Editor extends LitElement
     let btn_path;
 
     btn_path = new Path2D();
-    btn_path.colour = "#f00";
+    btn_path.colour = "#000";
     btn_path.colour_hover = "#0f0";
     btn_path.hover = false;
     btn_path.rect(-0.5*size, -0.5*size, size, size);
@@ -397,9 +397,17 @@ class Sprout_Editor extends LitElement
     {
       this.ctx.strokeStyle = this.colour;
     }
-    const x = -(pot_size/2);
-    const y = -(pot_size/2);
-    this.ctx.strokeRect(x, y, pot_size, pot_size);          
+    const r = pot_size/2;
+    this.ctx.setLineDash([5, 5]);
+    this.ctx.beginPath();
+    this.ctx.moveTo(-r, -r);
+    this.ctx.lineTo(-r, r);
+    this.ctx.lineTo(r, r);
+    this.ctx.lineTo(r, -r);
+    this.ctx.lineTo(-r, -r);
+    this.ctx.moveTo(0, 0);
+    this.ctx.lineTo(0, 3*r);
+    this.ctx.stroke();
 
     this.ctx.restore();
 
@@ -412,7 +420,6 @@ class Sprout_Editor extends LitElement
   Render_Btn(plant, path)
   {
     this.ctx.save();
-
     this.Transform_To_Btn(path, plant);
 
     if (path.hover)
@@ -423,8 +430,8 @@ class Sprout_Editor extends LitElement
     {
       this.ctx.fillStyle = path.colour;
     }
-
     this.ctx.fill(path);
+
     this.ctx.restore();
   }
 

@@ -19,6 +19,11 @@ class Sprout_List extends LitElement
     dlg.onclick_edit_ok = this.OnClick_Edit_Ok;
   }
 
+  Round(num)
+  {
+    return Math.round((num + Number.EPSILON) * 10000) / 10000;
+  }
+
   Get_Selected_Plant()
   {
     let res;
@@ -304,9 +309,9 @@ class Sprout_List extends LitElement
         <td>${plant.name}</td>
         <td>${plant.class_name}</td>
         <td>${plant.sprout_time}</td>
-        <td>${plant.x_scale}</td>
-        <td>${plant.y_scale}</td>
-        <td>${plant.angle}</td>
+        <td>${this.Round(plant.x_scale)}</td>
+        <td>${this.Round(plant.y_scale)}</td>
+        <td>${this.Round(plant.angle)}</td>
       </tr>
       `;
   }
