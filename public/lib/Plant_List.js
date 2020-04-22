@@ -1,6 +1,6 @@
 import {LitElement, html, css} from "./lit-element/lit-element.js";
 import "./Plant_Props_Dialog.js";
-import "./Plant_Code_Gen.js";
+import "./Scene_Code_Gen.js";
 
 class Plant_List extends LitElement
 {
@@ -266,7 +266,7 @@ class Plant_List extends LitElement
         </tfoot>
       </table>
       <plant-props-dlg id="dlg"></plant-props-dlg>
-      <plant-code-gen id="code"></plant-code-gen>
+      <scene-code-gen id="code"></scene-code-gen>
     `;
   }
 

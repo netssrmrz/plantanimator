@@ -1,6 +1,6 @@
 import {LitElement, html, css} from "./lit-element/lit-element.js";
 
-class Plant_Code_Gen extends LitElement 
+class Scene_Code_Gen extends LitElement 
 {
   constructor()
   {
@@ -184,4 +184,4 @@ class Plant_Code_Gen extends LitElement
   }
 }
 
-customElements.define('plant-code-gen', Plant_Code_Gen);
+customElements.define('scene-code-gen', Scene_Code_Gen);

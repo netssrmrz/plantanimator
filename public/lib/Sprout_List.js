@@ -1,6 +1,6 @@
 import {LitElement, html, css} from "./lit-element/lit-element.js";
 import "./Sprout_Props_Dialog.js";
-import "./Plant_Code_Gen.js";
+import "./Scene_Code_Gen.js";
 
 class Sprout_List extends LitElement
 {
@@ -264,13 +264,11 @@ class Sprout_List extends LitElement
         <tfoot>
           <tr>
             <td id="btn_bar" colspan="8">
-              <button id="gen_btn" @click="${this.OnClick_Gen_Code}"><img src="images/code-json.svg"></button>
             </td>
           </tr>
         </tfoot>
       </table>
       <sprout-props-dlg id="dlg"></sprout-props-dlg>
-      <plant-code-gen id="code"></plant-code-gen>
     `;
   }
 
