@@ -299,7 +299,6 @@ export class Plant_Flower extends Plant_Maturing
         this.maturity, -this.maturity, 0, 0);
       this.canvas_ctx.rotate(2 * Math.PI / p);
     }
-    this.canvas_ctx.fill();
     this.canvas_ctx.stroke();
   }
 }
@@ -324,7 +323,6 @@ export class Plant_Flower2 extends Plant_Maturing
       this.canvas_ctx.moveTo(px + pr, py);
       this.canvas_ctx.arc(px, py, pr, 0, Math.PI);
     }
-    this.canvas_ctx.fill();
     this.canvas_ctx.stroke();
   }
 }
@@ -350,7 +348,6 @@ export class Plant_Flower3 extends Plant_Maturing
     }
     this.canvas_ctx.moveTo(cx + r, cy);
     this.canvas_ctx.arc(cx, cy, r, 0, 2 * Math.PI);
-    //this.canvas_ctx.fill();
     this.canvas_ctx.stroke();
   }
 }
@@ -390,7 +387,6 @@ export class Plant_Flower4 extends Plant_Maturing
       this.canvas_ctx.moveTo(px + pr, py);
       this.canvas_ctx.arc(px, py, pr, 0, Math.PI);
     }
-    this.canvas_ctx.fill();
     this.canvas_ctx.stroke();
   }
 }
@@ -430,7 +426,6 @@ export class Plant_Flower5 extends Plant_Maturing
       this.canvas_ctx.moveTo(px + pr, py);
       this.canvas_ctx.arc(px, py, pr, 0, Math.PI);
     }
-    this.canvas_ctx.fill();
     this.canvas_ctx.stroke();
   }
 }
@@ -470,7 +465,6 @@ export class Plant_Flower6 extends Plant_Maturing
       this.canvas_ctx.moveTo(px + pr, py);
       this.canvas_ctx.arc(px, py, pr, 0, Math.PI);
     }
-    this.canvas_ctx.fill();
     this.canvas_ctx.stroke();
   }
 }
@@ -496,7 +490,6 @@ export class Plant_Flower7 extends Plant_Maturing
     }
     this.canvas_ctx.beginPath();
     this.canvas_ctx.arc(0, 0, this.maturity/5, 0, 2 * Math.PI);
-    this.canvas_ctx.fill();
     this.canvas_ctx.stroke();
   }
 }
@@ -522,7 +515,6 @@ export class Plant_Flower8 extends Plant_Maturing
     }
     this.canvas_ctx.beginPath();
     this.canvas_ctx.arc(0, 0, this.maturity/5, 0, 2 * Math.PI);
-    this.canvas_ctx.fill();
     this.canvas_ctx.stroke();
   }
 }
@@ -548,7 +540,6 @@ export class Plant_Flower9 extends Plant_Maturing
     }
     this.canvas_ctx.beginPath();
     this.canvas_ctx.arc(0, 0, this.maturity/5, 0, 2 * Math.PI);
-    this.canvas_ctx.fill();
     this.canvas_ctx.stroke();
   }
 }
@@ -574,7 +565,6 @@ export class Plant_Flower10 extends Plant_Maturing
     }
     this.canvas_ctx.beginPath();
     this.canvas_ctx.arc(0, 0, this.maturity/5, 0, 2 * Math.PI);
-    this.canvas_ctx.fill();
     this.canvas_ctx.stroke();
   }
 }
@@ -600,7 +590,6 @@ export class Plant_Flower11 extends Plant_Maturing
     }
     this.canvas_ctx.beginPath();
     this.canvas_ctx.arc(0, 0, this.maturity/5, 0, 2 * Math.PI);
-    this.canvas_ctx.fill();
     this.canvas_ctx.stroke();
   }
 }
@@ -612,7 +601,6 @@ export class Plant_Flower12 extends Plant_Maturing
     this.canvas_ctx.lineWidth = 2;
     this.canvas_ctx.beginPath();
     this.canvas_ctx.arc(0, 0, this.maturity/2, 0, 2 * Math.PI);
-    this.canvas_ctx.fill();
     this.canvas_ctx.stroke();
   }
 }
