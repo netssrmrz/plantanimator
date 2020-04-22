@@ -184,6 +184,34 @@ class Sprout_Editor extends LitElement
     this.Enable_Events();
   }
 
+  Set_Time_Btn_Pts()
+  {
+    if (this.plants && this.plants.length>0)
+    {
+      for (let i=0; i<this.plants.length; i++)
+      {
+        const plant = this.plants[i];
+        this.Set_Sprout_Time(plant, plant.sprout_time);
+      }
+    }
+  }
+
+  Set_Sprout_Time(plant, sprout_time)
+  {
+    plant.sprout_time = sprout_time;
+    const trunk_pt_idx = Math.trunc(plant.sprout_time+0.5);
+    if (trunk_pt_idx < 0)
+    {
+      trunk_pt_idx = 0;
+    }
+    else if (trunk_pt_idx >= this.trunk_pts.length)
+    {
+      trunk_pt_idx = this.trunk_pts.length -1;
+    }
+    plant.time_btn_path.x = this.trunk_pts[trunk_pt_idx].x;
+    plant.time_btn_path.y = this.trunk_pts[trunk_pt_idx].y;
+}
+
   // Events =======================================================================================
 
   OnFinish_Play()
@@ -277,10 +305,7 @@ class Sprout_Editor extends LitElement
       }
       if (this.cmd.id == "time_plant")
       {
-        this.cmd.plant.sprout_time = this.cmd.plant.time_btn_path.y / 10;
-        const trunk_pt_idx = Math.trunc(this.cmd.plant.sprout_time);
-        this.cmd.plant.time_btn_path.x = this.trunk_pts[trunk_pt_idx].x;
-        this.cmd.plant.time_btn_path.y = c_pt.y;
+        this.Set_Sprout_Time(this.cmd.plant, c_pt.y / 10);
       }
       if (this.cmd.id == "pt1")
       {
@@ -313,6 +338,7 @@ class Sprout_Editor extends LitElement
       if (this.cmd.id == "pt1" || this.cmd.id == "pt2" || this.cmd.id == "ctrl1" || this.cmd.id == "ctrl2")
       {
         this.Update_Trunk();
+        this.Set_Time_Btn_Pts();
       }
       if (this.cmd.plant)
       {
@@ -378,11 +404,8 @@ class Sprout_Editor extends LitElement
     // sprout time btn
     if (!plant.time_btn_path)
     {
-      plant.sprout_time = plant.y / 10;
-      const trunk_pt_idx = Math.trunc(plant.sprout_time);
-      x = this.trunk_pts[trunk_pt_idx].x;
-      y = this.trunk_pts[trunk_pt_idx].y;
       plant.time_btn_path = this.New_Btn_Path(x, y, this.btn_size, false, "spr_btn");
+      this.Set_Sprout_Time(plant, plant.y / 10);
     }
   }
 

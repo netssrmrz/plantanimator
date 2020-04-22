@@ -68,6 +68,7 @@
 
       function Plants_OnChange()
       {
+        editor.Design_Mode();
         editor.Render_Plants();
       }
 
@@ -82,6 +83,7 @@
       {
         const plant = New_Item();
         sprout_list.Add_Plant(plant);
+        editor.Design_Mode();
         editor.Render_Plants();
       }
     
