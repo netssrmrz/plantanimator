@@ -1,0 +1,103 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <title>Plant Animator - Library</title>
+  <style>
+    body
+    {
+      font-family: serif;
+      font-style: italic;
+      margin: 0px;
+      background-color: #fffff9;
+      text-align: center;
+    }
+    h1
+    {
+      font-size: 40px;
+      text-transform: uppercase;
+      font-weight: 100;
+      margin: 10px;
+      text-align: center;
+    }
+    canvas
+    {
+      border: 4px solid #eee;
+      margin-right: 3px;
+      padding: 3px;
+    }
+  </style>
+  <script type="module">
+    import * as pl from "./lib/pa.js";
+
+    window.onload = Main;
+
+    function Main()
+    {
+      New_Plant("Plant_Flower").Render_All();
+      New_Plant("Plant_Flower2").Render_All();
+      New_Plant("Plant_Flower3").Render_All();
+      New_Plant("Plant_Flower4").Render_All();
+      New_Plant("Plant_Flower5").Render_All();
+      New_Plant("Plant_Flower6").Render_All();
+      New_Plant("Plant_Flower7").Render_All();
+      New_Plant("Plant_Flower8").Render_All();
+      New_Plant("Plant_Flower9").Render_All();
+      New_Plant("Plant_Flower10").Render_All();
+      New_Plant("Plant_Flower11").Render_All();
+      New_Plant("Plant_Flower12").Render_All();
+      New_Plant("Plant_Leaf").Render_All();
+      New_Plant("Plant_Leaf2").Render_All();
+      New_Plant("Plant_Leaf3").Render_All();
+      New_Plant("Plant_Leaf4").Render_All();
+      New_Plant("Plant_Leaf5").Render_All();
+      New_Plant("Plant_Leaf6").Render_All();
+      New_Plant("Plant_Leaf7").Render_All();
+      New_Plant("Plant_Leaf8").Render_All();
+      New_Plant("Plant_Leaf9").Render_All();
+    }
+
+    function New_Plant(class_name)
+    {
+      var plant = new pl[class_name];
+      plant.maturity_rate = 1;
+      plant.maturity = 100;
+      plant.level = 1;
+      plant.canvas_ctx = Init_Canvas(class_name);
+      plant.x = 100;
+      plant.y = 100;
+      plant.x_scale = 1;
+      plant.y_scale = -1;
+      plant.angle = 0;
+      return plant;
+    }
+
+    function Init_Canvas(class_name)
+    {
+      const canvas = document.createElement("canvas");
+      canvas.id = class_name + "_canvas";
+      canvas.width = "200";
+      canvas.height = "200";
+      document.body.appendChild(canvas);
+
+      const canvas_ctx = canvas.getContext("2d");
+
+      canvas_ctx.font = "12px sans-serif";
+      canvas_ctx.strokeText(class_name, 10, 20);
+
+      canvas_ctx.strokeStyle = "#aaa";
+      canvas_ctx.fillStyle = "#fff";
+      canvas_ctx.lineWidth = 4;
+      canvas_ctx.lineCap = 'round';
+      canvas_ctx.lineJoin = 'round';
+
+      return canvas_ctx;
+    }
+  </script>
+</head>
+
+<body>
+  <h1>Plantinator</h1>
+</body>
+</html>
