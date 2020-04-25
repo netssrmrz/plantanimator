@@ -1,5 +1,5 @@
 ﻿# Plant Animator
 
 To run
-- npm start
+- firebase serve
 - Browse to http://localhost:3000/
