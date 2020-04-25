@@ -66,6 +66,8 @@
         editor = document.getElementById("sprout_editor");
         editor.plants = sprout_list.plants;
         editor.on_change_fn = Editor_OnChange;
+        
+        sprout_list.this_class = editor.this_class;
       }
 
       function Plants_OnChange()

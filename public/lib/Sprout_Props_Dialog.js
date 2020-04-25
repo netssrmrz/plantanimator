@@ -8,6 +8,7 @@ class Sprout_Props_Dialog extends LitElement
     super();
     this.onclick_edit_ok = null;
     this.plant = null;
+    this.this_class = null;
   }
 
   firstUpdated(changedProperties)
@@ -43,7 +44,16 @@ class Sprout_Props_Dialog extends LitElement
 
   OnClick_Edit_Ok()
   {
-    var plant = new pl[this.plant_class_elem.value];
+    var plant;
+    
+    if (this.plant_class_elem.value == "This")
+    {
+      plant = new this.this_class();
+    }
+    else
+    {
+      plant = new pl[this.plant_class_elem.value];
+    }
     plant.id = this.plant.id;
     plant.x = this.plant.x;
     plant.y = this.plant.y;
@@ -194,6 +204,7 @@ class Sprout_Props_Dialog extends LitElement
       <label>Class</label>
       <span>
         <select id="plant_class">
+          <option>This</option>
           <option>Plant_Flower</option>
           <option>Plant_Flower2</option>
           <option>Plant_Flower3</option>

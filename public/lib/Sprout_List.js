@@ -9,12 +9,12 @@ class Sprout_List extends LitElement
     this.plants = [];
     this.on_change_fn = null;
     this.OnClick_Edit_Ok = this.OnClick_Edit_Ok.bind(this);
+    this.this_class = null;
   }
   
   firstUpdated(changedProperties)
   {
     const dlg = this.shadowRoot.getElementById("dlg");
-    
     dlg.onclick_edit_ok = this.OnClick_Edit_Ok;
   }
 
@@ -143,6 +143,7 @@ class Sprout_List extends LitElement
     const i = this.Get_Plant_Idx(id);
     const plant = this.plants[i];
 
+    dlg.this_class = this.this_class;
     dlg.Show();
     dlg.Edit(plant);
   }

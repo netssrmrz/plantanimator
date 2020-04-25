@@ -4,6 +4,74 @@ import { Bezier } from "./bezierjs/bezier.js";
 
 const pot_size = 100;
 
+// Plant Def ======================================================================================
+
+function Get_Trunk_Pts(x1, y1, x2, y2, cx1, cy1, cx2, cy2)
+{
+  const curve = new Bezier(
+    x1, y1, cx1, cy1,
+    cx2, cy2, x2, y2);
+
+  return curve.getLUT(100);
+}
+
+class Plant extends pl.Plant_Maturing2
+{
+  Init_Trunk()
+  {
+    this.curve_pts = Get_Trunk_Pts
+      (this.pt1.x, this.pt1.y,
+      this.pt2.x, this.pt2.y,
+      this.ctrl1.x, this.ctrl1.y,
+      this.ctrl2.x, this.ctrl2.y);
+  }
+
+  Init_Branches()
+  {
+    let sprout, plant;
+    
+    if (this.sprouts && this.sprouts.length>0)
+    {
+      for (let i=0; i<this.sprouts.length; i++)
+      {
+        sprout = this.sprouts[i];
+
+        if (sprout.class_name == "This")
+        {
+          plant = new Plant();
+          plant.pt1 = this.pt1;
+          plant.pt2 = this.pt2;
+          plant.ctrl1 = this.ctrl1;
+          plant.ctrl2 = this.ctrl2;
+          plant.sprouts = this.sprouts;
+        }
+        else
+        {
+          plant = new pl[sprout.class_name];
+        }
+
+        this.Add_Plant_Abs(sprout.sprout_time, sprout.angle, plant, 
+          sprout.x_scale, sprout.y_scale,
+          sprout.x, sprout.y);
+      }
+    }
+  }
+
+  Render()
+  {
+    for (let c = 1; c < this.maturity; c++)
+    {
+      this.canvas_ctx.beginPath();
+      this.canvas_ctx.lineWidth = (this.maturity - c) / 10;
+      this.canvas_ctx.moveTo(this.curve_pts[c - 1].x, this.curve_pts[c - 1].y);
+      this.canvas_ctx.lineTo(this.curve_pts[c].x, this.curve_pts[c].y);
+      this.canvas_ctx.stroke();
+    }
+  }
+}
+
+// Editor Def ======================================================================================
+
 class Sprout_Editor extends LitElement
 {
   constructor()
@@ -17,6 +85,7 @@ class Sprout_Editor extends LitElement
     this.btn_size = 12;
     this.active_plant = null;
     this.cmd = null;
+    this.this_class = Plant;
 
     this.time_btn_path = null;
     this.move_btn_path = null;
@@ -554,54 +623,3 @@ class Sprout_Editor extends LitElement
 }
 
 customElements.define('sprout-editor', Sprout_Editor);
-
-// Plant Def ======================================================================================
-
-function Get_Trunk_Pts(x1, y1, x2, y2, cx1, cy1, cx2, cy2)
-{
-  const curve = new Bezier(
-    x1, y1, cx1, cy1,
-    cx2, cy2, x2, y2);
-
-  return curve.getLUT(100);
-}
-
-class Plant extends pl.Plant_Maturing2
-{
-  Init_Trunk()
-  {
-    this.curve_pts = Get_Trunk_Pts
-      (this.pt1.x, this.pt1.y,
-      this.pt2.x, this.pt2.y,
-      this.ctrl1.x, this.ctrl1.y,
-      this.ctrl2.x, this.ctrl2.y);
-  }
-
-  Init_Branches()
-  {
-    let sprout;
-    
-    if (this.sprouts && this.sprouts.length>0)
-    {
-      for (let i=0; i<this.sprouts.length; i++)
-      {
-        sprout = this.sprouts[i];
-        this.Add_Plant_Abs(sprout.sprout_time, sprout.angle, new pl[sprout.class_name], 
-          sprout.x_scale, sprout.y_scale,
-          sprout.x, sprout.y);
-      }
-    }
-  }
-
-  Render()
-  {
-    for (let c = 1; c < this.maturity; c++)
-    {
-      this.canvas_ctx.beginPath();
-      this.canvas_ctx.lineWidth = (this.maturity - c) / 10;
-      this.canvas_ctx.moveTo(this.curve_pts[c - 1].x, this.curve_pts[c - 1].y);
-      this.canvas_ctx.lineTo(this.curve_pts[c].x, this.curve_pts[c].y);
-      this.canvas_ctx.stroke();
-    }
-  }
-}

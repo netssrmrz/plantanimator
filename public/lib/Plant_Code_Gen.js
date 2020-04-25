@@ -86,17 +86,21 @@ class Plant_Code_Gen extends LitElement
 
   Gen_Branches(plants)
   {
-    let res = "";
+    let res = "", class_name = "Plant";
 
     if (plants && plants.length>0)
     {
       for (let i=0; i<plants.length; i++)
       {
         const p = plants[i];
+        if (p.class_name != "This")
+        {
+          class_name = "pl." + p.class_name;
+        }
         res += "\t\t\t\t\tthis.Add_Plant_Abs(" +
           p.sprout_time + "," + 
           p.angle + "," + 
-          "new pl." + p.class_name + "()," + 
+          "new " + class_name + "()," + 
           p.x_scale + "," + 
           p.y_scale + "," + 
           p.x + "," + 
