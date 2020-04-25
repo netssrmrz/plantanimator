@@ -586,34 +586,16 @@ class Plant extends pl.Plant_Maturing2
       for (let i=0; i<this.sprouts.length; i++)
       {
         sprout = this.sprouts[i];
-        this.Add_Plant(sprout.sprout_time, sprout.angle, new pl[sprout.class_name], 
+        this.Add_Plant_Abs(sprout.sprout_time, sprout.angle, new pl[sprout.class_name], 
           sprout.x_scale, sprout.y_scale,
           sprout.x, sprout.y);
       }
     }
   }
 
-  Add_Plant(sprout_time, angle, plant, x_scale, y_scale, x, y)
-  {
-    if (this.curr_depth < this.max_depth)
-    {
-      plant.sprout_time = sprout_time;
-      plant.render = false;
-      plant.x = x;
-      plant.y = y;
-      plant.x_scale = x_scale;
-      plant.y_scale = y_scale;
-      plant.angle = angle;
-      plant.maturity_rate = this.maturity_rate;
-      this.Add_Branch(plant);
-    }
-  }
-
   Render()
   {
-    var c;
-
-    for (c = 1; c < this.maturity; c++)
+    for (let c = 1; c < this.maturity; c++)
     {
       this.canvas_ctx.beginPath();
       this.canvas_ctx.lineWidth = (this.maturity - c) / 10;

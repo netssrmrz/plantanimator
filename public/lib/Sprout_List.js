@@ -1,6 +1,5 @@
 import {LitElement, html, css} from "./lit-element/lit-element.js";
 import "./Sprout_Props_Dialog.js";
-import "./Scene_Code_Gen.js";
 
 class Sprout_List extends LitElement
 {
@@ -155,13 +154,6 @@ class Sprout_List extends LitElement
     this.requestUpdate();
     if (this.on_change_fn)
       this.on_change_fn();
-  }
-
-  OnClick_Gen_Code()
-  {
-    const code = this.shadowRoot.getElementById("code");
-    code.Show();
-    code.Gen_Scene(this.plants);
   }
 
   static get styles()

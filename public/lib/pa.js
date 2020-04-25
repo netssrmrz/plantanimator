@@ -65,6 +65,7 @@ export class Plant
 
   Add_Branch(plant)
   {
+    console.log("Plant.Add_Branch()");
     plant.canvas_ctx = this.canvas_ctx;
     plant.max_depth = this.max_depth;
     plant.curr_depth = this.curr_depth + 1;
@@ -263,6 +264,23 @@ export class Plant_Maturing2 extends Plant
   Add_Plant_No_Scale(sprout_time, angle, plant)
   {
     this.Add_Plant(sprout_time, angle, plant, 1 / this.Total_X_Scale(), 1 / this.Total_Y_Scale())
+  }
+
+  Add_Plant_Abs(sprout_time, angle, plant, x_scale, y_scale, x, y)
+  {
+    console.log("Plant_Maturing2.Add_Plant_Abs()");
+    if (this.curr_depth < this.max_depth)
+    {
+      plant.sprout_time = sprout_time;
+      plant.render = false;
+      plant.x = x;
+      plant.y = y;
+      plant.x_scale = x_scale;
+      plant.y_scale = y_scale;
+      plant.angle = angle;
+      plant.maturity_rate = this.maturity_rate;
+      this.Add_Branch(plant);
+    }
   }
 
   Add_Plant(sprout_time, angle, plant, x_scale, y_scale)
