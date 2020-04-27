@@ -3,25 +3,67 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Plant Animator - Home</title>
+    <title>Plantimator - Plant Editor</title>
     <style>
+      @font-face
+      {
+        font-family: parisienne;
+        src: url(fonts/Parisienne-Regular.ttf);
+      }
+      @font-face
+      {
+        font-family: clickerscript;
+        src: url(fonts/ClickerScript-Regular.ttf);
+      }
+      @font-face
+      {
+        font-family: dancingscript;
+        src: url(fonts/DancingScript-VariableFont_wght.ttf);
+      }
+      .hp
+      {
+        font-weight: 100;
+        position: relative;
+        top: -6px;
+      }
       h1
       {
-        font-family: serif;
-        font-style: italic;
-        font-size: 40px;
-        text-transform: uppercase;
-        font-weight: 100;
         margin: 10px;
       }
-
+      .h1a
+      {
+        font-family: parisienne;
+        color: deeppink;
+        font-size: 54px;
+        font-weight: 100;
+      }
+      .h1b
+      {
+        color: #000;
+        font-family: parisienne;
+        font-size: 54px;
+        font-weight: 100;
+      }
+      .h1c
+      {
+        color: deeppink;
+        font-family: parisienne;
+        font-size: 54px;
+        font-weight: 100;
+      }
+      .h1d
+      {
+        color: #000;
+        font-family: serif;
+        font-size: 42px;
+        font-weight: 100;
+      }
       body
       {
         text-align: center;
         margin: 0px;
         background-color: #fffff9;
       }
-
       button
       {
         border-radius: 7px;
@@ -150,7 +192,10 @@
   </head>
 
   <body>
-    <h1>Plantinator</h1>
+    <h1>
+      <span class="hp">&#x1f337;</span>
+      <span class="h1a">Pl</span><span class="h1b">an</span><span class="h1c">t</span><span class="h1d">imator</span>
+    </h1>
 
     <sprout-editor id="sprout_editor"></sprout-editor>
 
