@@ -89,6 +89,73 @@ export class Base_Plant
   {
   }
 
+  Render_Design(ctx)
+  {
+    const colour = "#aaa";
+    const colour_selected = "#000";
+    const pot_size = 100;
+
+    if (this.selected)
+    {
+      ctx.strokeStyle = colour_selected;
+      ctx.lineWidth = 3;
+    }
+    else
+    {
+      ctx.strokeStyle = colour;
+      ctx.lineWidth = 1;
+    }
+    const r = pot_size/2;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(-r, -r);
+    ctx.lineTo(-r, r);
+    ctx.lineTo(r, r);
+    ctx.lineTo(r, -r);
+    ctx.lineTo(-r, -r);
+    ctx.moveTo(0, 0);
+    ctx.lineTo(0, 3*r);
+    ctx.stroke();
+
+    this.Render_Btn(ctx, this.scale_btn_path, this.scale_btn_path.x, this.scale_btn_path.y, true);
+    this.Render_Btn(ctx, this.rotate_btn_path, this.rotate_btn_path.x, this.rotate_btn_path.y, true);
+    this.Render_Btn(ctx, this.move_btn_path, this.move_btn_path.x, this.move_btn_path.y, true);
+  }
+
+  Render_Design_Abs(ctx)
+  {
+    ctx.setLineDash([5, 5]);
+    ctx.strokeStyle="#aaa";
+    ctx.beginPath();
+    ctx.moveTo(this.time_btn_path.x, this.time_btn_path.y);
+    ctx.lineTo(this.x, this.y);
+    ctx.stroke();
+
+    this.Render_Btn(ctx, this.time_btn_path, this.time_btn_path.x, this.time_btn_path.y, false);
+  }
+
+  Render_Btn(ctx, path, x, y, unscale)
+  {
+    ctx.save();
+    ctx.translate(x, y);
+    if (unscale)
+    {
+      ctx.scale(1/this.x_scale, 1/this.y_scale);
+    }
+
+    if (path.hover)
+    {
+      ctx.fillStyle = path.colour_hover;
+    }
+    else
+    {
+      ctx.fillStyle = path.colour;
+    }
+    ctx.fill(path);
+
+    ctx.restore();
+  }
+
   Total_X_Scale()
   {
     var curr_plant, res = 1;

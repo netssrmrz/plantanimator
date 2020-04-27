@@ -182,6 +182,11 @@ class Plant_Bezier
 
   }
 
+  Render_Design_Abs(ctx)
+  {
+    
+  }
+
   Render_Design(ctx)
   {
     ctx.beginPath();

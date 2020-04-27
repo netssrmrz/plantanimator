@@ -188,10 +188,10 @@ class Sprout_Editor extends LitElement
       for (i=0; i<this.plants.length; i++)
       {
         plant = this.plants[i];
-        if (this.Set_Event_In_Btn(plant, event, plant.scale_btn_path) ||
-          this.Set_Event_In_Btn(plant, event, plant.rotate_btn_path) ||
-          this.Set_Event_In_Btn(plant, event, plant.move_btn_path) ||
-          this.Set_Event_In_Btn(plant, event, plant.time_btn_path))
+        if (this.Set_Event_In_Btn(plant, event, plant.scale_btn_path, true) ||
+          this.Set_Event_In_Btn(plant, event, plant.rotate_btn_path, true) ||
+          this.Set_Event_In_Btn(plant, event, plant.move_btn_path, true) ||
+          this.Set_Event_In_Btn(plant, event, plant.time_btn_path, false))
         {
           this.active_plant = plant;
           res = true;
@@ -202,7 +202,7 @@ class Sprout_Editor extends LitElement
     return res;
   }
 
-  Set_Event_In_Btn(plant, event, path)
+  Set_Event_In_Btn(plant, event, path, relative)
   {
     let res = false;
 
@@ -210,7 +210,7 @@ class Sprout_Editor extends LitElement
     {
       this.ctx.save();
 
-      this.Transform_To_Btn(path, plant);
+      this.Transform_To_Btn(path, plant, relative);
       path.hover = this.ctx.isPointInPath(path, event.offsetX, event.offsetY);
       res = path.hover;
       
@@ -220,9 +220,9 @@ class Sprout_Editor extends LitElement
     return res;
   }
 
-  Transform_To_Btn(path, plant)
+  Transform_To_Btn(path, plant, relative)
   {
-    if (path.relative)
+    if (relative)
     {
       this.ctx.translate(plant.x, plant.y);
       this.ctx.rotate(plant.angle);
@@ -441,7 +441,7 @@ class Sprout_Editor extends LitElement
     {
       x = (pot_size/2);
       y = (pot_size/2);
-      plant.scale_btn_path = this.New_Btn_Path(x, y, this.btn_size, true, "scl_btn");
+      plant.scale_btn_path = this.New_Btn_Path(x, y, this.btn_size, "scl_btn");
     }
 
     // rotate btn
@@ -449,7 +449,7 @@ class Sprout_Editor extends LitElement
     {
       y = (pot_size/2);
       x = 0;
-      plant.rotate_btn_path = this.New_Btn_Path(x, y, this.btn_size, true, "rot_btn");
+      plant.rotate_btn_path = this.New_Btn_Path(x, y, this.btn_size, "rot_btn");
     }
 
     // translate btn
@@ -457,18 +457,18 @@ class Sprout_Editor extends LitElement
     {
       x = 0;
       y = 0;
-      plant.move_btn_path = this.New_Btn_Path(x, y, this.btn_size, true, "trn_btn");
+      plant.move_btn_path = this.New_Btn_Path(x, y, this.btn_size, "trn_btn");
     }
 
     // sprout time btn
     if (!plant.time_btn_path)
     {
-      plant.time_btn_path = this.New_Btn_Path(x, y, this.btn_size, false, "spr_btn");
+      plant.time_btn_path = this.New_Btn_Path(x, y, this.btn_size, "spr_btn");
       this.Set_Sprout_Time(plant, plant.y / 10);
     }
   }
 
-  New_Btn_Path(x, y, size, relative, id)
+  New_Btn_Path(x, y, size, id)
   {
     let btn_path;
 
@@ -480,7 +480,6 @@ class Sprout_Editor extends LitElement
     btn_path.x = x;
     btn_path.y = y;
     btn_path.size = size;
-    btn_path.relative = relative;
     btn_path.id = id;
 
     return btn_path;
@@ -506,80 +505,12 @@ class Sprout_Editor extends LitElement
         this.ctx.translate(plant.x, plant.y);
         this.ctx.rotate(plant.angle);
         this.ctx.scale(plant.x_scale, plant.y_scale);
-
-        if (plant.name=="Stem")
-        {
-          plant.Render_Design(this.ctx);
-        }
-        else
-        {
-          this.Render_Plant(plant);
-        }
-
+        plant.Render_Design(this.ctx);
         this.ctx.restore();
-        if (plant.name!="Stem")
-        {
-          this.Render_Btn(plant, plant.scale_btn_path);
-          this.Render_Btn(plant, plant.rotate_btn_path);
-          this.Render_Btn(plant, plant.move_btn_path);
-          this.Render_Btn(plant, plant.time_btn_path, plant.x, plant.y);
-        }
+
+        plant.Render_Design_Abs(this.ctx);
       }
     }
-
-  }
-
-  Render_Plant(plant)
-  {
-    if (plant.selected)
-    {
-      this.ctx.strokeStyle = this.colour_selected;
-      this.ctx.lineWidth = 3;
-    }
-    else
-    {
-      this.ctx.strokeStyle = this.colour;
-      this.ctx.lineWidth = 1;
-    }
-    const r = pot_size/2;
-    this.ctx.setLineDash([]);
-    this.ctx.beginPath();
-    this.ctx.moveTo(-r, -r);
-    this.ctx.lineTo(-r, r);
-    this.ctx.lineTo(r, r);
-    this.ctx.lineTo(r, -r);
-    this.ctx.lineTo(-r, -r);
-    this.ctx.moveTo(0, 0);
-    this.ctx.lineTo(0, 3*r);
-    this.ctx.stroke();
-  }
-
-  Render_Btn(plant, path, x, y)
-  {
-    if (x != null && y != null)
-    {
-      this.ctx.setLineDash([5, 5]);
-      this.ctx.strokeStyle="#aaa";
-      this.ctx.beginPath();
-      this.ctx.moveTo(path.x, path.y);
-      this.ctx.lineTo(x, y);
-      this.ctx.stroke();
-    }
-
-    this.ctx.save();
-    this.Transform_To_Btn(path, plant);
-
-    if (path.hover)
-    {
-      this.ctx.fillStyle = path.colour_hover;
-    }
-    else
-    {
-      this.ctx.fillStyle = path.colour;
-    }
-    this.ctx.fill(path);
-
-    this.ctx.restore();
   }
 
   static get styles()
