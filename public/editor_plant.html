@@ -90,7 +90,6 @@
       import * as pl from "./lib/pa.js";
       import "./lib/Sprout_Editor.js";
       import "./lib/Sprout_List.js";
-      import "./lib/Plant_Code_Gen.js";
 
       window.onload = Main;
       let sprout_list, editor;
@@ -100,7 +99,6 @@
         document.getElementById("new_plant_btn").onclick=OnClick_New_Plant;
         document.getElementById("play_btn").onclick = OnClick_Play;
         document.getElementById("design_btn").onclick = OnClick_Design;
-        document.getElementById("gen_btn").onclick = OnClick_Gen_Code;
         
         sprout_list = document.getElementById("sprout_list");
         sprout_list.on_change_fn = Plants_OnChange;
@@ -108,7 +106,8 @@
         editor = document.getElementById("sprout_editor");
         editor.plants = sprout_list.plants;
         editor.on_change_fn = Editor_OnChange;
-        
+        editor.Render_Plants();
+                
         sprout_list.this_class = editor.this_class;
       }
 
@@ -124,14 +123,6 @@
       }
 
       // button bar ===============================================================================
-
-      function OnClick_Gen_Code()
-      {
-        const code = document.getElementById("code");
-        code.Show();
-        code.Gen_Code(sprout_list.plants, 
-          editor.pt1_btn, editor.pt2_btn, editor.ctrl1_btn, editor.ctrl2_btn);
-      }
 
       function OnClick_New_Plant()
       {
@@ -203,11 +194,9 @@
       <button id="new_plant_btn"><img src="images/plus.svg"></button>
       <button id="play_btn"><img src="images/play-pause.svg"></button>
       <button id="design_btn"><img src="images/pencil-ruler.svg"></button>
-      <button id="gen_btn"><img src="images/code-json.svg"></button>
     </div>
 
     <sprout-list id="sprout_list"></sprout-list>
-    <plant-code-gen id="code"></plant-code-gen>
 
   </body>
 </html>

@@ -1,15 +1,247 @@
 import {LitElement, html, css} from "./lit-element/lit-element.js";
 import "./Sprout_Props_Dialog.js";
+import { Bezier } from "./bezierjs/bezier.js";
+import "./Plant_Code_Gen.js";
+
+class Plant_Bezier
+{
+  constructor()
+  {
+    this.name = null;
+    this.class_name = "Plant_Bezier";
+    this.x = 0;
+    this.y = 0;
+    this.x1 = 0;
+    this.y1 = 0;
+    this.x2 = 0;
+    this.y2 = 0;
+    this.ctrl1_x = 0;
+    this.ctrl1_y = 0;
+    this.ctrl2_x = 0;
+    this.ctrl2_y = 0;
+    this.angle = 0;
+    this.x_scale = 1;
+    this.y_scale = 1;
+    this.pt1_btn = this.New_Btn_Path(12, "pt1");
+    this.pt2_btn = this.New_Btn_Path(12, "pt2");
+    this.ctrl1_btn = this.New_Btn_Path(12, "ctrl1");
+    this.ctrl2_btn = this.New_Btn_Path(12, "ctrl2");
+    this.cmd = null;
+    this.trunk_pts = null;
+  }
+
+  New_Btn_Path(size, id)
+  {
+    let btn_path;
+
+    btn_path = new Path2D();
+    btn_path.colour = "#000";
+    btn_path.colour_hover = "#0f0";
+    btn_path.hover = false;
+    btn_path.rect(-0.5*size, -0.5*size, size, size);
+    btn_path.size = size;
+    btn_path.id = id;
+
+    return btn_path;
+  }
+
+  Set_Pts(x1, y1, x2, y2, ctrl1_x, ctrl1_y, ctrl2_x, ctrl2_y)
+  {
+    this.x1 = x1;
+    this.y1 = y1;
+    this.x2 = x2;
+    this.y2 = y2;
+    this.ctrl1_x = ctrl1_x;
+    this.ctrl1_y = ctrl1_y;
+    this.ctrl2_x = ctrl2_x;
+    this.ctrl2_y = ctrl2_y;
+
+    const curve = new Bezier
+      (this.x1, this.y1, this.ctrl1_x, this.ctrl1_y, this.ctrl2_x, this.ctrl2_y, this.x2, this.y2);
+    this.trunk_pts = curve.getLUT(100);
+  }
+
+  Get_Trunk_Pt(sprout_time)
+  {
+    let trunk_pt_idx = Math.trunc(sprout_time+0.5);
+    if (trunk_pt_idx < 0)
+    {
+      trunk_pt_idx = 0;
+    }
+    else if (trunk_pt_idx >= this.trunk_pts.length)
+    {
+      trunk_pt_idx = this.trunk_pts.length -1;
+    }
+
+    return this.trunk_pts[trunk_pt_idx];
+  }
+
+  To_Canvas_Pt(ctx, sx, sy)
+  {
+    return {x: sx-ctx.canvas.width/2-4, y: ctx.canvas.height-sy+4};
+  }
+
+  On_Mouse_Up(event, ctx)
+  {
+    let res = false;
+
+    if (this.cmd)
+    {
+      if (this.cmd.id == "pt1" || this.cmd.id == "pt2" || this.cmd.id == "ctrl1" || this.cmd.id == "ctrl2")
+      {
+        this.Set_Pts(this.x1, this.y1, this.x2, this.y2, this.ctrl1_x, this.ctrl1_y, this.ctrl2_x, this.ctrl2_y);
+      }
+      this.cmd = null;
+      res = true;
+    }
+
+    return res;
+  }
+
+  On_Mouse_Move(event, ctx)
+  {
+    let res = false;
+
+    if (this.cmd)
+    {
+      const c_pt = this.To_Canvas_Pt(ctx, event.offsetX, event.offsetY);
+      if (this.cmd.id == "pt1")
+      {
+        this.x1 = c_pt.x;
+        this.y1 = c_pt.y;
+      }
+      else if (this.cmd.id == "pt2")
+      {
+        this.x2 = c_pt.x;
+        this.y2 = c_pt.y;
+      }
+      else if (this.cmd.id == "ctrl1")
+      {
+        this.ctrl1_x = c_pt.x;
+        this.ctrl1_y = c_pt.y;
+      }
+      else if (this.cmd.id == "ctrl2")
+      {
+        this.ctrl2_x = c_pt.x;
+        this.ctrl2_y = c_pt.y;
+      }
+      res = true;
+    }
+    else
+    {
+      res = res || this.On_Mouse_Move_Btn(ctx, event, this.pt1_btn, this.x1, this.y1);
+      res = res || this.On_Mouse_Move_Btn(ctx, event, this.pt2_btn, this.x2, this.y2);
+      res = res || this.On_Mouse_Move_Btn(ctx, event, this.ctrl1_btn, this.ctrl1_x, this.ctrl1_y);
+      res = res || this.On_Mouse_Move_Btn(ctx, event, this.ctrl2_btn, this.ctrl2_x, this.ctrl2_y);
+    }
+
+    return res;
+  }
+
+  On_Mouse_Move_Btn(ctx, event, path, x, y)
+  {
+    let res = false;
+
+    ctx.save();
+    ctx.translate(x, y);
+    const is_in_path = ctx.isPointInPath(path, event.offsetX, event.offsetY);
+    if (path.hover != is_in_path)
+    {
+      path.hover = is_in_path;
+      res = true;
+    }
+    ctx.restore();
+
+    return res;
+  }
+
+  On_Mouse_Down(event, ctx)
+  {
+    if (this.pt1_btn.hover)
+    {
+      this.cmd = {id: "pt1"};
+    }
+    if (this.pt2_btn.hover)
+    {
+      this.cmd = {id: "pt2"};
+    }
+    if (this.ctrl1_btn.hover)
+    {
+      this.cmd = {id: "ctrl1"};
+    }
+    if (this.ctrl2_btn.hover)
+    {
+      this.cmd = {id: "ctrl2"};
+    }
+
+    return false;
+  }
+
+  Render()
+  {
+
+  }
+
+  Render_Design(ctx)
+  {
+    ctx.beginPath();
+    ctx.setLineDash([]);
+    ctx.strokeStyle="#aaa";
+    ctx.moveTo(this.trunk_pts[0].x, this.trunk_pts[0].y);
+    for (let i=1; i<this.trunk_pts.length; i++)
+    {
+      ctx.lineTo(this.trunk_pts[i].x, this.trunk_pts[i].y);
+    }
+    ctx.stroke();
+
+    ctx.setLineDash([5, 5]);
+    ctx.strokeStyle="#aaa";
+    ctx.beginPath();
+    ctx.moveTo(this.x1, this.y1);
+    ctx.lineTo(this.ctrl1_x, this.ctrl1_y);
+    ctx.moveTo(this.x2, this.y2);
+    ctx.lineTo(this.ctrl2_x, this.ctrl2_y);
+    ctx.stroke();
+
+    this.Render_Btn(ctx, this.pt1_btn, this.x1, this.y1);
+    this.Render_Btn(ctx, this.pt2_btn, this.x2, this.y2);
+    this.Render_Btn(ctx, this.ctrl1_btn, this.ctrl1_x, this.ctrl1_y);
+    this.Render_Btn(ctx, this.ctrl2_btn, this.ctrl2_x, this.ctrl2_y);
+  }
+
+  Render_Btn(ctx, path, x, y)
+  {
+    ctx.save();
+    ctx.translate(x, y);
+
+    if (path.hover)
+    {
+      ctx.fillStyle = path.colour_hover;
+    }
+    else
+    {
+      ctx.fillStyle = path.colour;
+    }
+    ctx.fill(path);
+
+    ctx.restore();
+  }
+}
 
 class Sprout_List extends LitElement
 {
   constructor()
   {
     super();
-    this.plants = [];
     this.on_change_fn = null;
     this.OnClick_Edit_Ok = this.OnClick_Edit_Ok.bind(this);
     this.this_class = null;
+
+    const stem = new Plant_Bezier();
+    stem.name = "Stem";
+    stem.Set_Pts(0, 0, 0, 1000, -250, 200, 250, 800);
+    this.plants = [];
+    this.Add_Plant(stem, false, false);
   }
   
   firstUpdated(changedProperties)
@@ -48,9 +280,20 @@ class Sprout_List extends LitElement
     }
   }
 
-  Add_Plant(plant)
+  Add_Plant(plant, can_edit, can_delete)
   {
     plant.id = this.plants.length;
+    plant.can_edit = true;
+    if (can_edit != null)
+    {
+      plant.can_edit = can_edit;
+    }
+    plant.can_delete = true;
+    if (can_delete != null)
+    {
+      plant.can_delete = can_delete;
+    }
+
     this.plants.push(plant);
     this.requestUpdate();
   }
@@ -157,6 +400,19 @@ class Sprout_List extends LitElement
       this.on_change_fn();
   }
 
+  OnClick_Gen_Code()
+  {
+    const code = this.shadowRoot.getElementById("code");
+    code.Show();
+    const stem = this.plants.find((p) => p.name=="Stem");
+    const branches = this.plants.filter((p) => p.name!="Stem");
+    const pt1 = {x: stem.x1, y: stem.y1};
+    const pt2 = {x: stem.x2, y: stem.y2};
+    const ctrl1 = {x: stem.ctrl1_x, y: stem.ctrl1_y};
+    const ctrl2 = {x: stem.ctrl2_x, y: stem.ctrl2_y};
+    code.Gen_Code(branches, pt1, pt2, ctrl1, ctrl2);
+  }
+
   static get styles()
   {
     return css`
@@ -245,7 +501,8 @@ class Sprout_List extends LitElement
             <th>#</th>
             <th>Name</th>
             <th>Class</th>
-            <th>Sprout Time</th>
+            <th>X</th>
+            <th>Y</th>
             <th>X Scale</th>
             <th>Y Scale</th>
             <th>Angle</th>
@@ -257,12 +514,14 @@ class Sprout_List extends LitElement
         <tfoot>
           <tr>
             <td id="btn_bar" colspan="8">
+              <button id="gen_btn" @click="${this.OnClick_Gen_Code}"><img src="images/code-json.svg"></button>
             </td>
           </tr>
         </tfoot>
       </table>
       <sprout-props-dlg id="dlg"></sprout-props-dlg>
-    `;
+      <plant-code-gen id="code"></plant-code-gen>
+      `;
   }
 
   Render_Items()
@@ -293,18 +552,30 @@ class Sprout_List extends LitElement
       <tr plant-id="${plant.id}" class="${row_class}">
         <td>
           <button plant-id="${plant.id}" @click="${this.OnClick_Select_Plant}"><img src="images/target.svg"></button>
-          <button plant-id="${plant.id}" @click="${this.OnClick_Edit_Plant}"><img src="images/pencil-outline.svg"></button>
-          <button plant-id="${plant.id}" @click="${this.OnClick_Delete_Plant}"><img src="images/delete-outline.svg"></button>
+          ${this.Render_Button(plant.id, this.OnClick_Edit_Plant, "pencil-outline.svg", plant.can_edit)}
+          ${this.Render_Button(plant.id, this.OnClick_Delete_Plant, "delete-outline.svg", plant.can_delete)}
         </td>
         <td>${i+1}</td>
         <td>${plant.name}</td>
         <td>${plant.class_name}</td>
-        <td>${plant.sprout_time}</td>
+        <td>${plant.x}</td>
+        <td>${plant.y}</td>
         <td>${this.Round(plant.x_scale)}</td>
         <td>${this.Round(plant.y_scale)}</td>
         <td>${this.Round(plant.angle)}</td>
       </tr>
       `;
+  }
+
+  Render_Button(id, on_click_fn, image, can_render)
+  {
+    let res;
+
+    if (can_render)
+    {
+      res = html`<button plant-id="${id}" @click="${on_click_fn}"><img src="images/${image}"></button>`;
+    }
+    return res;
   }
 }
 

@@ -91,11 +91,6 @@ class Sprout_Editor extends LitElement
     this.move_btn_path = null;
     this.rotate_btn_path = null;
     this.scale_btn_path = null;
-    this.pt1_btn = this.New_Btn_Path(0, 0, 12, false, "pt1");
-    this.pt2_btn = this.New_Btn_Path(0, 1000, 12, false, "pt2");
-    this.ctrl1_btn = this.New_Btn_Path(-250, 200, 12, false, "ctrl1");
-    this.ctrl2_btn = this.New_Btn_Path(250, 800, 12, false, "ctrl2");
-    this.Update_Trunk();
 
     this.OnMouseMove_Canvas = this.OnMouseMove_Canvas.bind(this);
     this.OnMouseDown_Canvas = this.OnMouseDown_Canvas.bind(this);
@@ -119,14 +114,14 @@ class Sprout_Editor extends LitElement
     this.is_playing = true;
     this.on_finish_play_fn = on_finish_play_fn;
 
+    const stem = this.plants.find((p) => p.name=="Stem");
+
     const plant = new Plant();
-    plant.pt1 = {x: this.pt1_btn.x, y: this.pt1_btn.y};
-    plant.pt2 = {x: this.pt2_btn.x, y: this.pt2_btn.y};
-    plant.ctrl1 = {x: this.ctrl1_btn.x, y: this.ctrl1_btn.y};
-    plant.ctrl2 = {x: this.ctrl2_btn.x, y: this.ctrl2_btn.y};
-    plant.sprouts = this.plants;
-    //item.class_name = class_name;
-    //item.name = "Sprout 1";
+    plant.pt1 = {x: stem.x1, y: stem.y1};
+    plant.pt2 = {x: stem.x2, y: stem.y2};
+    plant.ctrl1 = {x: stem.ctrl1_x, y: stem.ctrl1_y};
+    plant.ctrl2 = {x: stem.ctrl2_x, y: stem.ctrl2_y};
+    plant.sprouts = this.plants.filter((p) => p.name!="Stem");
     plant.maturity_rate = 1;
     plant.maturity = 0;
     plant.max_depth = 3;
@@ -135,7 +130,6 @@ class Sprout_Editor extends LitElement
     plant.x_scale = 1;
     plant.y_scale = 1;
     plant.angle = 0;
-    //item.sprout_time = 50;
     plant.canvas_ctx = this.ctx;
 
     this.Disable_Events();
@@ -205,24 +199,25 @@ class Sprout_Editor extends LitElement
       }
     }
 
-    res = res || this.Set_Event_In_Btn(null, event, this.pt1_btn);
-    res = res || this.Set_Event_In_Btn(null, event, this.pt2_btn);
-    res = res || this.Set_Event_In_Btn(null, event, this.ctrl1_btn);
-    res = res || this.Set_Event_In_Btn(null, event, this.ctrl2_btn);
-
     return res;
   }
 
   Set_Event_In_Btn(plant, event, path)
   {
-    this.ctx.save();
+    let res = false;
 
-    this.Transform_To_Btn(path, plant);
-    path.hover = this.ctx.isPointInPath(path, event.offsetX, event.offsetY);
-    
-    this.ctx.restore();
+    if (path)
+    {
+      this.ctx.save();
 
-    return path.hover;
+      this.Transform_To_Btn(path, plant);
+      path.hover = this.ctx.isPointInPath(path, event.offsetX, event.offsetY);
+      res = path.hover;
+      
+      this.ctx.restore();
+    }
+
+    return res;
   }
 
   Transform_To_Btn(path, plant)
@@ -243,15 +238,6 @@ class Sprout_Editor extends LitElement
     }
   }
 
-  Update_Trunk()
-  {
-    this.trunk_pts = Get_Trunk_Pts
-      (this.pt1_btn.x, this.pt1_btn.y,
-      this.pt2_btn.x, this.pt2_btn.y,
-      this.ctrl1_btn.x, this.ctrl1_btn.y,
-      this.ctrl2_btn.x, this.ctrl2_btn.y);
-  }
-
   Design_Mode()
   {
     this.Render_Plants();
@@ -265,26 +251,22 @@ class Sprout_Editor extends LitElement
       for (let i=0; i<this.plants.length; i++)
       {
         const plant = this.plants[i];
-        this.Set_Sprout_Time(plant, plant.sprout_time);
+        if (plant.name != "Stem")
+        {
+          this.Set_Sprout_Time(plant, plant.sprout_time);
+        }
       }
     }
   }
 
   Set_Sprout_Time(plant, sprout_time)
   {
+    const stem = this.plants.find((p) => p.name == "Stem");
+    const trunk_pt = stem.Get_Trunk_Pt(sprout_time);
     plant.sprout_time = sprout_time;
-    const trunk_pt_idx = Math.trunc(plant.sprout_time+0.5);
-    if (trunk_pt_idx < 0)
-    {
-      trunk_pt_idx = 0;
-    }
-    else if (trunk_pt_idx >= this.trunk_pts.length)
-    {
-      trunk_pt_idx = this.trunk_pts.length -1;
-    }
-    plant.time_btn_path.x = this.trunk_pts[trunk_pt_idx].x;
-    plant.time_btn_path.y = this.trunk_pts[trunk_pt_idx].y;
-}
+    plant.time_btn_path.x = trunk_pt.x;
+    plant.time_btn_path.y = trunk_pt.y;
+  }
 
   // Events =======================================================================================
 
@@ -299,6 +281,20 @@ class Sprout_Editor extends LitElement
 
   OnMouseDown_Canvas(event)
   {
+    let plant;
+
+    if (this.plants && this.plants.length>0)
+    {
+      for (let i=0; i<this.plants.length; i++)
+      {
+        plant = this.plants[i];
+        if (plant.On_Mouse_Down)
+        {
+          plant.On_Mouse_Down(event, this.ctx);
+        }
+      }
+    }
+
     if (this.Set_MouseEvents(event))
     {
       if (this.active_plant)
@@ -320,29 +316,25 @@ class Sprout_Editor extends LitElement
           this.cmd = {id: "time_plant", plant: this.active_plant};
         }
       }
-      if (this.pt1_btn.hover)
-      {
-        this.cmd = {id: "pt1"};
-      }
-      if (this.pt2_btn.hover)
-      {
-        this.cmd = {id: "pt2"};
-      }
-      if (this.ctrl1_btn.hover)
-      {
-        this.cmd = {id: "ctrl1"};
-      }
-      if (this.ctrl2_btn.hover)
-      {
-        this.cmd = {id: "ctrl2"};
-      }
       this.Render_Plants();
     }
   }
 
   OnMouseMove_Canvas(event)
   {
-    let c_pt;
+    let c_pt, plant;
+
+    if (this.plants && this.plants.length>0)
+    {
+      for (let i=0; i<this.plants.length; i++)
+      {
+        plant = this.plants[i];
+        if (plant.On_Mouse_Move)
+        {
+          plant.On_Mouse_Move(event, this.ctx);
+        }
+      }
+    }
 
     this.Set_MouseEvents(event);
     if (this.cmd)
@@ -381,39 +373,32 @@ class Sprout_Editor extends LitElement
       {
         this.Set_Sprout_Time(this.cmd.plant, c_pt.y / 10);
       }
-      if (this.cmd.id == "pt1")
-      {
-        this.pt1_btn.x = c_pt.x;
-        this.pt1_btn.y = c_pt.y;
-      }
-      if (this.cmd.id == "pt2")
-      {
-        this.pt2_btn.x = c_pt.x;
-        this.pt2_btn.y = c_pt.y;
-      }
-      if (this.cmd.id == "ctrl1")
-      {
-        this.ctrl1_btn.x = c_pt.x;
-        this.ctrl1_btn.y = c_pt.y;
-      }
-      if (this.cmd.id == "ctrl2")
-      {
-        this.ctrl2_btn.x = c_pt.x;
-        this.ctrl2_btn.y = c_pt.y;
-      }
     }
     this.Render_Plants();
   }
 
   OnMouseUp_Canvas(event)
   {
+    let plant, has_change = false;
+
+    if (this.plants && this.plants.length>0)
+    {
+      for (let i=0; i<this.plants.length; i++)
+      {
+        plant = this.plants[i];
+        if (plant.On_Mouse_Up)
+        {
+          has_change = has_change || plant.On_Mouse_Up(event, this.ctx);
+        }
+      }
+    }
+    if (has_change)
+    {
+      this.Set_Time_Btn_Pts();
+    }
+
     if (this.cmd)
     {
-      if (this.cmd.id == "pt1" || this.cmd.id == "pt2" || this.cmd.id == "ctrl1" || this.cmd.id == "ctrl2")
-      {
-        this.Update_Trunk();
-        this.Set_Time_Btn_Pts();
-      }
       if (this.cmd.plant)
       {
         this.plants.forEach((plant) => plant.selected = false);
@@ -506,47 +491,46 @@ class Sprout_Editor extends LitElement
     let plant;
 
     this.Clr();
-    this.ctx.save();
-    this.Render_Trunk();
-    this.ctx.restore();
 
     if (this.plants && this.plants.length>0)
     {
       for (let i=0; i<this.plants.length; i++)
       {
         plant = this.plants[i];
-        this.Render_Plant(plant);
+        if (plant.name!="Stem")
+        {
+          this.Init_Btns(plant, pot_size);
+        }
+
+        this.ctx.save();
+        this.ctx.translate(plant.x, plant.y);
+        this.ctx.rotate(plant.angle);
+        this.ctx.scale(plant.x_scale, plant.y_scale);
+
+        if (plant.name=="Stem")
+        {
+          plant.Render_Design(this.ctx);
+        }
+        else
+        {
+          this.Render_Plant(plant);
+        }
+
+        this.ctx.restore();
+        if (plant.name!="Stem")
+        {
+          this.Render_Btn(plant, plant.scale_btn_path);
+          this.Render_Btn(plant, plant.rotate_btn_path);
+          this.Render_Btn(plant, plant.move_btn_path);
+          this.Render_Btn(plant, plant.time_btn_path, plant.x, plant.y);
+        }
       }
     }
 
-    this.Render_Btn(null, this.pt1_btn);
-    this.Render_Btn(null, this.pt2_btn);
-    this.Render_Btn(null, this.ctrl1_btn, this.pt1_btn.x, this.pt1_btn.y);
-    this.Render_Btn(null, this.ctrl2_btn, this.pt2_btn.x, this.pt2_btn.y);
-  }
-
-  Render_Trunk()
-  {
-    this.ctx.beginPath();
-    this.ctx.setLineDash([]);
-    this.ctx.strokeStyle="#aaa";
-    this.ctx.moveTo(this.trunk_pts[0].x, this.trunk_pts[0].y);
-    for (let i=1; i<this.trunk_pts.length; i++)
-    {
-      this.ctx.lineTo(this.trunk_pts[i].x, this.trunk_pts[i].y);
-    }
-    this.ctx.stroke();
   }
 
   Render_Plant(plant)
   {
-    this.Init_Btns(plant, pot_size);
-
-    this.ctx.save();
-    this.ctx.translate(plant.x, plant.y);
-    this.ctx.rotate(plant.angle);
-    this.ctx.scale(plant.x_scale, plant.y_scale);
-
     if (plant.selected)
     {
       this.ctx.strokeStyle = this.colour_selected;
@@ -568,13 +552,6 @@ class Sprout_Editor extends LitElement
     this.ctx.moveTo(0, 0);
     this.ctx.lineTo(0, 3*r);
     this.ctx.stroke();
-
-    this.ctx.restore();
-
-    this.Render_Btn(plant, plant.scale_btn_path);
-    this.Render_Btn(plant, plant.rotate_btn_path);
-    this.Render_Btn(plant, plant.move_btn_path);
-    this.Render_Btn(plant, plant.time_btn_path, plant.x, plant.y);
   }
 
   Render_Btn(plant, path, x, y)
