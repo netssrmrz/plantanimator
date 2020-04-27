@@ -56,9 +56,18 @@
       New_Plant("Plant_Leaf7").Render_All();
       New_Plant("Plant_Leaf8").Render_All();
       New_Plant("Plant_Leaf9").Render_All();
+      New_Plant("Plant_Leaf10").Render_All();
+      New_Plant("Plant_Leaf11").Render_All();
+      New_Plant("Plant_Leaf12").Render_All();
+      New_Plant("Plant_Stem1", 1).Render_All();
+      New_Plant("Plant_Stem2", 1).Render_All();
+      New_Plant("Plant_Stem3", 1).Render_All();
+      New_Plant("Plant_Stem4", 1).Render_All();
+      New_Plant("Plant_Stem5", 1).Render_All();
+      New_Plant("Plant_Stem6", 1).Render_All();
     }
 
-    function New_Plant(class_name)
+    function New_Plant(class_name, style)
     {
       var plant = new pl[class_name];
       plant.maturity_rate = 1;
@@ -70,7 +79,30 @@
       plant.x_scale = 1;
       plant.y_scale = -1;
       plant.angle = 0;
+
+      if (style == 1)
+      {
+        plant.x = 100;
+        plant.y = 200;
+        plant.x_scale = 0.2;
+        plant.y_scale = -0.2;
+        plant.max_depth = 3;
+        //Set_Maturity(plant, 100);
+      }
+
       return plant;
+    }
+
+    function Set_Maturity(plant, m)
+    {
+      plant.maturity = m;
+      if (plant.branches && plant.branches.length>0)
+      {
+        for (let i=0; i<plant.braches.length; i++)
+        {
+          Set_Maturity(plant.branches[i], m);
+        }
+      }
     }
 
     function Init_Canvas(class_name)
@@ -86,8 +118,8 @@
       canvas_ctx.font = "12px sans-serif";
       canvas_ctx.strokeText(class_name, 10, 20);
 
-      canvas_ctx.strokeStyle = "#aaa";
-      canvas_ctx.fillStyle = "#fff";
+      canvas_ctx.strokeStyle = "#000";
+      canvas_ctx.fillStyle = "#000";
       canvas_ctx.lineWidth = 4;
       canvas_ctx.lineCap = 'round';
       canvas_ctx.lineJoin = 'round';

@@ -15,7 +15,7 @@ function Get_Trunk_Pts(x1, y1, x2, y2, cx1, cy1, cx2, cy2)
   return curve.getLUT(100);
 }
 
-class Plant extends pl.Plant_Maturing2
+class Plant extends pl.Base_Plant_Maturing2
 {
   Init_Trunk()
   {
@@ -144,7 +144,12 @@ class Sprout_Editor extends LitElement
     this.ctx.strokeStyle = "#000";
 
     this.Clr();
-    pl.Animate(this.ctx, [plant], this.OnFinish_Play, this.Render_Plants);
+    pl.Animate(this.ctx, [plant], this.OnFinish_Play, this.Render_Plants, this.Clr_Ctx);
+  }
+
+  Clr_Ctx(ctx)
+  {
+    ctx.clearRect(-ctx.canvas.width/2, 0, ctx.canvas.width, ctx.canvas.height);
   }
 
   Disable_Events()

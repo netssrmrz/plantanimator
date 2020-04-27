@@ -21,8 +21,6 @@ class Plant_Code_Gen extends LitElement
   {
     let code;
 
-    if (plants && plants.length>0)
-    {
       code = 
         "<html>\n" +
         "\t<head>\n" +
@@ -31,7 +29,7 @@ class Plant_Code_Gen extends LitElement
         "\t\t\timport * as pl from \"./lib/pa.js\";\n" +
         "\t\t\timport { Bezier } from \"./lib/bezierjs/bezier.js\";\n\n" +
 
-        "\t\t\tclass Plant extends pl.Plant_Maturing2\n" +
+        "\t\t\tclass Plant extends pl.Base_Plant_Maturing2\n" +
         "\t\t\t{\n" +
         
         "\t\t\t\tconstructor()\n" +
@@ -45,10 +43,7 @@ class Plant_Code_Gen extends LitElement
         "\t\t\t\t\tthis.curve_pts = this.curve.getLUT(100);\n" +
         "\t\t\t\t}\n\n" +
         
-        "\t\t\t\tInit_Branches()\n" +
-        "\t\t\t\t{\n" +
         this.Gen_Branches(plants) +
-        "\t\t\t\t}\n\n" +
         
         "\t\t\t\tRender()\n" +
         "\t\t\t\t{\n" +
@@ -81,7 +76,6 @@ class Plant_Code_Gen extends LitElement
         "</html>\n";
 
       this.shadowRoot.getElementById("txt_area").value = code;
-    }
   }
 
   Gen_Branches(plants)
@@ -90,6 +84,9 @@ class Plant_Code_Gen extends LitElement
 
     if (plants && plants.length>0)
     {
+      res =
+        "\t\t\t\tInit_Branches()\n" +
+        "\t\t\t\t{\n";
       for (let i=0; i<plants.length; i++)
       {
         const p = plants[i];
@@ -106,6 +103,7 @@ class Plant_Code_Gen extends LitElement
           p.x + "," + 
           p.y + ");\n";
       }
+      res += "\t\t\t\t}\n\n";
     }
 
     return res;

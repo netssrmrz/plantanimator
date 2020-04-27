@@ -226,6 +226,15 @@ class Sprout_Props_Dialog extends LitElement
           <option>Plant_Leaf7</option>
           <option>Plant_Leaf8</option>
           <option>Plant_Leaf9</option>
+          <option>Plant_Leaf10</option>
+          <option>Plant_Leaf11</option>
+          <option>Plant_Leaf12</option>
+          <option>Plant_Stem1</option>
+          <option>Plant_Stem2</option>
+          <option>Plant_Stem3</option>
+          <option>Plant_Stem4</option>
+          <option>Plant_Stem5</option>
+          <option>Plant_Stem6</option>
         </select>
       </span>
       <label>Sprout Time</label>
