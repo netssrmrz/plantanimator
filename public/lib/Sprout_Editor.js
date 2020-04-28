@@ -80,17 +80,7 @@ class Sprout_Editor extends LitElement
     this.plants = null;
     this.is_playing = false;
     this.on_finish_play_fn = null;
-    this.colour = "#aaa";
-    this.colour_selected = "#000";
-    this.btn_size = 12;
-    this.active_plant = null;
-    this.cmd = null;
     this.this_class = Plant;
-
-    this.time_btn_path = null;
-    this.move_btn_path = null;
-    this.rotate_btn_path = null;
-    this.scale_btn_path = null;
 
     this.OnMouseMove_Canvas = this.OnMouseMove_Canvas.bind(this);
     this.OnMouseDown_Canvas = this.OnMouseDown_Canvas.bind(this);
@@ -137,13 +127,8 @@ class Sprout_Editor extends LitElement
     this.ctx.lineWidth = 1;
     this.ctx.strokeStyle = "#000";
 
-    this.Clr();
+    this.Clr(this.ctx);
     pl.Animate(this.ctx, [plant], this.OnFinish_Play, this.Render_Plants, this.Clr_Ctx);
-  }
-
-  Clr_Ctx(ctx)
-  {
-    ctx.clearRect(-ctx.canvas.width/2, 0, ctx.canvas.width, ctx.canvas.height);
   }
 
   Disable_Events()
@@ -169,103 +154,10 @@ class Sprout_Editor extends LitElement
     }
   }
 
-  To_Degrees(r)
-  {
-    return r*(180/Math.PI);
-  }
-
-  To_Canvas_Pt(sx, sy)
-  {
-    return {x: sx-this.canvas.width/2-4, y: this.canvas.height-sy+4};
-  }
-
-  Set_MouseEvents(event)
-  {
-    let plant, i, res = false;
-
-    if (this.plants && this.plants.length>0)
-    {
-      for (i=0; i<this.plants.length; i++)
-      {
-        plant = this.plants[i];
-        if (this.Set_Event_In_Btn(plant, event, plant.scale_btn_path, true) ||
-          this.Set_Event_In_Btn(plant, event, plant.rotate_btn_path, true) ||
-          this.Set_Event_In_Btn(plant, event, plant.move_btn_path, true) ||
-          this.Set_Event_In_Btn(plant, event, plant.time_btn_path, false))
-        {
-          this.active_plant = plant;
-          res = true;
-        }
-      }
-    }
-
-    return res;
-  }
-
-  Set_Event_In_Btn(plant, event, path, relative)
-  {
-    let res = false;
-
-    if (path)
-    {
-      this.ctx.save();
-
-      this.Transform_To_Btn(path, plant, relative);
-      path.hover = this.ctx.isPointInPath(path, event.offsetX, event.offsetY);
-      res = path.hover;
-      
-      this.ctx.restore();
-    }
-
-    return res;
-  }
-
-  Transform_To_Btn(path, plant, relative)
-  {
-    if (relative)
-    {
-      this.ctx.translate(plant.x, plant.y);
-      this.ctx.rotate(plant.angle);
-      this.ctx.scale(plant.x_scale, plant.y_scale);
-
-      this.ctx.translate(path.x, path.y);
-      // undo plant scaling
-      this.ctx.scale(1/plant.x_scale, 1/plant.y_scale);
-    }
-    else
-    {
-      this.ctx.translate(path.x, path.y);
-    }
-  }
-
   Design_Mode()
   {
     this.Render_Plants();
     this.Enable_Events();
-  }
-
-  Set_Time_Btn_Pts()
-  {
-    if (this.plants && this.plants.length>0)
-    {
-      for (let i=0; i<this.plants.length; i++)
-      {
-        const plant = this.plants[i];
-        if (plant.name != "Stem")
-        {
-          this.Set_Sprout_Time(plant, plant.sprout_time);
-        }
-      }
-    }
-  }
-
-  Set_Sprout_Time(plant, sprout_time)
-  {
-    const stem = this.plants.find((p) => p.name == "Stem");
-    const trunk_pt = stem.Get_Trunk_Pt(sprout_time);
-    plant.sprout_time = sprout_time;
-    plant.time_btn_path.x = trunk_pt.x;
-    plant.time_btn_path.y = trunk_pt.y;
   }
 
   // Events =======================================================================================
@@ -293,29 +185,6 @@ class Sprout_Editor extends LitElement
           plant.On_Mouse_Down(event, this.ctx);
         }
       }
-    }
-
-    if (this.Set_MouseEvents(event))
-    {
-      if (this.active_plant)
-      {
-        if (this.active_plant.move_btn_path.hover)
-        {
-          this.cmd = {id: "move_plant", plant: this.active_plant};
-        }
-        if (this.active_plant.scale_btn_path.hover)
-        {
-          this.cmd = {id: "scale_plant", plant: this.active_plant};
-        }
-        if (this.active_plant.rotate_btn_path.hover)
-        {
-          this.cmd = {id: "rotate_plant", plant: this.active_plant};
-        }
-        if (this.active_plant.time_btn_path.hover)
-        {
-          this.cmd = {id: "time_plant", plant: this.active_plant};
-        }
-      }
       this.Render_Plants();
     }
   }
@@ -334,52 +203,13 @@ class Sprout_Editor extends LitElement
           plant.On_Mouse_Move(event, this.ctx);
         }
       }
+      this.Render_Plants();
     }
-
-    this.Set_MouseEvents(event);
-    if (this.cmd)
-    {
-      c_pt = this.To_Canvas_Pt(event.offsetX, event.offsetY);
-      if (this.cmd.id == "move_plant")
-      {
-        this.cmd.plant.x = c_pt.x;
-        this.cmd.plant.y = c_pt.y;
-      }
-      if (this.cmd.id == "scale_plant")
-      {
-        const m = new DOMMatrix();
-        m.translateSelf(this.cmd.plant.x, this.cmd.plant.y);
-        m.rotateSelf(this.To_Degrees(this.cmd.plant.angle));
-        m.invertSelf();
-        const p = new DOMPoint(c_pt.x, c_pt.y);
-        const tp = p.matrixTransform(m);
-        this.cmd.plant.x_scale = tp.x / (pot_size/2);
-        this.cmd.plant.y_scale = tp.y / (pot_size/2);
-      }
-      if (this.cmd.id == "rotate_plant")
-      {
-        const x_sign = Math.sign(this.cmd.plant.x_scale);
-        const y_sign = Math.sign(this.cmd.plant.y_scale);
-        const m = new DOMMatrix();
-        m.translateSelf(this.cmd.plant.x, this.cmd.plant.y);
-        m.scaleSelf(x_sign, y_sign);
-        m.invertSelf();
-        const p = new DOMPoint(c_pt.x, c_pt.y);
-        const tp = p.matrixTransform(m);
-        this.cmd.plant.angle = Math.atan2(tp.y, tp.x) - (Math.PI/2);
-        this.cmd.plant.angle = this.cmd.plant.angle * (x_sign*y_sign);
-      }
-      if (this.cmd.id == "time_plant")
-      {
-        this.Set_Sprout_Time(this.cmd.plant, c_pt.y / 10);
-      }
-    }
-    this.Render_Plants();
   }
 
   OnMouseUp_Canvas(event)
   {
-    let plant, has_change = false;
+    let plant, has_change;
 
     if (this.plants && this.plants.length>0)
     {
@@ -388,34 +218,24 @@ class Sprout_Editor extends LitElement
         plant = this.plants[i];
         if (plant.On_Mouse_Up)
         {
-          has_change = has_change || plant.On_Mouse_Up(event, this.ctx);
+          has_change = plant.On_Mouse_Up(event, this.ctx);
+          if (has_change && this.on_change_fn)
+          {
+            this.on_change_fn(plant);
+          }
         }
+        this.Render_Plants();
       }
-    }
-    if (has_change)
-    {
-      this.Set_Time_Btn_Pts();
-    }
-
-    if (this.cmd)
-    {
-      if (this.cmd.plant)
-      {
-        this.plants.forEach((plant) => plant.selected = false);
-        this.cmd.plant.selected = true;
-      }
-
-      if (this.on_change_fn)
-      {
-        this.on_change_fn(this.cmd.plant);
-      }
-      this.Render_Plants();
-      this.cmd = null;
     }
   }
 
   // Gfx ==========================================================================================
   
+  Clr(ctx)
+  {
+    ctx.clearRect(-ctx.canvas.width/2, 0, ctx.canvas.width, ctx.canvas.height);
+  }
+
   Render_Crosshairs(c_pt)
   {
     this.ctx.lineWidth = 1;
@@ -427,88 +247,28 @@ class Sprout_Editor extends LitElement
     this.ctx.stroke();
   }
 
-  Clr()
-  {
-    this.ctx.clearRect(-this.canvas.width/2, 0, this.canvas.width, this.canvas.height);
-  }
-
-  Init_Btns(plant, pot_size)
-  {
-    let x, y;
-
-    // scale btn
-    if (!plant.scale_btn_path)
-    {
-      x = (pot_size/2);
-      y = (pot_size/2);
-      plant.scale_btn_path = this.New_Btn_Path(x, y, this.btn_size, "scl_btn");
-    }
-
-    // rotate btn
-    if (!plant.rotate_btn_path)
-    {
-      y = (pot_size/2);
-      x = 0;
-      plant.rotate_btn_path = this.New_Btn_Path(x, y, this.btn_size, "rot_btn");
-    }
-
-    // translate btn
-    if (!plant.move_btn_path)
-    {
-      x = 0;
-      y = 0;
-      plant.move_btn_path = this.New_Btn_Path(x, y, this.btn_size, "trn_btn");
-    }
-
-    // sprout time btn
-    if (!plant.time_btn_path)
-    {
-      plant.time_btn_path = this.New_Btn_Path(x, y, this.btn_size, "spr_btn");
-      this.Set_Sprout_Time(plant, plant.y / 10);
-    }
-  }
-
-  New_Btn_Path(x, y, size, id)
-  {
-    let btn_path;
-
-    btn_path = new Path2D();
-    btn_path.colour = "#000";
-    btn_path.colour_hover = "#0f0";
-    btn_path.hover = false;
-    btn_path.rect(-0.5*size, -0.5*size, size, size);
-    btn_path.x = x;
-    btn_path.y = y;
-    btn_path.size = size;
-    btn_path.id = id;
-
-    return btn_path;
-  }
-
   Render_Plants()
   {
     let plant;
 
-    this.Clr();
+    this.Clr(this.ctx);
 
     if (this.plants && this.plants.length>0)
     {
       for (let i=0; i<this.plants.length; i++)
       {
         plant = this.plants[i];
-        if (plant.name!="Stem")
-        {
-          this.Init_Btns(plant, pot_size);
-        }
 
         this.ctx.save();
         this.ctx.translate(plant.x, plant.y);
         this.ctx.rotate(plant.angle);
         this.ctx.scale(plant.x_scale, plant.y_scale);
-        plant.Render_Design(this.ctx);
+        if (plant.Render_Design)
+          plant.Render_Design(this.ctx);
         this.ctx.restore();
 
-        plant.Render_Design_Abs(this.ctx);
+        if (plant.Render_Design_Abs)
+          plant.Render_Design_Abs(this.ctx);
       }
     }
   }

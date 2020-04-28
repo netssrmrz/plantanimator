@@ -35,7 +35,7 @@ class Plant_Bezier
     let btn_path;
 
     btn_path = new Path2D();
-    btn_path.colour = "#000";
+    btn_path.colour = "deeppink";
     btn_path.colour_hover = "#0f0";
     btn_path.hover = false;
     btn_path.rect(-0.5*size, -0.5*size, size, size);
@@ -80,6 +80,8 @@ class Plant_Bezier
   {
     return {x: sx-ctx.canvas.width/2-4, y: ctx.canvas.height-sy+4};
   }
+
+  // Events =======================================================================================
 
   On_Mouse_Up(event, ctx)
   {
@@ -127,7 +129,7 @@ class Plant_Bezier
       }
       res = true;
     }
-    else
+    else if (this.selected)
     {
       res = res || this.On_Mouse_Move_Btn(ctx, event, this.pt1_btn, this.x1, this.y1);
       res = res || this.On_Mouse_Move_Btn(ctx, event, this.pt2_btn, this.x2, this.y2);
@@ -157,41 +159,51 @@ class Plant_Bezier
 
   On_Mouse_Down(event, ctx)
   {
-    if (this.pt1_btn.hover)
+    if (this.selected)
     {
-      this.cmd = {id: "pt1"};
-    }
-    if (this.pt2_btn.hover)
-    {
-      this.cmd = {id: "pt2"};
-    }
-    if (this.ctrl1_btn.hover)
-    {
-      this.cmd = {id: "ctrl1"};
-    }
-    if (this.ctrl2_btn.hover)
-    {
-      this.cmd = {id: "ctrl2"};
+      if (this.pt1_btn.hover)
+      {
+        this.cmd = {id: "pt1"};
+      }
+      if (this.pt2_btn.hover)
+      {
+        this.cmd = {id: "pt2"};
+      }
+      if (this.ctrl1_btn.hover)
+      {
+        this.cmd = {id: "ctrl1"};
+      }
+      if (this.ctrl2_btn.hover)
+      {
+        this.cmd = {id: "ctrl2"};
+      }
     }
 
     return false;
   }
+
+  // Gfx ==========================================================================================
 
   Render()
   {
 
   }
 
-  Render_Design_Abs(ctx)
-  {
-    
-  }
-
   Render_Design(ctx)
   {
+    if (this.selected)
+    {
+      ctx.strokeStyle = "#000";
+      ctx.lineWidth = 3;
+    }
+    else
+    {
+      ctx.strokeStyle = "#aaa";
+      ctx.lineWidth = 1;
+    }
+
     ctx.beginPath();
     ctx.setLineDash([]);
-    ctx.strokeStyle="#aaa";
     ctx.moveTo(this.trunk_pts[0].x, this.trunk_pts[0].y);
     for (let i=1; i<this.trunk_pts.length; i++)
     {
@@ -199,19 +211,23 @@ class Plant_Bezier
     }
     ctx.stroke();
 
-    ctx.setLineDash([5, 5]);
-    ctx.strokeStyle="#aaa";
-    ctx.beginPath();
-    ctx.moveTo(this.x1, this.y1);
-    ctx.lineTo(this.ctrl1_x, this.ctrl1_y);
-    ctx.moveTo(this.x2, this.y2);
-    ctx.lineTo(this.ctrl2_x, this.ctrl2_y);
-    ctx.stroke();
+    if (this.selected)
+    {
+      ctx.setLineDash([5, 5]);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle="#aaa";
+      ctx.beginPath();
+      ctx.moveTo(this.x1, this.y1);
+      ctx.lineTo(this.ctrl1_x, this.ctrl1_y);
+      ctx.moveTo(this.x2, this.y2);
+      ctx.lineTo(this.ctrl2_x, this.ctrl2_y);
+      ctx.stroke();
 
-    this.Render_Btn(ctx, this.pt1_btn, this.x1, this.y1);
-    this.Render_Btn(ctx, this.pt2_btn, this.x2, this.y2);
-    this.Render_Btn(ctx, this.ctrl1_btn, this.ctrl1_x, this.ctrl1_y);
-    this.Render_Btn(ctx, this.ctrl2_btn, this.ctrl2_x, this.ctrl2_y);
+      this.Render_Btn(ctx, this.pt1_btn, this.x1, this.y1);
+      this.Render_Btn(ctx, this.pt2_btn, this.x2, this.y2);
+      this.Render_Btn(ctx, this.ctrl1_btn, this.ctrl1_x, this.ctrl1_y);
+      this.Render_Btn(ctx, this.ctrl2_btn, this.ctrl2_x, this.ctrl2_y);
+    }
   }
 
   Render_Btn(ctx, path, x, y)
@@ -242,11 +258,12 @@ class Sprout_List extends LitElement
     this.OnClick_Edit_Ok = this.OnClick_Edit_Ok.bind(this);
     this.this_class = null;
 
-    const stem = new Plant_Bezier();
-    stem.name = "Stem";
-    stem.Set_Pts(0, 0, 0, 1000, -250, 200, 250, 800);
+    this.stem_plant = new Plant_Bezier();
+    this.stem_plant.name = "Stem";
+    this.stem_plant.Set_Pts(0, 0, 0, 1000, -250, 200, 250, 800);
+
     this.plants = [];
-    this.Add_Plant(stem, false, false);
+    this.Add_Plant(this.stem_plant, false, false);
   }
   
   firstUpdated(changedProperties)
@@ -288,6 +305,7 @@ class Sprout_List extends LitElement
   Add_Plant(plant, can_edit, can_delete)
   {
     plant.id = this.plants.length;
+    plant.stem_plant = this.stem_plant;
     plant.can_edit = true;
     if (can_edit != null)
     {
@@ -300,6 +318,8 @@ class Sprout_List extends LitElement
     }
 
     this.plants.push(plant);
+    this.Select_Plant(plant.id);
+
     this.requestUpdate();
   }
 
@@ -409,12 +429,11 @@ class Sprout_List extends LitElement
   {
     const code = this.shadowRoot.getElementById("code");
     code.Show();
-    const stem = this.plants.find((p) => p.name=="Stem");
     const branches = this.plants.filter((p) => p.name!="Stem");
-    const pt1 = {x: stem.x1, y: stem.y1};
-    const pt2 = {x: stem.x2, y: stem.y2};
-    const ctrl1 = {x: stem.ctrl1_x, y: stem.ctrl1_y};
-    const ctrl2 = {x: stem.ctrl2_x, y: stem.ctrl2_y};
+    const pt1 = {x: this.stem_plant.x1, y: this.stem_plant.y1};
+    const pt2 = {x: this.stem_plant.x2, y: this.stem_plant.y2};
+    const ctrl1 = {x: this.stem_plant.ctrl1_x, y: this.stem_plant.ctrl1_y};
+    const ctrl2 = {x: this.stem_plant.ctrl2_x, y: this.stem_plant.ctrl2_y};
     code.Gen_Code(branches, pt1, pt2, ctrl1, ctrl2);
   }
 

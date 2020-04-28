@@ -15,6 +15,31 @@ export class Base_Plant
     this.x_scale = 1;
     this.y_scale = 1;
     this.parent = null;
+    this.stem_plant = null;
+    this.sprout_time = 0;
+    this.cmd = null;
+    this.pot_size = 100;
+    this.selected = false;
+
+    this.scale_btn_path = this.New_Btn_Path(12, "scl_btn");
+    this.rotate_btn_path = this.New_Btn_Path(12, "rot_btn");
+    this.move_btn_path = this.New_Btn_Path(12, "trn_btn");
+    this.time_btn_path = this.New_Btn_Path(12, "spr_btn");
+  }
+
+  New_Btn_Path(size, id)
+  {
+    let btn_path;
+
+    btn_path = new Path2D();
+    btn_path.colour = "deeppink";
+    btn_path.colour_hover = "#0f0";
+    btn_path.hover = false;
+    btn_path.rect(-0.5*size, -0.5*size, size, size);
+    btn_path.size = size;
+    btn_path.id = id;
+
+    return btn_path;
   }
 
   Next_Frame()
@@ -43,26 +68,6 @@ export class Base_Plant
     return res;
   }
 
-  Render_All()
-  {
-    var branch, c;
-
-    this.canvas_ctx.save();
-    this.canvas_ctx.translate(this.x, this.y);
-    this.canvas_ctx.rotate(this.angle);
-    this.canvas_ctx.scale(this.Get_X_Scale(), this.Get_Y_Scale());
-
-    this.Render();
-    if (this.branches)
-      for (c = 0; c < this.branches.length; c++)
-      {
-        branch = this.branches[c];
-        branch.Render_All();
-      }
-
-    this.canvas_ctx.restore();
-  }
-
   Add_Branch(plant)
   {
     plant.canvas_ctx = this.canvas_ctx;
@@ -83,77 +88,6 @@ export class Base_Plant
   Grow()
   {
     return false;
-  }
-
-  Render()
-  {
-  }
-
-  Render_Design(ctx)
-  {
-    const colour = "#aaa";
-    const colour_selected = "#000";
-    const pot_size = 100;
-
-    if (this.selected)
-    {
-      ctx.strokeStyle = colour_selected;
-      ctx.lineWidth = 3;
-    }
-    else
-    {
-      ctx.strokeStyle = colour;
-      ctx.lineWidth = 1;
-    }
-    const r = pot_size/2;
-    ctx.setLineDash([]);
-    ctx.beginPath();
-    ctx.moveTo(-r, -r);
-    ctx.lineTo(-r, r);
-    ctx.lineTo(r, r);
-    ctx.lineTo(r, -r);
-    ctx.lineTo(-r, -r);
-    ctx.moveTo(0, 0);
-    ctx.lineTo(0, 3*r);
-    ctx.stroke();
-
-    this.Render_Btn(ctx, this.scale_btn_path, this.scale_btn_path.x, this.scale_btn_path.y, true);
-    this.Render_Btn(ctx, this.rotate_btn_path, this.rotate_btn_path.x, this.rotate_btn_path.y, true);
-    this.Render_Btn(ctx, this.move_btn_path, this.move_btn_path.x, this.move_btn_path.y, true);
-  }
-
-  Render_Design_Abs(ctx)
-  {
-    ctx.setLineDash([5, 5]);
-    ctx.strokeStyle="#aaa";
-    ctx.beginPath();
-    ctx.moveTo(this.time_btn_path.x, this.time_btn_path.y);
-    ctx.lineTo(this.x, this.y);
-    ctx.stroke();
-
-    this.Render_Btn(ctx, this.time_btn_path, this.time_btn_path.x, this.time_btn_path.y, false);
-  }
-
-  Render_Btn(ctx, path, x, y, unscale)
-  {
-    ctx.save();
-    ctx.translate(x, y);
-    if (unscale)
-    {
-      ctx.scale(1/this.x_scale, 1/this.y_scale);
-    }
-
-    if (path.hover)
-    {
-      ctx.fillStyle = path.colour_hover;
-    }
-    else
-    {
-      ctx.fillStyle = path.colour;
-    }
-    ctx.fill(path);
-
-    ctx.restore();
   }
 
   Total_X_Scale()
@@ -199,6 +133,237 @@ export class Base_Plant
     if (this.y_scale)
       y_scale = this.y_scale;
     return y_scale;
+  }
+
+  To_Canvas_Pt(ctx, sx, sy)
+  {
+    return {x: sx-ctx.canvas.width/2-4, y: ctx.canvas.height-sy+4};
+  }
+
+  To_Degrees(r)
+  {
+    return r*(180/Math.PI);
+  }
+
+  // Events =======================================================================================
+
+  On_Mouse_Move(event, ctx)
+  {
+    let res = false;
+
+    if (this.cmd)
+    {
+      const c_pt = this.To_Canvas_Pt(ctx, event.offsetX, event.offsetY);
+      if (this.cmd.id == "move_plant")
+      {
+        this.x = c_pt.x;
+        this.y = c_pt.y;
+      }
+      if (this.cmd.id == "scale_plant")
+      {
+        const m = new DOMMatrix();
+        m.translateSelf(this.x, this.y);
+        m.rotateSelf(this.To_Degrees(this.angle));
+        m.invertSelf();
+        const p = new DOMPoint(c_pt.x, c_pt.y);
+        const tp = p.matrixTransform(m);
+        this.x_scale = tp.x / (this.pot_size/2);
+        this.y_scale = tp.y / (this.pot_size/2);
+      }
+      if (this.cmd.id == "rotate_plant")
+      {
+        const x_sign = Math.sign(this.x_scale);
+        const y_sign = Math.sign(this.y_scale);
+        const m = new DOMMatrix();
+        m.translateSelf(this.x, this.y);
+        m.scaleSelf(x_sign, y_sign);
+        m.invertSelf();
+        const p = new DOMPoint(c_pt.x, c_pt.y);
+        const tp = p.matrixTransform(m);
+        this.angle = Math.atan2(tp.y, tp.x) - (Math.PI/2);
+        this.angle = this.angle * (x_sign*y_sign);
+      }
+      if (this.cmd.id == "time_plant")
+      {
+        this.sprout_time = c_pt.y / 10;
+      }
+    }
+    else if (this.selected)
+    {
+      res = res || this.On_Mouse_Move_Btn(ctx, event, this.scale_btn_path, 50, 50, true);
+      res = res || this.On_Mouse_Move_Btn(ctx, event, this.rotate_btn_path, 0, 50, true);
+      res = res || this.On_Mouse_Move_Btn(ctx, event, this.move_btn_path, 0, 0, true);
+      if (this.stem_plant && this.stem_plant.Get_Trunk_Pt)
+      {
+        const pt = this.stem_plant.Get_Trunk_Pt(this.sprout_time);
+        res = res || this.On_Mouse_Move_Btn(ctx, event, this.time_btn_path, pt.x, pt.y);
+      }
+    }
+
+    return res;
+  }
+
+  On_Mouse_Move_Btn(ctx, event, path, x, y, is_relative)
+  {
+    let res = false;
+
+    ctx.save();
+    if (is_relative)
+    {
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.angle);
+      ctx.scale(this.x_scale, this.y_scale);
+    }
+
+    ctx.translate(x, y);
+    const is_in_path = ctx.isPointInPath(path, event.offsetX, event.offsetY);
+    if (path.hover != is_in_path)
+    {
+      path.hover = is_in_path;
+      res = true;
+    }
+    ctx.restore();
+
+    return res;
+  }
+
+  On_Mouse_Down(event, ctx)
+  {
+    if (this.selected)
+    {
+      if (this.move_btn_path.hover)
+      {
+        this.cmd = {id: "move_plant"};
+      }
+      if (this.scale_btn_path.hover)
+      {
+        this.cmd = {id: "scale_plant"};
+      }
+      if (this.rotate_btn_path.hover)
+      {
+        this.cmd = {id: "rotate_plant"};
+      }
+      if (this.time_btn_path.hover)
+      {
+        this.cmd = {id: "time_plant"};
+      }
+    }
+
+    return false;
+  }
+
+  On_Mouse_Up(event, ctx)
+  {
+    let res = false;
+
+    if (this.cmd)
+    {
+      this.cmd = null;
+      res = true;
+    }
+
+    return res;
+  }
+
+  // Gfx ==========================================================================================
+
+  Render_All()
+  {
+    var branch, c;
+
+    this.canvas_ctx.save();
+    this.canvas_ctx.translate(this.x, this.y);
+    this.canvas_ctx.rotate(this.angle);
+    this.canvas_ctx.scale(this.Get_X_Scale(), this.Get_Y_Scale());
+
+    this.Render();
+    if (this.branches)
+      for (c = 0; c < this.branches.length; c++)
+      {
+        branch = this.branches[c];
+        branch.Render_All();
+      }
+
+    this.canvas_ctx.restore();
+  }
+
+  Render()
+  {
+  }
+
+  Render_Design(ctx)
+  {
+    const colour = "#aaa";
+    const colour_selected = "#000";
+    const pot_size = 100;
+
+    if (this.selected)
+    {
+      ctx.strokeStyle = colour_selected;
+      ctx.lineWidth = 3;
+    }
+    else
+    {
+      ctx.strokeStyle = colour;
+      ctx.lineWidth = 1;
+    }
+    const r = pot_size/2;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(-r, -r);
+    ctx.lineTo(-r, r);
+    ctx.lineTo(r, r);
+    ctx.lineTo(r, -r);
+    ctx.lineTo(-r, -r);
+    ctx.moveTo(0, 0);
+    ctx.lineTo(0, 3*r);
+    ctx.stroke();
+
+    if (this.selected)
+    {
+      this.Render_Btn(ctx, this.scale_btn_path, 50, 50, true);
+      this.Render_Btn(ctx, this.rotate_btn_path, 0, 50, true);
+      this.Render_Btn(ctx, this.move_btn_path, 0, 0, true);
+    }
+  }
+
+  Render_Design_Abs(ctx)
+  {
+    if (this.selected && this.stem_plant && this.stem_plant.Get_Trunk_Pt)
+    {
+      const pt = this.stem_plant.Get_Trunk_Pt(this.sprout_time);
+
+      ctx.setLineDash([5, 5]);
+      ctx.strokeStyle="#aaa";
+      ctx.beginPath();
+      ctx.moveTo(pt.x, pt.y);
+      ctx.lineTo(this.x, this.y);
+      ctx.stroke();
+
+      this.Render_Btn(ctx, this.time_btn_path, pt.x, pt.y, false);
+    }
+  }
+
+  Render_Btn(ctx, path, x, y, unscale)
+  {
+    ctx.save();
+    ctx.translate(x, y);
+    if (unscale)
+    {
+      ctx.scale(1/this.x_scale, 1/this.y_scale);
+    }
+
+    if (path.hover)
+    {
+      ctx.fillStyle = path.colour_hover;
+    }
+    else
+    {
+      ctx.fillStyle = path.colour;
+    }
+    ctx.fill(path);
+
+    ctx.restore();
   }
 }
 
