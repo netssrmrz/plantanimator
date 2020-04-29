@@ -92,13 +92,14 @@
       import "./lib/Sprout_List.js";
 
       window.onload = Main;
-      let sprout_list, editor;
+      let sprout_list, editor, remote_ctrl;
 
       function Main()
       {
         document.getElementById("new_plant_btn").onclick=OnClick_New_Plant;
         document.getElementById("play_btn").onclick = OnClick_Play;
         document.getElementById("design_btn").onclick = OnClick_Design;
+        document.getElementById("remote_btn").onclick = OnClick_Show_Remote;
         
         sprout_list = document.getElementById("sprout_list");
         sprout_list.on_change_fn = Plants_OnChange;
@@ -109,6 +110,10 @@
         editor.Render_Plants();
                 
         sprout_list.this_class = editor.this_class;
+
+        remote_ctrl = document.getElementById("remote_ctrl");
+        remote_ctrl.objs = sprout_list.plants;
+        remote_ctrl.on_change_fn = Remote_Change;
       }
 
       function Plants_OnChange()
@@ -122,7 +127,18 @@
         sprout_list.requestUpdate();
       }
 
+      function Remote_Change(plant)
+      {
+        sprout_list.requestUpdate();
+        editor.Render_Plants();
+      }
+
       // button bar ===============================================================================
+
+      function OnClick_Show_Remote()
+      {
+        remote_ctrl.Show();
+      }
 
       function OnClick_New_Plant()
       {
@@ -180,6 +196,366 @@
         return item;
       }
     </script>
+    <script type="module">
+      import {LitElement, html, css} from "./lib/lit-element/lit-element.js";
+
+      class Remote_Ctrl extends LitElement
+      {
+        constructor()
+        {
+          super();
+          this.objs = null;
+          this.on_change_fn = null;
+          this.cmd = null;
+        }
+
+        Change_Obj(change_fn)
+        {
+          let has_change = false, obj;
+
+          if (this.objs && this.objs.length>0)
+          {
+            for (let i=0; i<this.objs.length; i++)
+            {
+              obj = this.objs[i];
+              if (obj.selected)
+              {
+                change_fn(obj);
+                has_change = true;
+              }
+            }
+          }
+
+          if (has_change && this.on_change_fn)
+          {
+            this.on_change_fn();
+          }
+        }
+
+        Disable_Buttons()
+        {
+          const buttons = this.shadowRoot.querySelectorAll("button");
+          if (buttons && buttons.length>0)
+          {
+            for (let i=0; i<buttons.length; i++)
+            {
+              const button = buttons[i];
+              button.disabled = true;
+            }
+          }
+        }
+
+        Enable_Buttons()
+        {
+          const buttons = this.shadowRoot.querySelectorAll("button");
+          if (buttons && buttons.length>0)
+          {
+            for (let i=0; i<buttons.length; i++)
+            {
+              const button = buttons[i];
+              button.disabled = false;
+            }
+          }
+        }
+
+        Show()
+        {
+          this.style.display = "inline-grid";
+        }
+
+        OnClick_Left_Up()
+        {
+          if (this.cmd == "move")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x -= 1;
+              obj.y += 1;
+            }
+          }
+          else if (this.cmd == "scale")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x_scale -= 0.01;
+              obj.y_scale += 0.01;
+            }
+          }
+        }
+
+        OnClick_Up()
+        {
+          if (this.cmd == "move")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.y += 1;
+            }
+          }
+          else if (this.cmd == "scale")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.y_scale += 0.01;
+            }
+          }
+        }
+
+        OnClick_Right_Up()
+        {
+          if (this.cmd == "move")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x += 1;
+              obj.y += 1;
+            }
+          }
+          else if (this.cmd == "scale")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x_scale += 0.01;
+              obj.y_scale += 0.01;
+            }
+          }
+        }
+
+        OnClick_Left()
+        {
+          if (this.cmd == "move")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x -= 1;
+            }
+          }
+          else if (this.cmd == "scale")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x_scale -= 0.01;
+            }
+          }
+          else if (this.cmd == "rotate")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.angle += 0.01;
+            }
+          }
+        }
+
+        OnClick_Right()
+        {
+          if (this.cmd == "move")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x += 1;
+            }
+          }
+          else if (this.cmd == "scale")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x_scale += 0.01;
+            }
+          }
+          else if (this.cmd == "rotate")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.angle -= 0.01;
+            }
+          }
+        }
+
+        OnClick_Left_Down()
+        {
+          if (this.cmd == "move")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x -= 1;
+              obj.y -= 1;
+            }
+          }
+          else if (this.cmd == "scale")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x_scale -= 0.01;
+              obj.y_scale -= 0.01;
+            }
+          }
+        }
+
+        OnClick_Down()
+        {
+          if (this.cmd == "move")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.y -= 1;
+            }
+          }
+          else if (this.cmd == "scale")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.y_scale -= 0.01;
+            }
+          }
+        }
+
+        OnClick_Right_Down()
+        {
+          if (this.cmd == "move")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x += 1;
+              obj.y -= 1;
+            }
+          }
+          else if (this.cmd == "scale")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x_scale += 0.01;
+              obj.y_scale -= 0.01;
+            }
+          }
+        }
+
+        OnClick_Cmd(event)
+        {
+          this.Set_Cmd(event.currentTarget.id);
+        }
+
+        OnClick_Close()
+        {
+          this.style.display = "none";
+        }
+
+        Set_Cmd(cmd)
+        {
+          this.cmd = cmd;
+          this.shadowRoot.getElementById("move").classList.remove("selected");
+          this.shadowRoot.getElementById("rotate").classList.remove("selected");
+          this.shadowRoot.getElementById("scale").classList.remove("selected");
+          this.shadowRoot.getElementById(cmd).classList.add("selected");
+
+          if (this.cmd == "rotate")
+          {
+            this.shadowRoot.getElementById("lu").disabled = true;
+            this.shadowRoot.getElementById("u").disabled = true;
+            this.shadowRoot.getElementById("ru").disabled = true;
+            this.shadowRoot.getElementById("r").disabled = false;
+            this.shadowRoot.getElementById("rd").disabled = true;
+            this.shadowRoot.getElementById("d").disabled = true;
+            this.shadowRoot.getElementById("ld").disabled = true;
+            this.shadowRoot.getElementById("l").disabled = false;
+          }
+          else
+          {
+            this.shadowRoot.getElementById("lu").disabled = false;
+            this.shadowRoot.getElementById("u").disabled = false;
+            this.shadowRoot.getElementById("ru").disabled = false;
+            this.shadowRoot.getElementById("r").disabled = false;
+            this.shadowRoot.getElementById("rd").disabled = false;
+            this.shadowRoot.getElementById("d").disabled = false;
+            this.shadowRoot.getElementById("ld").disabled = false;
+            this.shadowRoot.getElementById("l").disabled = false;
+          }
+        }
+
+        static get styles()
+        {
+          return css`
+            :host
+            {
+              display: none;
+              grid-template-columns: 20% 20% 20% 20% 20%;
+              grid-template-rows: 33% 34% 33%;
+              column-gap: 5px;
+              row-gap: 5px;
+              align-items: center;
+              justify-items: center;
+            }
+            button
+            {
+              border-radius: 7px;
+              border: 1px solid #000;
+              padding: 5px;
+              cursor: pointer;
+              width: 36px;
+              height: 36px;
+              background-color: inherit;
+            }
+            button:disabled
+            {
+              opacity: 0.25;
+            }
+            button img
+            {
+              padding: 0;
+              margin: 0;
+              width: 24px;
+              height: 24px;
+            }
+            .selected
+            {
+              background-color: #0f0;
+            }
+          `;
+        }
+
+        render()
+        {
+          return html`
+            <button id="lu" @click="${this.OnClick_Left_Up}"><img src="images/arrow-top-left-bold-outline.svg"></button>
+            <button id="u" @click="${this.OnClick_Up}"><img src="images/arrow-up-bold-outline.svg"></button>
+            <button id="ru" @click="${this.OnClick_Right_Up}"><img src="images/arrow-top-right-bold-outline.svg"></button>
+            <button id="move" @click="${this.OnClick_Cmd}"><img src="images/move-resize-variant.svg"></button>
+            <button id="close" @click="${this.OnClick_Close}"><img src="images/close.svg"></button>
+
+            <button id="l" @click="${this.OnClick_Left}"><img src="images/arrow-left-bold-outline.svg"></button>
+            <button></button>
+            <button id="r" @click="${this.OnClick_Right}"><img src="images/arrow-right-bold-outline.svg"></button>
+            <button id="rotate" @click="${this.OnClick_Cmd}"><img src="images/rotate-left.svg"></button>
+            <button></button>
+
+            <button id="ld" @click="${this.OnClick_Left_Down}"><img src="images/arrow-bottom-left-bold-outline.svg"></button>
+            <button id="d" @click="${this.OnClick_Down}"><img src="images/arrow-down-bold-outline.svg"></button>
+            <button id="rd" @click="${this.OnClick_Right_Down}"><img src="images/arrow-bottom-right-bold-outline.svg"></button>
+            <button id="scale" @click="${this.OnClick_Cmd}"><img src="images/move-resize.svg"></button>
+            <button></button>
+          `;
+        }
+      }
+
+      customElements.define('remote-ctrl', Remote_Ctrl);
+    </script>
   </head>
 
   <body>
@@ -194,9 +570,11 @@
       <button id="new_plant_btn"><img src="images/plus.svg"></button>
       <button id="play_btn"><img src="images/play-pause.svg"></button>
       <button id="design_btn"><img src="images/pencil-ruler.svg"></button>
+      <button id="remote_btn"><img src="images/remote.svg"></button>
     </div>
 
     <sprout-list id="sprout_list"></sprout-list>
+    <remote-ctrl id="remote_ctrl"></remote-ctrl>
 
   </body>
 </html>
