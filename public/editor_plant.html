@@ -116,19 +116,28 @@
         remote_ctrl.on_change_fn = Remote_Change;
       }
 
+      // fires when a change is made on the plant list
       function Plants_OnChange()
       {
+        //console.log("Plants_OnChange()");
+        sprout_list.Save();
         editor.Design_Mode();
         editor.Render_Plants();
       }
 
+      // fires when a change is made via the canvas editor
       function Editor_OnChange(plant)
       {
+        //console.log("Editor_OnChange()");
+        sprout_list.Save();
         sprout_list.requestUpdate();
       }
 
+      // fires when a change is made via the remote control
       function Remote_Change(plant)
       {
+        //console.log("Remote_Change()");
+        sprout_list.Save();
         sprout_list.requestUpdate();
         editor.Render_Plants();
       }
@@ -144,6 +153,8 @@
       {
         const plant = New_Item();
         sprout_list.Add_Plant(plant);
+        sprout_list.Save();
+
         editor.Design_Mode();
         editor.Render_Plants();
       }
@@ -160,7 +171,9 @@
           editor.Play(OnStop_Play);
           document.getElementById("new_plant_btn").disabled = true;
           document.getElementById("design_btn").disabled = true;
+          document.getElementById("remote_btn").disabled = true;
           sprout_list.Set_Disabled(true);
+          remote_ctrl.Set_Disabled(true);
         }
       }
 
@@ -168,7 +181,9 @@
       {
         document.getElementById("new_plant_btn").disabled = false;
         document.getElementById("design_btn").disabled = false;
+        document.getElementById("remote_btn").disabled = false;
         sprout_list.Set_Disabled(false);
+        remote_ctrl.Set_Disabled(false);
       }
 
       function OnClick_Design()
@@ -245,22 +260,20 @@
           }
         }
 
-        Enable_Buttons()
+        Set_Disabled(disabled)
         {
-          const buttons = this.shadowRoot.querySelectorAll("button");
-          if (buttons && buttons.length>0)
+          let btns, i;
+
+          btns = this.shadowRoot.querySelectorAll("button");
+          if (btns && btns.length>0)
           {
-            for (let i=0; i<buttons.length; i++)
-            {
-              const button = buttons[i];
-              button.disabled = false;
-            }
+            btns.forEach((btn) => btn.disabled = disabled);
           }
         }
 
         Show()
         {
-          this.style.display = "inline-grid";
+          this.style.display = "inline-block";
         }
 
         OnClick_Left_Up()
@@ -495,6 +508,11 @@
             :host
             {
               display: none;
+              text-align: center;
+            }
+            .grid
+            {
+              display: grid;
               grid-template-columns: 20% 20% 20% 20% 20%;
               grid-template-rows: 33% 34% 33%;
               column-gap: 5px;
@@ -527,29 +545,46 @@
             {
               background-color: #0f0;
             }
+            h2
+            {
+              font-weight: 100;
+              font-family: serif;
+              font-style: italic;
+              font-size: 20px;
+              box-shadow: 
+                rgb(0,0,0) 0px 1px 0px 0px, 
+                rgb(255,255,255) 0px 4px 0px 0px, 
+                rgb(0,0,0) 0px 7px 0px 0px;    
+              display: inline-block;
+              margin-bottom: 20px;      
+            }
           `;
         }
 
         render()
         {
           return html`
-            <button id="lu" @click="${this.OnClick_Left_Up}"><img src="images/arrow-top-left-bold-outline.svg"></button>
-            <button id="u" @click="${this.OnClick_Up}"><img src="images/arrow-up-bold-outline.svg"></button>
-            <button id="ru" @click="${this.OnClick_Right_Up}"><img src="images/arrow-top-right-bold-outline.svg"></button>
-            <button id="move" @click="${this.OnClick_Cmd}"><img src="images/move-resize-variant.svg"></button>
-            <button id="close" @click="${this.OnClick_Close}"><img src="images/close.svg"></button>
+            <h2 class="title">Fine Control</h2>
 
-            <button id="l" @click="${this.OnClick_Left}"><img src="images/arrow-left-bold-outline.svg"></button>
-            <button></button>
-            <button id="r" @click="${this.OnClick_Right}"><img src="images/arrow-right-bold-outline.svg"></button>
-            <button id="rotate" @click="${this.OnClick_Cmd}"><img src="images/rotate-left.svg"></button>
-            <button></button>
+            <div class="grid">
+              <button id="lu" @click="${this.OnClick_Left_Up}"><img src="images/arrow-top-left-bold-outline.svg"></button>
+              <button id="u" @click="${this.OnClick_Up}"><img src="images/arrow-up-bold-outline.svg"></button>
+              <button id="ru" @click="${this.OnClick_Right_Up}"><img src="images/arrow-top-right-bold-outline.svg"></button>
+              <button id="move" @click="${this.OnClick_Cmd}"><img src="images/move-resize-variant.svg"></button>
+              <button id="close" @click="${this.OnClick_Close}"><img src="images/close.svg"></button>
 
-            <button id="ld" @click="${this.OnClick_Left_Down}"><img src="images/arrow-bottom-left-bold-outline.svg"></button>
-            <button id="d" @click="${this.OnClick_Down}"><img src="images/arrow-down-bold-outline.svg"></button>
-            <button id="rd" @click="${this.OnClick_Right_Down}"><img src="images/arrow-bottom-right-bold-outline.svg"></button>
-            <button id="scale" @click="${this.OnClick_Cmd}"><img src="images/move-resize.svg"></button>
-            <button></button>
+              <button id="l" @click="${this.OnClick_Left}"><img src="images/arrow-left-bold-outline.svg"></button>
+              <button></button>
+              <button id="r" @click="${this.OnClick_Right}"><img src="images/arrow-right-bold-outline.svg"></button>
+              <button id="rotate" @click="${this.OnClick_Cmd}"><img src="images/rotate-left.svg"></button>
+              <button></button>
+
+              <button id="ld" @click="${this.OnClick_Left_Down}"><img src="images/arrow-bottom-left-bold-outline.svg"></button>
+              <button id="d" @click="${this.OnClick_Down}"><img src="images/arrow-down-bold-outline.svg"></button>
+              <button id="rd" @click="${this.OnClick_Right_Down}"><img src="images/arrow-bottom-right-bold-outline.svg"></button>
+              <button id="scale" @click="${this.OnClick_Cmd}"><img src="images/move-resize.svg"></button>
+              <button></button>
+            </div>
           `;
         }
       }
