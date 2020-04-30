@@ -121,6 +121,7 @@
       {
         //console.log("Plants_OnChange()");
         sprout_list.Save();
+        editor.plants = sprout_list.plants;
         editor.Design_Mode();
         editor.Render_Plants();
       }
@@ -153,6 +154,7 @@
       {
         const plant = New_Item();
         sprout_list.Add_Plant(plant);
+        sprout_list.Select_Plant(plant.id);
         sprout_list.Save();
 
         editor.Design_Mode();
@@ -168,10 +170,18 @@
         }
         else
         {
-          editor.Play(OnStop_Play);
+          if (sprout_list.code_gen_type == "plant_code")
+          {
+            editor.Play_Plant(OnStop_Play);
+          }
+          else
+          {
+            editor.Play_Scene(OnStop_Play);
+          }
           document.getElementById("new_plant_btn").disabled = true;
           document.getElementById("design_btn").disabled = true;
           document.getElementById("remote_btn").disabled = true;
+          document.getElementById("undo_btn").disabled = true;
           sprout_list.Set_Disabled(true);
           remote_ctrl.Set_Disabled(true);
         }
@@ -182,6 +192,7 @@
         document.getElementById("new_plant_btn").disabled = false;
         document.getElementById("design_btn").disabled = false;
         document.getElementById("remote_btn").disabled = false;
+        document.getElementById("undo_btn").disabled = false;
         sprout_list.Set_Disabled(false);
         remote_ctrl.Set_Disabled(false);
       }

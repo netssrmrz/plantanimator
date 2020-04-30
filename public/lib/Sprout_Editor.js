@@ -99,10 +99,11 @@ class Sprout_Editor extends LitElement
     this.Enable_Events();
   }
 
-  Play(on_finish_play_fn)
+  Play_Plant(on_finish_play_fn)
   {
     this.is_playing = true;
     this.on_finish_play_fn = on_finish_play_fn;
+    this.Disable_Events();
 
     const stem = this.plants.find((p) => p.name=="Stem");
 
@@ -121,13 +122,31 @@ class Sprout_Editor extends LitElement
     plant.angle = 0;
     plant.canvas_ctx = this.ctx;
 
-    this.Disable_Events();
     this.ctx.setLineDash([]);
     this.ctx.lineWidth = 1;
     this.ctx.strokeStyle = "#000";
 
     this.Clr(this.ctx);
-    pl.Animate(this.ctx, [plant], this.OnFinish_Play, this.Render_Plants, this.Clr_Ctx);
+    pl.Animate(this.ctx, [plant], this.OnFinish_Play, this.Render_Plants, this.Clr);
+  }
+
+  Play_Scene(on_finish_play_fn)
+  {
+    let plant; 
+    this.is_playing = true;
+    this.on_finish_play_fn = on_finish_play_fn;
+    this.Disable_Events();
+
+    if (this.plants && this.plants.length>0)
+    {
+      for (let i=0; i<this.plants.length; i++)
+      {
+        plant = this.plants[i];
+        plant.Reset();
+      }
+      this.Clr(this.ctx);
+      pl.Animate(this.ctx, this.plants, this.OnFinish_Play, this.Render_Plants, this.Clr);
+    }
   }
 
   Disable_Events()

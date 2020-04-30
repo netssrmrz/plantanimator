@@ -14,7 +14,7 @@ export class Base_Plant
     this.angle = 0;
     this.x_scale = 1;
     this.y_scale = 1;
-    this.parent = null;
+    //this.parent = null;
     this.stem_plant = null;
     this.sprout_time = 0;
     this.cmd = null;
@@ -25,6 +25,7 @@ export class Base_Plant
     this.move_btn_path = null;
     this.time_btn_path = null;
     this.max_depth = 3;
+    this.init = false;
 
     this.Set_Paths();
   }
@@ -83,7 +84,7 @@ export class Base_Plant
     plant.canvas_ctx = this.canvas_ctx;
     plant.max_depth = this.max_depth;
     plant.curr_depth = this.curr_depth + 1;
-    plant.parent = this;
+    //plant.parent = this;
 
     if (!this.branches)
       this.branches = [];
@@ -100,7 +101,7 @@ export class Base_Plant
     return false;
   }
 
-  Total_X_Scale()
+  /*Total_X_Scale()
   {
     var curr_plant, res = 1;
 
@@ -110,9 +111,9 @@ export class Base_Plant
     }
 
     return res;
-  }
+  }*/
 
-  Total_Y_Scale()
+  /*Total_Y_Scale()
   {
     var curr_plant, res = 1;
 
@@ -120,13 +121,14 @@ export class Base_Plant
       res = res * curr_plant.Get_Y_Scale();
 
     return res;
-  }
+  }*/
 
   Reset()
   {
     this.branches = null;
     this.curr_depth = 0;
     this.maturity = 0;
+    this.init = false;
   }
 
   Get_X_Scale()
@@ -510,10 +512,10 @@ export class Base_Plant_Maturing2 extends Base_Plant
     this.canvas_ctx.restore();
   }
 
-  Add_Plant_No_Scale(sprout_time, angle, plant)
+  /*Add_Plant_No_Scale(sprout_time, angle, plant)
   {
     this.Add_Plant(sprout_time, angle, plant, 1 / this.Total_X_Scale(), 1 / this.Total_Y_Scale())
-  }
+  }*/
 
   Add_Plant_Abs(sprout_time, angle, plant, x_scale, y_scale, x, y)
   {
@@ -1270,68 +1272,25 @@ export class Plant_Stem7 extends Base_Plant_Maturing2
   }
 }
 
-// Sample Plants ==================================================================================
-
-export class Plant1 extends Base_Plant_Maturing2
+export class Plant_Stem8 extends Base_Plant_Maturing2
 {
   constructor()
   {
     super();
-    this.curve = new Bezier(0,0,495,994,-500,955,-328,689);
+    this.curve = new Bezier(0,0,-332,95,338,889,-72,852);
     this.curve_pts = this.curve.getLUT(100);
   }
 
   Init_Branches()
   {
-    this.Add_Plant_Abs(12,0,new Plant_Flower12(),1,1,-297,725);
+    this.Add_Plant_Abs(0,0,new Plant_Stem7(),1,1,0,0);
+    this.Add_Plant_Abs(28.6,-0.0955948279770296,new Plant_Stem6(),-0.6099999999999999,0.6099999999999999,-71,223);
+    this.Add_Plant_Abs(0,0.3453981633974479,new Plant_Stem1(),-0.39999999999999947,0.39999999999999947,0,0);
   }
 
   Render()
   {
     for (let c = 1; c < this.maturity; c++)
-    {
-      this.canvas_ctx.beginPath();
-      this.canvas_ctx.lineWidth = (this.maturity - c) / 10;
-      this.canvas_ctx.moveTo(this.curve_pts[c - 1].x, this.curve_pts[c - 1].y);
-      this.canvas_ctx.lineTo(this.curve_pts[c].x, this.curve_pts[c].y);
-      this.canvas_ctx.stroke();
-    }
-  }
-}
-
-export class Plant2 extends Base_Plant_Maturing2
-{
-  constructor()
-  {
-    var x1, y1, x2, y2, cx1, cy1, cx2, cy2;
-
-    super();
-
-    x1 = 0; y1 = 0;
-    x2 = 1000; y2 = 0;
-
-    cx1 = 200; cy1 = -250;
-    cx2 = 800; cy2 = 250;
-
-    this.curve = new Bezier(
-      x1, y1, cx1, cy1,
-      cx2, cy2, x2, y2);
-    this.curve_pts = this.curve.getLUT(100);
-  }
-
-  Init_Branches()
-  {
-    this.Add_Plant(10, Random(0, 0.5), new Plant2(), 0.5, -0.5);
-    this.Add_Plant_No_Scale(20, Random(4.7, 1), new Plant_Leaf5());
-    this.Add_Plant(50, Random(0, 0.5), new Plant2(), 0.25, 0.25);
-    this.Add_Plant_No_Scale(90, Random(0, 2), new Plant_Flower3());
-  }
-
-  Render()
-  {
-    var c;
-
-    for (c = 1; c < this.maturity; c++)
     {
       this.canvas_ctx.beginPath();
       this.canvas_ctx.lineWidth = (this.maturity - c) / 10;

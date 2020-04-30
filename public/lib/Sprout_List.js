@@ -12,21 +12,31 @@ class Sprout_List extends LitElement
     this.on_change_fn = null;
     this.OnClick_Edit_Ok = this.OnClick_Edit_Ok.bind(this);
     this.this_class = null;
-
-    if (!this.Load())
-    {
-      this.stem_plant = new pl.Plant_Bezier();
-      this.stem_plant.name = "Stem";
-      this.stem_plant.Set_Pts(0, 0, 0, 1000, -250, 200, 250, 800);
-
-      this.plants = [];
-      this.Add_Plant(this.stem_plant, false, false);
-    }
+    this.plants = null;
+    this.stem_plant = null;
+    this.code_gen_type = null;
   }
   
   firstUpdated(changedProperties)
   {
-    this.Set_Code_Gen_Type("plant_code");
+    if (this.Load())
+    {
+      this.stem_plant = this.plants.find((p) => p.name == "Stem");
+      if (this.stem_plant)
+      {
+        this.Set_Code_Gen_Type("plant_code");
+      }
+      else
+      {
+        this.Set_Code_Gen_Type("scene_code");
+      }
+    }
+    else
+    {
+      this.plants = [];
+      this.Set_Code_Gen_Type("plant_code");
+    }
+
     const dlg = this.shadowRoot.getElementById("dlg");
     dlg.onclick_edit_ok = this.OnClick_Edit_Ok;
   }
@@ -37,15 +47,31 @@ class Sprout_List extends LitElement
     this.shadowRoot.getElementById("plant_code").classList.remove("selected");
     this.shadowRoot.getElementById("scene_code").classList.remove("selected");
 
-    this.shadowRoot.getElementById(code_gen_type).classList.add("selected");
-
     if (code_gen_type == "plant_code")
     {
-      // if not stem then add stem
+      this.shadowRoot.getElementById("plant_code").classList.add("selected");
+      if (!this.stem_plant)
+      {
+        this.stem_plant = new pl.Plant_Bezier();
+        this.stem_plant.name = "Stem";
+        this.stem_plant.Set_Pts(0, 0, 0, 1000, -250, 200, 250, 800);
+        this.plants.forEach((p) => p.stem_plant = this.stem_plant);
+        this.Add_Plant(this.stem_plant, false, false);
+        this.requestUpdate();
+        if (this.on_change_fn) this.on_change_fn();
+      }
     }
     else if (code_gen_type == "scene_code")
     {
-      // if has stem then remove stem
+      this.shadowRoot.getElementById("scene_code").classList.add("selected");
+      if (this.stem_plant)
+      {
+        this.stem_plant = null;
+        this.plants = this.plants.filter((p) => p.name != "Stem");
+        this.plants.forEach((p) => p.stem_plant = null);
+        this.requestUpdate();
+        if (this.on_change_fn) this.on_change_fn();
+      }
     }
   }
 
@@ -68,6 +94,7 @@ class Sprout_List extends LitElement
       this.stem_plant = this.plants.find((p) => p.name == "Stem");
       this.plants.forEach((p) => p.stem_plant = this.stem_plant);
 
+      this.requestUpdate();
       res = true;
     }
 
@@ -127,7 +154,7 @@ class Sprout_List extends LitElement
 
   Add_Plant(plant, can_edit, can_delete)
   {
-    plant.id = this.plants.length;
+    plant.id = Date.now();
     plant.stem_plant = this.stem_plant;
     plant.can_edit = true;
     if (can_edit != null)
@@ -141,7 +168,6 @@ class Sprout_List extends LitElement
     }
 
     this.plants.push(plant);
-    this.Select_Plant(plant.id);
 
     this.requestUpdate();
   }
@@ -276,6 +302,16 @@ class Sprout_List extends LitElement
   OnClick_Code_Type(event)
   {
     this.Set_Code_Gen_Type(event.currentTarget.id);
+  }
+
+  OnClick_Reset()
+  {
+    localStorage.removeItem("plants");
+    this.plants = [];
+    this.stem_plant = null;
+    this.requestUpdate();
+    this.Set_Code_Gen_Type(this.code_gen_type);
+    if (this.on_change_fn) this.on_change_fn();
   }
 
   static get styles()

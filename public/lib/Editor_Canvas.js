@@ -86,7 +86,7 @@ class Editor_Canvas extends LitElement
       for (let i=0; i<this.plants.length; i++)
       {
         plant = this.plants[i];
-        plant.canvas_ctx = this.ctx;
+        //plant.canvas_ctx = this.ctx;
         plant.Reset();
       }
       this.is_playing = true;

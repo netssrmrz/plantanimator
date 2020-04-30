@@ -239,6 +239,7 @@ class Plant_Dialog extends LitElement
           <option>Plant_Stem5</option>
           <option>Plant_Stem6</option>
           <option>Plant_Stem7</option>
+          <option>Plant_Stem8</option>
         </select>
       </span>
       <label>Sprout Time</label>
