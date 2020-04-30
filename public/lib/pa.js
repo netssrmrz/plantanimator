@@ -199,20 +199,20 @@ export class Base_Plant
     }
     else if (this.selected)
     {
-      res = res || this.On_Mouse_Move_Btn(ctx, event, this.scale_btn_path, 50, 50, true);
-      res = res || this.On_Mouse_Move_Btn(ctx, event, this.rotate_btn_path, 0, 50, true);
-      res = res || this.On_Mouse_Move_Btn(ctx, event, this.move_btn_path, 0, 0, true);
+      res = res || this.On_Mouse_Move_Btn(ctx, event, this.scale_btn_path, 50, 50, true, true);
+      res = res || this.On_Mouse_Move_Btn(ctx, event, this.rotate_btn_path, 0, 50, true, true);
+      res = res || this.On_Mouse_Move_Btn(ctx, event, this.move_btn_path, 0, 0, true, true);
       if (this.stem_plant && this.stem_plant.Get_Trunk_Pt)
       {
         const pt = this.stem_plant.Get_Trunk_Pt(this.sprout_time);
-        res = res || this.On_Mouse_Move_Btn(ctx, event, this.time_btn_path, pt.x, pt.y);
+        res = res || this.On_Mouse_Move_Btn(ctx, event, this.time_btn_path, pt.x, pt.y, false, false);
       }
     }
 
     return res;
   }
 
-  On_Mouse_Move_Btn(ctx, event, path, x, y, is_relative)
+  On_Mouse_Move_Btn(ctx, event, path, x, y, is_relative, unscale)
   {
     let res = false;
 
@@ -225,6 +225,10 @@ export class Base_Plant
     }
 
     ctx.translate(x, y);
+    if (unscale)
+    {
+      ctx.scale(1/this.x_scale, 1/this.y_scale);
+    }
     const is_in_path = ctx.isPointInPath(path, event.offsetX, event.offsetY);
     if (path.hover != is_in_path)
     {

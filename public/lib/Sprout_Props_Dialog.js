@@ -16,11 +16,25 @@ class Sprout_Props_Dialog extends LitElement
     this.plant_name_elem = this.shadowRoot.getElementById("plant_name");
     this.plant_class_elem = this.shadowRoot.getElementById("plant_class");
     this.sprout_time_elem = this.shadowRoot.getElementById("sprout_time");
+    this.plant_x_elem = this.shadowRoot.getElementById("plant_x");
+    this.plant_y_elem = this.shadowRoot.getElementById("plant_y");
     this.plant_x_scale_elem = this.shadowRoot.getElementById("plant_x_scale");
     this.plant_y_scale_elem = this.shadowRoot.getElementById("plant_y_scale");
     this.plant_angle_elem = this.shadowRoot.getElementById("plant_angle");
     this.new_ok_btn = this.shadowRoot.getElementById("new_plant_ok_btn");
     this.edit_ok_btn = this.shadowRoot.getElementById("edit_plant_ok_btn");
+  }
+
+  Get_User_Input(plant)
+  {
+    plant.class_name = this.plant_class_elem.value;
+    plant.name = this.plant_name_elem.value;
+    plant.sprout_time = Number.parseFloat(this.sprout_time_elem.value);
+    plant.x = Number.parseFloat(this.plant_x_elem.value);
+    plant.y = Number.parseFloat(this.plant_y_elem.value);
+    plant.x_scale = Number.parseFloat(this.plant_x_scale_elem.value);
+    plant.y_scale = Number.parseFloat(this.plant_y_scale_elem.value);
+    plant.angle = Number.parseFloat(this.plant_angle_elem.value);
   }
 
   OnClick_New_Ok()
@@ -29,14 +43,9 @@ class Sprout_Props_Dialog extends LitElement
     plant.maturity_rate = 1;
     plant.maturity = 0;
     plant.max_depth = 3;
-
-    plant.class_name = this.plant_class_elem.value;
-    plant.name = this.plant_name_elem.value;
-    plant.x = Number.parseFloat(this.plant_x_pos_elem.value);
-    plant.y = Number.parseFloat(this.plant_y_pos_elem.value);
-    plant.x_scale = Number.parseFloat(this.plant_x_scale_elem.value);
-    plant.y_scale = Number.parseFloat(this.plant_y_scale_elem.value);
-    plant.angle = Number.parseFloat(this.plant_angle_elem.value);
+    plant.level = 0;
+    plant.selected = false;
+    this.Get_User_Input(plant);
 
     this.Hide();
     this.onclick_new_ok(plant);
@@ -55,20 +64,12 @@ class Sprout_Props_Dialog extends LitElement
       plant = new pl[this.plant_class_elem.value];
     }
     plant.id = this.plant.id;
-    plant.x = this.plant.x;
-    plant.y = this.plant.y;
     plant.maturity_rate = this.plant.maturity_rate;
     plant.maturity = this.plant.maturity;
+    plant.max_depth = this.plant.max_depth;
     plant.level = this.plant.level;
     plant.selected = this.plant.selected;
-
-    plant.class_name = this.plant_class_elem.value;
-    plant.name = this.plant_name_elem.value;
-    plant.sprout_time = this.sprout_time_elem.value;
-    plant.x_scale = Number.parseFloat(this.plant_x_scale_elem.value);
-    plant.y_scale = Number.parseFloat(this.plant_y_scale_elem.value);
-    plant.angle = Number.parseFloat(this.plant_angle_elem.value);
-    plant.selected = this.plant.selected;
+    this.Get_User_Input(plant);
     
     this.Hide();
     this.onclick_edit_ok(plant);
@@ -83,8 +84,9 @@ class Sprout_Props_Dialog extends LitElement
   {
     this.plant_name_elem.value = "Plant 1";
     this.plant_class_elem.value = "Plant1";
-    this.plant_x_pos_elem.value = "500";
-    this.plant_y_pos_elem.value = "500";
+    this.sprout_time_elem.value = "50";
+    this.plant_x_elem.value = "500";
+    this.plant_y_elem.value = "500";
     this.plant_x_scale_elem.value = "1";
     this.plant_y_scale_elem.value = "1";
     this.plant_angle_elem.value = "0";
@@ -99,6 +101,8 @@ class Sprout_Props_Dialog extends LitElement
     this.plant_name_elem.value = plant.name;
     this.plant_class_elem.value = plant.class_name;
     this.sprout_time_elem.value = plant.sprout_time;
+    this.plant_x_elem.value = plant.x;
+    this.plant_y_elem.value = plant.y;
     this.plant_x_scale_elem.value = plant.x_scale;
     this.plant_y_scale_elem.value = plant.y_scale;
     this.plant_angle_elem.value = plant.angle;
@@ -239,6 +243,10 @@ class Sprout_Props_Dialog extends LitElement
       </span>
       <label>Sprout Time</label>
       <span><input id="sprout_time" type="number"></span>
+      <label>X</label>
+      <span><input id="plant_x" type="number"></span>
+      <label>Y</label>
+      <span><input id="plant_y" type="number"></span>
       <label>X Scale</label>
       <span><input id="plant_x_scale" type="number"></span>
       <label>Y Scale</label>
