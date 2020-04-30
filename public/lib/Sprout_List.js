@@ -397,7 +397,7 @@ class Sprout_List extends LitElement
   {
     let res;
 
-    if (can_render)
+    if (can_render == null || can_render == true)
     {
       res = html`<button plant-id="${id}" @click="${on_click_fn}"><img src="images/${image}"></button>`;
     }
