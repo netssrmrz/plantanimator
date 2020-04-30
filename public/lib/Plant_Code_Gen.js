@@ -60,7 +60,6 @@ class Plant_Code_Gen extends LitElement
         "\t\t\t}\n\n" +
 
         "\t\t\tconst plant = new Plant();\n" +
-        "\t\t\tplant.max_depth = 3;\n" +
         "\t\t\tconst plants = [plant];\n\n" +
 
         "\t\t\tconst canvas = document.getElementById(\"canvas\");\n" +

@@ -34,12 +34,14 @@ class Scene_Code_Gen extends LitElement
         plant = plants[i];
         code += this.Gen_Plant(i, plant);
 
-        array_code = this.Append_Str(array_code, "plant"+plant.id, ", ");
+        array_code = this.Append_Str(array_code, "plant"+i, ", ");
       }
       code += 
         "\n\t\t\tconst plants=["+array_code+"];\n"+
         "\t\t\tconst canvas = document.getElementById(\"canvas\");\n" +
         "\t\t\tconst ctx = canvas.getContext(\"2d\");\n" +
+        "\t\t\tctx.translate(canvas.width/2, canvas.height);\n" +
+        "\t\t\tctx.scale(1, -1);\n" +
         "\t\t\tpl.Animate(ctx, plants);\n" +
         "\t\t</script>\n" +
         "\t</head>\n" +

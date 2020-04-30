@@ -30,7 +30,6 @@ class Plant_Props_Dialog extends LitElement
     plant.name = this.plant_name_elem.value;
     plant.maturity_rate = 1;
     plant.maturity = 0;
-    plant.max_depth = 3;
     plant.x = Number.parseFloat(this.plant_x_pos_elem.value);
     plant.y = Number.parseFloat(this.plant_y_pos_elem.value);
     plant.x_scale = Number.parseFloat(this.plant_x_scale_elem.value);

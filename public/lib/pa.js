@@ -24,6 +24,7 @@ export class Base_Plant
     this.rotate_btn_path = null;
     this.move_btn_path = null;
     this.time_btn_path = null;
+    this.max_depth = 3;
 
     this.Set_Paths();
   }
@@ -1232,6 +1233,43 @@ export class Plant_Stem6 extends Base_Plant_Maturing2
     }
   }
 }
+
+export class Plant_Stem7 extends Base_Plant_Maturing2
+{
+  constructor()
+  {
+    super();
+    this.curve = new Bezier(0,0,-250,200,260,996,-72,923);
+    this.curve_pts = this.curve.getLUT(100);
+  }
+
+  Init_Branches()
+  {
+    this.Add_Plant_Abs(4.2,-0.11487660541689904,new Plant_Leaf6(),1.8000000000000007,1.8000000000000007,-21,22);
+    this.Add_Plant_Abs(61,0.5079812250083899,new Plant_Stem1(),0.3499999999999994,0.3499999999999994,36,745);
+    this.Add_Plant_Abs(4.9,-0.33563855032760914,new Plant_Leaf6(),1.03,1.03,-59,89);
+    this.Add_Plant_Abs(50,-0.6788490587889789,new Plant_Leaf6(),0.7599999999999998,0.7599999999999998,-70,155);
+    this.Add_Plant_Abs(50,0.31561566203876645,new Plant_Leaf6(),0.8118143138725752,0.8002611451548056,19,673);
+    this.Add_Plant_Abs(50,0.5503859476767916,new Plant_Leaf6(),0.8899999999999999,0.8899999999999999,14,638);
+    this.Add_Plant_Abs(50,-0.6435011087932844,new Plant_Leaf6(),1,1,-9,540);
+    this.Add_Plant_Abs(50,0.24841049935104054,new Plant_Leaf6(),1.12,1.12,-57,343);
+    this.Add_Plant_Abs(90,0,new Plant_Flower9(),0.6099999999999997,0.6099999999999997,-70,924);
+    this.Add_Plant_Abs(95,0,new Plant_Flower12(),0.36999999999999944,0.36999999999999944,-176,916);
+  }
+
+  Render()
+  {
+    for (let c = 1; c < this.maturity; c++)
+    {
+      this.canvas_ctx.beginPath();
+      this.canvas_ctx.lineWidth = (this.maturity - c) / 10;
+      this.canvas_ctx.moveTo(this.curve_pts[c - 1].x, this.curve_pts[c - 1].y);
+      this.canvas_ctx.lineTo(this.curve_pts[c].x, this.curve_pts[c].y);
+      this.canvas_ctx.stroke();
+    }
+  }
+}
+
 // Sample Plants ==================================================================================
 
 export class Plant1 extends Base_Plant_Maturing2
@@ -1245,7 +1283,7 @@ export class Plant1 extends Base_Plant_Maturing2
 
   Init_Branches()
   {
-    this.Add_Plant_Abs(12,0,new pl.Plant_Flower12(),1,1,-297,725);
+    this.Add_Plant_Abs(12,0,new Plant_Flower12(),1,1,-297,725);
   }
 
   Render()

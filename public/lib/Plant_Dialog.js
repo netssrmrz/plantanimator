@@ -1,7 +1,7 @@
 import {LitElement, html, css} from "./lit-element/lit-element.js";
 import * as pl from "./pa.js";
 
-class Sprout_Props_Dialog extends LitElement 
+class Plant_Dialog extends LitElement 
 {
   constructor()
   {
@@ -42,7 +42,6 @@ class Sprout_Props_Dialog extends LitElement
     var plant = new pl[this.plant_class_elem.value];
     plant.maturity_rate = 1;
     plant.maturity = 0;
-    plant.max_depth = 3;
     plant.level = 0;
     plant.selected = false;
     this.Get_User_Input(plant);
@@ -239,6 +238,7 @@ class Sprout_Props_Dialog extends LitElement
           <option>Plant_Stem4</option>
           <option>Plant_Stem5</option>
           <option>Plant_Stem6</option>
+          <option>Plant_Stem7</option>
         </select>
       </span>
       <label>Sprout Time</label>
@@ -262,4 +262,4 @@ class Sprout_Props_Dialog extends LitElement
   }
 }
 
-customElements.define('sprout-props-dlg', Sprout_Props_Dialog);
+customElements.define('plant-dlg', Plant_Dialog);

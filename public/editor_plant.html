@@ -200,7 +200,6 @@
         item.name = "Sprout 1";
         item.maturity_rate = 1;
         item.maturity = 0;
-        item.max_depth = 3;
         item.x = 0;
         item.y = 250;
         item.x_scale = 1;
@@ -226,7 +225,6 @@
         firstUpdated(changedProperties)
         {
           this.Set_Cmd(null);
-          this.Disable_Unused_Buttons();
         }
 
         Change_Obj(change_fn)
@@ -254,15 +252,12 @@
 
         Disable_Buttons()
         {
-          const buttons = this.shadowRoot.querySelectorAll("button");
-          if (buttons && buttons.length>0)
+          const btns = this.shadowRoot.querySelectorAll("button");
+          if (btns && btns.length>0)
           {
-            for (let i=0; i<buttons.length; i++)
-            {
-              const button = buttons[i];
-              button.disabled = true;
-            }
+            btns.forEach((btn) => btn.disabled = true);
           }
+          this.shadowRoot.getElementById("close").disabled = false;
         }
 
         Disable_Unused_Buttons()
@@ -274,14 +269,14 @@
 
         Set_Disabled(disabled)
         {
-          let btns, i;
-
-          btns = this.shadowRoot.querySelectorAll("button");
-          if (btns && btns.length>0)
+          if (disabled)
           {
-            btns.forEach((btn) => btn.disabled = disabled);
+            this.Disable_Buttons();
           }
-          this.Disable_Unused_Buttons();
+          else
+          {
+            this.Set_Cmd(this.cmd);
+          }
         }
 
         Show()
@@ -486,6 +481,8 @@
         Set_Cmd(cmd)
         {
           this.cmd = cmd;
+          this.Disable_Buttons();
+
           this.shadowRoot.getElementById("move").classList.remove("selected");
           this.shadowRoot.getElementById("rotate").classList.remove("selected");
           this.shadowRoot.getElementById("scale").classList.remove("selected");
@@ -494,15 +491,12 @@
             this.shadowRoot.getElementById(cmd).classList.add("selected");
           }
 
+          this.shadowRoot.getElementById("move").disabled = false;
+          this.shadowRoot.getElementById("rotate").disabled = false;
+          this.shadowRoot.getElementById("scale").disabled = false;
           if (this.cmd == "rotate")
           {
-            this.shadowRoot.getElementById("lu").disabled = true;
-            this.shadowRoot.getElementById("u").disabled = true;
-            this.shadowRoot.getElementById("ru").disabled = true;
             this.shadowRoot.getElementById("r").disabled = false;
-            this.shadowRoot.getElementById("rd").disabled = true;
-            this.shadowRoot.getElementById("d").disabled = true;
-            this.shadowRoot.getElementById("ld").disabled = true;
             this.shadowRoot.getElementById("l").disabled = false;
           }
           else if (this.cmd == "move" || this.cmd == "scale")
@@ -515,17 +509,6 @@
             this.shadowRoot.getElementById("d").disabled = false;
             this.shadowRoot.getElementById("ld").disabled = false;
             this.shadowRoot.getElementById("l").disabled = false;
-          }
-          else
-          {
-            this.shadowRoot.getElementById("lu").disabled = true;
-            this.shadowRoot.getElementById("u").disabled = true;
-            this.shadowRoot.getElementById("ru").disabled = true;
-            this.shadowRoot.getElementById("r").disabled = true;
-            this.shadowRoot.getElementById("rd").disabled = true;
-            this.shadowRoot.getElementById("d").disabled = true;
-            this.shadowRoot.getElementById("ld").disabled = true;
-            this.shadowRoot.getElementById("l").disabled = true;
           }
         }
 
@@ -633,6 +616,7 @@
       <button id="play_btn"><img src="images/play-pause.svg"></button>
       <button id="design_btn"><img src="images/pencil-ruler.svg"></button>
       <button id="remote_btn"><img src="images/remote.svg"></button>
+      <button id="undo_btn"><img src="images/undo.svg"></button>
     </div>
 
     <sprout-list id="sprout_list"></sprout-list>

@@ -1,6 +1,7 @@
 import {LitElement, html, css} from "./lit-element/lit-element.js";
-import "./Sprout_Props_Dialog.js";
+import "./Plant_Dialog.js";
 import "./Plant_Code_Gen.js";
+import "./Scene_Code_Gen.js";
 import * as pl from "./pa.js";
 
 class Sprout_List extends LitElement
@@ -25,10 +26,29 @@ class Sprout_List extends LitElement
   
   firstUpdated(changedProperties)
   {
+    this.Set_Code_Gen_Type("plant_code");
     const dlg = this.shadowRoot.getElementById("dlg");
     dlg.onclick_edit_ok = this.OnClick_Edit_Ok;
   }
   
+  Set_Code_Gen_Type(code_gen_type)
+  {
+    this.code_gen_type = code_gen_type;
+    this.shadowRoot.getElementById("plant_code").classList.remove("selected");
+    this.shadowRoot.getElementById("scene_code").classList.remove("selected");
+
+    this.shadowRoot.getElementById(code_gen_type).classList.add("selected");
+
+    if (code_gen_type == "plant_code")
+    {
+      // if not stem then add stem
+    }
+    else if (code_gen_type == "scene_code")
+    {
+      // if has stem then remove stem
+    }
+  }
+
   Save()
   {
     const plants_json = JSON.stringify(this.plants, this.JSON_Replacer);
@@ -230,14 +250,32 @@ class Sprout_List extends LitElement
 
   OnClick_Gen_Code()
   {
-    const code = this.shadowRoot.getElementById("code");
-    code.Show();
-    const branches = this.plants.filter((p) => p.name!="Stem");
-    const pt1 = {x: this.stem_plant.x1, y: this.stem_plant.y1};
-    const pt2 = {x: this.stem_plant.x2, y: this.stem_plant.y2};
-    const ctrl1 = {x: this.stem_plant.ctrl1_x, y: this.stem_plant.ctrl1_y};
-    const ctrl2 = {x: this.stem_plant.ctrl2_x, y: this.stem_plant.ctrl2_y};
-    code.Gen_Code(branches, pt1, pt2, ctrl1, ctrl2);
+    const plant_code_gen = this.shadowRoot.getElementById("plant_code_gen");
+    const scene_code_gen = this.shadowRoot.getElementById("scene_code_gen");
+    plant_code_gen.Hide();
+    scene_code_gen.Hide();
+
+    if (this.code_gen_type == "plant_code")
+    {
+      plant_code_gen.Show();
+      const branches = this.plants.filter((p) => p.name!="Stem");
+      const pt1 = {x: this.stem_plant.x1, y: this.stem_plant.y1};
+      const pt2 = {x: this.stem_plant.x2, y: this.stem_plant.y2};
+      const ctrl1 = {x: this.stem_plant.ctrl1_x, y: this.stem_plant.ctrl1_y};
+      const ctrl2 = {x: this.stem_plant.ctrl2_x, y: this.stem_plant.ctrl2_y};
+      plant_code_gen.Gen_Code(branches, pt1, pt2, ctrl1, ctrl2);
+    }
+    else
+    {
+      scene_code_gen.Show();
+      const scene_plants = this.plants.filter((p) => p.name!="Stem");
+      scene_code_gen.Gen_Scene(scene_plants);
+    }
+  }
+
+  OnClick_Code_Type(event)
+  {
+    this.Set_Code_Gen_Type(event.currentTarget.id);
   }
 
   static get styles()
@@ -341,12 +379,16 @@ class Sprout_List extends LitElement
           <tr>
             <td id="btn_bar" colspan="8">
               <button id="gen_btn" @click="${this.OnClick_Gen_Code}"><img src="images/code-json.svg"></button>
+              <button id="plant_code" @click="${this.OnClick_Code_Type}"><img src="images/flower-tulip-outline.svg"></button>
+              <button id="scene_code" @click="${this.OnClick_Code_Type}"><img src="images/image.svg"></button>
+              <button id="reset" @click="${this.OnClick_Reset}"><img src="images/nuke.svg"></button>
             </td>
           </tr>
         </tfoot>
       </table>
-      <sprout-props-dlg id="dlg"></sprout-props-dlg>
-      <plant-code-gen id="code"></plant-code-gen>
+      <plant-dlg id="dlg"></plant-dlg>
+      <plant-code-gen id="plant_code_gen"></plant-code-gen>
+      <scene-code-gen id="scene_code_gen"></scene-code-gen>
       `;
   }
 

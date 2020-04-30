@@ -114,7 +114,6 @@ class Sprout_Editor extends LitElement
     plant.sprouts = this.plants.filter((p) => p.name!="Stem");
     plant.maturity_rate = 1;
     plant.maturity = 0;
-    plant.max_depth = 3;
     plant.x = 0;
     plant.y = 0;
     plant.x_scale = 1;
