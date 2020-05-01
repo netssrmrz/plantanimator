@@ -4,7 +4,7 @@ import "./Plant_Code_Gen.js";
 import "./Scene_Code_Gen.js";
 import * as pl from "./pa.js";
 
-class Sprout_List extends LitElement
+class Plant_List extends LitElement
 {
   constructor()
   {
@@ -483,4 +483,4 @@ class Sprout_List extends LitElement
   }
 }
 
-customElements.define('sprout-list', Sprout_List);
+customElements.define('plant-list', Plant_List);

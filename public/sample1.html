@@ -49,71 +49,65 @@
 
       canvas = document.getElementById("canvas");
       canvas_ctx = canvas.getContext("2d");
-      canvas_ctx.strokeStyle = "#aaa";
-      canvas_ctx.fillStyle = "#fff";
+      canvas_ctx.strokeStyle = "#000";
+      canvas_ctx.fillStyle = "#000";
       canvas_ctx.lineWidth = 4;
       canvas_ctx.lineCap = 'round';
       canvas_ctx.lineJoin = 'round';
 
       plants = [];
-      plants.push(New_Top_Border(canvas_ctx));
-      plants.push(New_Left_Border(canvas_ctx));
-      plants.push(New_Bottom_Border(canvas_ctx));
-      plants.push(New_Right_Border(canvas_ctx));
+      plants.push(p1(canvas_ctx));
+      plants.push(p2(canvas_ctx));
+      plants.push(p3(canvas_ctx));
+      plants.push(p4(canvas_ctx));
       pl.Animate(canvas_ctx, plants);
     }
 
-    function New_Top_Border(canvas_ctx)
+    function p1(canvas_ctx)
     {
-      var plant = new pl.Plant1();
-      plant.maturity_rate = 1;
-      plant.canvas_ctx = canvas_ctx;
-      plant.x = 0;
-      plant.y = 0;
-      plant.x_scale = 1;
-      plant.y_scale = -1;
-      plant.angle = 0.14;
-      return plant;
-    }
-
-    function New_Bottom_Border(canvas_ctx)
-    {
-      var plant = new pl.Plant1();
-      plant.maturity_rate = 1;
-      plant.canvas_ctx = canvas_ctx;
-      plant.x = 2000;
-      plant.y = 1000;
+      var plant = new pl.Plant_Stem8();
+      plant.maturity_rate = 0.6;
+      plant.x = 1000;
+      plant.y = 100;
       plant.x_scale = -1;
       plant.y_scale = 1;
-      plant.angle = 0.14;
+      plant.angle = Math.PI/2;
       return plant;
     }
 
-    function New_Left_Border(canvas_ctx)
+    function p2(canvas_ctx)
     {
-      var plant = new pl.Plant1();
-      plant.maturity_rate = 1;
-      plant.max_depth = 4;
-      plant.canvas_ctx = canvas_ctx;
-      plant.x = 0;
-      plant.y = 0;
+      var plant = new pl.Plant_Stem8();
+      plant.maturity_rate = 0.5;
+      plant.x = 1000;
+      plant.y = 100;
       plant.x_scale = -1;
       plant.y_scale = -1;
-      plant.angle = -1.7;
+      plant.angle = Math.PI/2;
       return plant;
     }
 
-    function New_Right_Border(canvas_ctx)
+    function p3(canvas_ctx)
     {
-      var plant = new pl.Plant1();
-      plant.maturity_rate = 1;
-      plant.max_depth = 4;
-      plant.canvas_ctx = canvas_ctx;
-      plant.x = 2000;
-      plant.y = 1000;
+      var plant = new pl.Plant_Stem8();
+      plant.maturity_rate = 0.4;
+      plant.x = 1000;
+      plant.y = 900;
       plant.x_scale = 1;
       plant.y_scale = 1;
-      plant.angle = -1.7;
+      plant.angle = Math.PI/2;
+      return plant;
+    }
+
+    function p4(canvas_ctx)
+    {
+      var plant = new pl.Plant_Stem8();
+      plant.maturity_rate = 0.3;
+      plant.x = 1000;
+      plant.y = 900;
+      plant.x_scale = 1;
+      plant.y_scale = -1;
+      plant.angle = Math.PI/2;
       return plant;
     }
   </script>
