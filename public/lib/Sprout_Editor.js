@@ -169,6 +169,7 @@ class Sprout_Editor extends LitElement
     {
       this.ctx.stop = true;
       this.is_playing = false;
+      this.Enable_Events();
     }
   }
 
@@ -187,6 +188,7 @@ class Sprout_Editor extends LitElement
     {
       this.on_finish_play_fn();
     }
+    this.Enable_Events();
   }
 
   OnMouseDown_Canvas(event)

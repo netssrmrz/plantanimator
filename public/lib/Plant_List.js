@@ -345,6 +345,19 @@ class Plant_List extends LitElement
       {
         background-color: #ddd;
       }
+      tbody:after
+      {
+        display: block;
+        content: " ";
+        height: 20px;
+      }
+      tfoot
+      {
+        box-shadow: 
+          rgb(0,0,0) 0px -1px 0px 0px, 
+          rgb(255,255,255) 0px -4px 0px 0px, 
+          rgb(0,0,0) 0px -7px 0px 0px;            
+      }
       th
       {
         font-weight: 100;
@@ -388,6 +401,9 @@ class Plant_List extends LitElement
       {
         background-color: #0f0;
       }
+      .msg
+      {
+      }
     `;
   }
 
@@ -414,10 +430,10 @@ class Plant_List extends LitElement
         <tfoot>
           <tr>
             <td id="btn_bar" colspan="8">
-              <button id="gen_btn" @click="${this.OnClick_Gen_Code}"><img src="images/code-json.svg"></button>
-              <button id="plant_code" @click="${this.OnClick_Code_Type}"><img src="images/flower-tulip-outline.svg"></button>
-              <button id="scene_code" @click="${this.OnClick_Code_Type}"><img src="images/image.svg"></button>
-              <button id="reset" @click="${this.OnClick_Reset}"><img src="images/nuke.svg"></button>
+              <button id="gen_btn" @click="${this.OnClick_Gen_Code}" title="Generate Code"><img src="images/code-json.svg"></button>
+              <button id="plant_code" @click="${this.OnClick_Code_Type}" title="Switch to Plant Editing"><img src="images/flower-tulip-outline.svg"></button>
+              <button id="scene_code" @click="${this.OnClick_Code_Type}" title="Switch to Scene Editing"><img src="images/image.svg"></button>
+              <button id="reset" @click="${this.OnClick_Reset}" title="Reset"><img src="images/nuke.svg"></button>
             </td>
           </tr>
         </tfoot>
@@ -440,6 +456,10 @@ class Plant_List extends LitElement
         res = html`${res}${this.Render_Item(i, plant)}`;
       }
     }
+    else
+    {
+      res = html`<tr><td class="msg" colspan=9>No plants added yet. Get to work!</td></tr>`;
+    }
     return res;
   }
 
@@ -453,11 +473,11 @@ class Plant_List extends LitElement
     }
 
     return html`
-      <tr plant-id="${plant.id}" class="${row_class}">
+      <tr plant-id="${plant.id}" xclass="${row_class}">
         <td>
-          <button plant-id="${plant.id}" @click="${this.OnClick_Select_Plant}"><img src="images/target.svg"></button>
-          ${this.Render_Button(plant.id, this.OnClick_Edit_Plant, "pencil-outline.svg", plant.can_edit)}
-          ${this.Render_Button(plant.id, this.OnClick_Delete_Plant, "delete-outline.svg", plant.can_delete)}
+          <button plant-id="${plant.id}" @click="${this.OnClick_Select_Plant}" title="Select" class="${row_class}"><img src="images/target.svg"></button>
+          ${this.Render_Button(plant.id, this.OnClick_Edit_Plant, "pencil-outline.svg", plant.can_edit, "Edit Plant Properties")}
+          ${this.Render_Button(plant.id, this.OnClick_Delete_Plant, "delete-outline.svg", plant.can_delete, "Delete Plant")}
         </td>
         <td>${i+1}</td>
         <td>${plant.name}</td>
@@ -471,13 +491,13 @@ class Plant_List extends LitElement
       `;
   }
 
-  Render_Button(id, on_click_fn, image, can_render)
+  Render_Button(id, on_click_fn, image, can_render, title)
   {
     let res;
 
     if (can_render == null || can_render == true)
     {
-      res = html`<button plant-id="${id}" @click="${on_click_fn}"><img src="images/${image}"></button>`;
+      res = html`<button plant-id="${id}" @click="${on_click_fn}" title="${title}"><img src="images/${image}"></button>`;
     }
     return res;
   }

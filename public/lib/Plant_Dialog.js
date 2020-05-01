@@ -29,7 +29,7 @@ class Plant_Dialog extends LitElement
   {
     plant.class_name = this.plant_class_elem.value;
     plant.name = this.plant_name_elem.value;
-    plant.sprout_time = Number.parseFloat(this.sprout_time_elem.value);
+    plant.sprout_time = Number.parseInt(this.sprout_time_elem.value);
     plant.x = Number.parseFloat(this.plant_x_elem.value);
     plant.y = Number.parseFloat(this.plant_y_elem.value);
     plant.x_scale = Number.parseFloat(this.plant_x_scale_elem.value);
