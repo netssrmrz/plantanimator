@@ -1402,6 +1402,48 @@ export class Plant_Stem10 extends Base_Plant_Maturing2
     }
   }
 }
+
+export class Plant_Stem11 extends Base_Plant_Maturing2
+{
+  constructor()
+  {
+    super();
+    this.curve = new Bezier(0,0,-250,200,250,800,-496,998);
+    this.curve_pts = this.curve.getLUT(100);
+  }
+
+  Init_Branches()
+  {
+    this.Add_Plant_Abs(27,-4.649970170388732,new Plant_Stem10(),0.25,0.25,-72,117);
+    this.Add_Plant_Abs(20,-1.6095926132103333,new Plant_Stem10(),0.2,0.2,-78,189);
+    this.Add_Plant_Abs(99.5,0,new Plant_Flower9(),1,1,-252,620);
+    this.Add_Plant_Abs(42,0,new Plant_Flower9(),0.8,0.8,28,374);
+    this.Add_Plant_Abs(6.6,-0.2629947316809196,new Plant_Stem2(),-0.5,0.5,-34,37);
+    this.Add_Plant_Abs(50,0,new Plant_Stem1(),0.5,0.5,-78,263);
+    this.Add_Plant_Abs(50,0.22471116841464278,new Plant_Stem4(),0.5,0.5,-60,522);
+    this.Add_Plant_Abs(95.1,0.49513326346840447,new Plant_Flower9(),0.6264926431319213,0.5708826219999855,-92,846);
+    this.Add_Plant_Abs(83,-4.599661368794312,new Plant_Stem10(),0.1,0.1,-246,888);
+    this.Add_Plant_Abs(50,1.231503712340852,new Plant_Leaf10(),1.5,1.5,-79,180);
+    this.Add_Plant_Abs(50,1.0999024678141933,new Plant_Leaf11(),1.5,1.5,-77,181);
+    this.Add_Plant_Abs(50,0.44530104388768565,new Plant_Leaf12(),-1.3,1.3,-78,177);
+    this.Add_Plant_Abs(50,0.9865250492139879,new Plant_Leaf10(),1,1,-77,287);
+    this.Add_Plant_Abs(50,0.8032306410357486,new Plant_Leaf11(),1,1,-77,290);
+    this.Add_Plant_Abs(50,0.16116626431310999,new Plant_Leaf12(),-1,1,-76,294);
+  }
+
+  Render()
+  {
+    for (let c = 1; c < this.maturity; c++)
+    {
+      this.canvas_ctx.beginPath();
+      this.canvas_ctx.lineWidth = (this.maturity - c) / 10;
+      this.canvas_ctx.moveTo(this.curve_pts[c - 1].x, this.curve_pts[c - 1].y);
+      this.canvas_ctx.lineTo(this.curve_pts[c].x, this.curve_pts[c].y);
+      this.canvas_ctx.stroke();
+    }
+  }
+}
+
 // Utils ==========================================================================================
 
 export function Animate(canvas_ctx, plants, on_finish_fn, on_stop_fn, on_clr_fn)

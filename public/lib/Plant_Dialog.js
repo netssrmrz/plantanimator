@@ -62,6 +62,7 @@ class Plant_Dialog extends LitElement
     {
       plant = new pl[this.plant_class_elem.value];
     }
+    plant.stem_plant = this.plant.stem_plant;
     plant.id = this.plant.id;
     plant.maturity_rate = this.plant.maturity_rate;
     plant.maturity = this.plant.maturity;
@@ -242,6 +243,7 @@ class Plant_Dialog extends LitElement
           <option>Plant_Stem8</option>
           <option>Plant_Stem9</option>
           <option>Plant_Stem10</option>
+          <option>Plant_Stem11</option>
         </select>
       </span>
       <label>Sprout Time</label>
