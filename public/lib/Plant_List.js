@@ -473,7 +473,7 @@ class Plant_List extends LitElement
     }
 
     return html`
-      <tr plant-id="${plant.id}" xclass="${row_class}">
+      <tr plant-id="${plant.id}">
         <td>
           <button plant-id="${plant.id}" @click="${this.OnClick_Select_Plant}" title="Select" class="${row_class}"><img src="images/target.svg"></button>
           ${this.Render_Button(plant.id, this.OnClick_Edit_Plant, "pencil-outline.svg", plant.can_edit, "Edit Plant Properties")}

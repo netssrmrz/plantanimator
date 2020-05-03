@@ -121,9 +121,12 @@
       {
         //console.log("Plants_OnChange()");
         sprout_list.Save();
+
         editor.plants = sprout_list.plants;
         editor.Design_Mode();
         editor.Render_Plants();
+
+        remote_ctrl.plants = sprout_list.plants;
       }
 
       // fires when a change is made via the canvas editor
@@ -617,7 +620,7 @@
   <body>
     <h1>
       <span class="hp">&#x1f337;</span>
-      <span>Plantimator - Editor</span>
+      <span class="h1d">Plantimator - Editor</span>
       <!--span class="h1a">Pl</span><span class="h1b">an</span><span class="h1c">t</span><span class="h1d">imator</span-->
     </h1>
 

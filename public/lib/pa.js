@@ -1301,6 +1301,107 @@ export class Plant_Stem8 extends Base_Plant_Maturing2
   }
 }
 
+export class Plant_Stem9 extends Base_Plant_Maturing2
+{
+  constructor()
+  {
+    super();
+    this.curve = new Bezier(-6,95,300,322,362,515,326,910);
+    this.curve_pts = this.curve.getLUT(100);
+  }
+
+  Init_Branches()
+  {
+    this.Add_Plant_Abs(14,-2.384758148031105,new Plant_Leaf5(),1.5,1.5,100,181);
+    this.Add_Plant_Abs(11,0.6593100683328581,new Plant_Leaf5(),1.5,1.5,90,169);
+    this.Add_Plant_Abs(9,-2.547842986879022,new Plant_Leaf5(),1.5,1.5,59,145);
+    this.Add_Plant_Abs(6,0.5266272714337505,new Plant_Leaf5(),1.5,1.5,40,129);
+    this.Add_Plant_Abs(2,-2.6962916097021075,new Plant_Leaf5(),1.5,1.5,19,114);
+    this.Add_Plant_Abs(0,0.4547192748209694,new Plant_Leaf5(),1.5,1.5,-2,99);
+    this.Add_Plant_Abs(50,0.7944069286878652,new Plant_Leaf5(),1.5,1.5,130,210);
+    this.Add_Plant_Abs(19,-2.3380146751193664,new Plant_Leaf5(),1.25,1.25,145,223);
+    this.Add_Plant_Abs(21,0.7853981633974483,new Plant_Leaf5(),1.25,1.25,162,240);
+    this.Add_Plant_Abs(50,-2.340322807200555,new Plant_Leaf5(),1.25,1.25,176,257);
+    this.Add_Plant_Abs(50,0.8238407534186365,new Plant_Leaf5(),1.25,1.25,194,275);
+    this.Add_Plant_Abs(50,-2.279422598922567,new Plant_Leaf5(),1.25,1.25,208,295);
+    this.Add_Plant_Abs(50,0.8996524913588879,new Plant_Leaf5(),1.25,1.25,219,311);
+    this.Add_Plant_Abs(50,-2.204429334864642,new Plant_Leaf5(),1.25,1.25,231,328);
+    this.Add_Plant_Abs(36,0.94677327381814,new Plant_Leaf5(),1.25,1.25,241,343);
+    this.Add_Plant_Abs(39,-2.1240906521171894,new Plant_Leaf5(),1,1,251,360);
+    this.Add_Plant_Abs(40,0.9670469933974601,new Plant_Leaf5(),1,1,263,378);
+    this.Add_Plant_Abs(44,-2.1112158270654806,new Plant_Leaf5(),1,1,272,402);
+    this.Add_Plant_Abs(46,1.1071487177940904,new Plant_Leaf5(),1,1,283,422);
+    this.Add_Plant_Abs(50,-1.97568811307998,new Plant_Leaf5(),1,1,290,446);
+    this.Add_Plant_Abs(53,1.1943059923483736,new Plant_Leaf5(),1,1,300,467);
+    this.Add_Plant_Abs(56,-1.9055331641117113,new Plant_Leaf5(),1,1,304,486);
+    this.Add_Plant_Abs(73,1.5042281630190728,new Plant_Leaf5(),0.75,0.75,334,642);
+    this.Add_Plant_Abs(71,-1.677531999444032,new Plant_Leaf5(),0.75,0.75,329,619);
+    this.Add_Plant_Abs(68,1.4410937896389844,new Plant_Leaf5(),0.75,0.75,330,597);
+    this.Add_Plant_Abs(50,-1.7475051828649333,new Plant_Leaf5(),0.75,0.75,324,574);
+    this.Add_Plant_Abs(50,1.3397056595989998,new Plant_Leaf5(),0.75,0.75,321,550);
+    this.Add_Plant_Abs(61,-1.8094056493030974,new Plant_Leaf5(),0.75,0.75,315,529);
+    this.Add_Plant_Abs(58,1.2490457723982544,new Plant_Leaf5(),0.75,0.75,311,508);
+    this.Add_Plant_Abs(76,-1.612438905893485,new Plant_Leaf5(),0.5,0.5,334,663);
+    this.Add_Plant_Abs(77,1.5707963267948966,new Plant_Leaf5(),0.5,0.5,334,681);
+    this.Add_Plant_Abs(79,-1.5916266468311135,new Plant_Leaf5(),0.5,0.5,336,698);
+    this.Add_Plant_Abs(81,1.5707963267948966,new Plant_Leaf5(),0.5,0.5,335,722);
+    this.Add_Plant_Abs(83,-1.551190995937692,new Plant_Leaf5(),0.5,0.5,336,742);
+    this.Add_Plant_Abs(85,-4.673946390363502,new Plant_Leaf5(),0.5,0.5,336,762);
+    this.Add_Plant_Abs(87,-1.501939837493852,new Plant_Leaf5(),0.5,0.5,335,782);
+    this.Add_Plant_Abs(89,-4.651240817735388,new Plant_Leaf5(),0.25,0.25,334,799);
+    this.Add_Plant_Abs(90,-1.5208379310729538,new Plant_Leaf5(),0.22,0.22,335,817);
+    this.Add_Plant_Abs(91,-4.630936936078818,new Plant_Leaf5(),0.19,0.19,333,831);
+    this.Add_Plant_Abs(94,-1.501939837493852,new Plant_Leaf5(),0.16,0.16,333,849);
+    this.Add_Plant_Abs(95,-4.626883686706485,new Plant_Leaf5(),0.13,0.13,330,866);
+    this.Add_Plant_Abs(97,-1.4840579881189115,new Plant_Leaf5(),0.1,0.1,330,882);
+    this.Add_Plant_Abs(97,-4.632558994672452,new Plant_Leaf5(),0.07,0.07,326,896);
+  }
+
+  Render()
+  {
+    for (let c = 1; c < this.maturity; c++)
+    {
+      this.canvas_ctx.beginPath();
+      this.canvas_ctx.lineWidth = (this.maturity - c) / 10;
+      this.canvas_ctx.moveTo(this.curve_pts[c - 1].x, this.curve_pts[c - 1].y);
+      this.canvas_ctx.lineTo(this.curve_pts[c].x, this.curve_pts[c].y);
+      this.canvas_ctx.stroke();
+    }
+  }
+}
+
+export class Plant_Stem10 extends Base_Plant_Maturing2
+{
+  constructor()
+  {
+    super();
+    this.curve = new Bezier(0,0,-250,200,171,504,165,918);
+    this.curve_pts = this.curve.getLUT(100);
+  }
+
+  Init_Branches()
+  {
+    this.Add_Plant_Abs(4,-0.920925877382949,new Plant_Leaf11(),3,3,-39,36);
+    this.Add_Plant_Abs(4,-0.5290767031646826,new Plant_Leaf9(),6,6,-78,183);
+    this.Add_Plant_Abs(40,0.0660196174786769,new Plant_Leaf9(),5,5,-44,294);
+    this.Add_Plant_Abs(65,-0.14481249823893916,new Plant_Leaf9(),-4,4,42,487);
+    this.Add_Plant_Abs(50,0.4673105962810409,new Plant_Leaf7(),5,5,-44,41);
+    this.Add_Plant_Abs(10,1.0321189850405048,new Plant_Leaf12(),3,3,-6,6);
+    this.Add_Plant_Abs(14,-0.7016782278699055,new Plant_Leaf8(),7,4,-41,42);
+  }
+
+  Render()
+  {
+    for (let c = 1; c < this.maturity; c++)
+    {
+      this.canvas_ctx.beginPath();
+      this.canvas_ctx.lineWidth = (this.maturity - c) / 10;
+      this.canvas_ctx.moveTo(this.curve_pts[c - 1].x, this.curve_pts[c - 1].y);
+      this.canvas_ctx.lineTo(this.curve_pts[c].x, this.curve_pts[c].y);
+      this.canvas_ctx.stroke();
+    }
+  }
+}
 // Utils ==========================================================================================
 
 export function Animate(canvas_ctx, plants, on_finish_fn, on_stop_fn, on_clr_fn)
