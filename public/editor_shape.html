@@ -1,0 +1,805 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Plantimator - Shape Editor</title>
+    <style>
+      @font-face
+      {
+        font-family: parisienne;
+        src: url(fonts/Parisienne-Regular.ttf);
+      }
+      @font-face
+      {
+        font-family: clickerscript;
+        src: url(fonts/ClickerScript-Regular.ttf);
+      }
+      @font-face
+      {
+        font-family: dancingscript;
+        src: url(fonts/DancingScript-VariableFont_wght.ttf);
+      }
+      .hp
+      {
+        position: relative;
+        top: -6px;
+        font-style: normal;
+        font-size: 30px;
+      }
+      h1
+      {
+        margin: 10px;
+        font-family: serif;
+        font-style: italic;
+        font-size: 40px;
+        text-transform: uppercase;
+        font-weight: 100;
+        margin: 10px;
+        text-align: center;
+      }
+      .h1a
+      {
+        font-family: parisienne;
+        color: deeppink;
+        font-size: 54px;
+        font-weight: 100;
+      }
+      .h1b
+      {
+        color: #000;
+        font-family: parisienne;
+        font-size: 54px;
+        font-weight: 100;
+      }
+      .h1c
+      {
+        color: deeppink;
+        font-family: parisienne;
+        font-size: 54px;
+        font-weight: 100;
+      }
+      .h1d
+      {
+        color: #000;
+        font-family: serif;
+        font-size: 42px;
+        font-weight: 100;
+      }
+      body
+      {
+        text-align: center;
+        margin: 0px;
+        background-color: #fffff9;
+      }
+      button
+      {
+        border-radius: 7px;
+        border: 1px solid #000;
+        padding: 5px;
+        cursor: pointer;
+        width: 36px;
+        height: 36px;
+        background-color: inherit;
+      }
+      button img
+      {
+        padding: 0;
+        margin: 0;
+        width: 24px;
+        height: 24px;
+      }
+      button:disabled
+      {
+        opacity: 0.25;
+      }
+    </style>
+    <script type="module">
+      import * as pl from "./lib/pa.js";
+      import "./lib/Shape_Editor.js";
+      import "./lib/Shape_List.js";
+
+      window.onload = Main;
+      let shapes_elem, editor_elem, remote_ctrl;
+
+      function Main()
+      {
+        document.getElementById("new_moveto").onclick=OnClick_Add_MoveTo;
+        document.getElementById("new_lineto").onclick=OnClick_Add_LineTo;
+        //document.getElementById("play_btn").onclick = OnClick_Play;
+        //document.getElementById("design_btn").onclick = OnClick_Design;
+        //document.getElementById("remote_btn").onclick = OnClick_Show_Remote;
+        
+        shapes_elem = document.getElementById("shapes");
+        shapes_elem.on_change_fn = Shapes_OnChange;
+        
+        editor_elem = document.getElementById("shape_editor");
+        //editor.on_change_fn = Editor_OnChange;
+        editor_elem.Set_Shapes(shapes_elem.shapes);
+                
+        //sprout_list.this_class = editor.this_class;
+
+        //remote_ctrl = document.getElementById("remote_ctrl");
+        //remote_ctrl.objs = sprout_list.plants;
+        //remote_ctrl.on_change_fn = Remote_Change;
+      }
+
+      // fires when a change is made on the plant list
+      function Shapes_OnChange(shapes)
+      {
+        //console.log("Plants_OnChange()");
+        //shapes_elem.Save();
+
+        editor_elem.Set_Shapes(shapes);
+        //editor.plants = sprout_list.plants;
+        //editor.Design_Mode();
+        //editor.Render_Plants();
+
+        //remote_ctrl.plants = sprout_list.plants;
+      }
+
+      // fires when a change is made via the canvas editor
+      function Editor_OnChange(plant)
+      {
+        //console.log("Editor_OnChange()");
+        sprout_list.Save();
+        sprout_list.requestUpdate();
+      }
+
+      // fires when a change is made via the remote control
+      function Remote_Change(plant)
+      {
+        //console.log("Remote_Change()");
+        sprout_list.Save();
+        sprout_list.requestUpdate();
+        editor.Render_Plants();
+      }
+
+      // button bar ===============================================================================
+
+      function OnClick_Show_Remote()
+      {
+        remote_ctrl.Show();
+      }
+
+      function OnClick_Add_MoveTo()
+      {
+        const shape = new Shape_MoveTo();
+        shape.class_name = "Shape_MoveTo";
+        shape.name = "moveto";
+        shape.x = 100;
+        shape.y = 100;
+
+        shapes_elem.Add(shape);
+        shapes_elem.Select(shape.id);
+        //sprout_list.Save();
+
+        editor_elem.Set_Shapes(shapes_elem.shapes);
+        //editor.Design_Mode();
+        //editor.Render_Plants();
+      }
+
+      function OnClick_Add_LineTo()
+      {
+        const shape = new Shape_LineTo();
+        shape.class_name = "Shape_LineTo";
+        shape.name = "lineto";
+        shape.x = 200;
+        shape.y = 200;
+
+        shapes_elem.Add(shape);
+        shapes_elem.Select(shape.id);
+        //sprout_list.Save();
+
+        editor_elem.Set_Shapes(shapes_elem.shapes);
+        //editor.Design_Mode();
+        //editor.Render_Plants();
+      }
+    
+      function OnClick_Play()
+      {
+        if (editor.is_playing)
+        {
+          editor.Stop();
+          OnStop_Play();
+        }
+        else
+        {
+          if (sprout_list.code_gen_type == "plant_code")
+          {
+            editor.Play_Plant(OnStop_Play);
+          }
+          else
+          {
+            editor.Play_Scene(OnStop_Play);
+          }
+          document.getElementById("new_plant_btn").disabled = true;
+          document.getElementById("design_btn").disabled = true;
+          document.getElementById("remote_btn").disabled = true;
+          document.getElementById("undo_btn").disabled = true;
+          sprout_list.Set_Disabled(true);
+          remote_ctrl.Set_Disabled(true);
+        }
+      }
+
+      function OnStop_Play()
+      {
+        document.getElementById("new_plant_btn").disabled = false;
+        document.getElementById("design_btn").disabled = false;
+        document.getElementById("remote_btn").disabled = false;
+        document.getElementById("undo_btn").disabled = false;
+        sprout_list.Set_Disabled(false);
+        remote_ctrl.Set_Disabled(false);
+      }
+
+      function OnClick_Design()
+      {
+        editor.Design_Mode();
+      }
+
+      class Shape
+      {
+        constructor()
+        {
+          this.class_name = "Shape";
+          this.name = "shape";;
+          this.x = 0;
+          this.y = 0;
+          this.selected = false;
+          this.cmd = null;
+          this.btn_path = this.New_Btn_Path("move");
+        }
+
+        New_Btn_Path(id)
+        {
+          const r = 5;
+          let btn_path;
+
+          btn_path = new Path2D();
+          btn_path.hover = false;
+          btn_path.rect(-r, -r, r*2, r*2);
+          btn_path.id = id;
+
+          return btn_path;
+        }
+
+        On_Mouse_Move(event, ctx)
+        {
+          let res = false;
+
+          if (this.selected)
+          {
+            res = this.On_Mouse_Move_Btn(ctx, event, this.btn_path, this.x, this.y);
+          }
+
+          return res;
+        }
+
+        On_Mouse_Move_Btn(ctx, event, path, x, y)
+        {
+          let res = false;
+
+          ctx.save();
+          ctx.translate(x, y);
+          const is_in_path = ctx.isPointInPath(path, event.offsetX, event.offsetY);
+          if (path.hover != is_in_path)
+          {
+            path.hover = is_in_path;
+            res = true;
+          }
+          ctx.restore();
+
+          return res;
+        }
+
+        Render(ctx)
+        {
+          if (this.selected)
+          {
+            this.Render_Btn(ctx, this.btn_path, this.x, this.y);
+          }
+        }
+
+        Render_Btn(ctx, path, x, y)
+        {
+          const r = 5;
+
+          ctx.save();
+          ctx.translate(x, y);
+
+          if (path.hover)
+          {
+            ctx.fillStyle = "#0f0";
+          }
+          else
+          {
+            ctx.fillStyle = "deeppink";
+          }
+          ctx.fill(path);
+
+          ctx.restore();
+        }
+      }
+
+      class Shape_LineTo extends Shape
+      {
+        Render(ctx)
+        {
+          super.Render(ctx);
+          ctx.lineTo(this.x, this.y);
+        }
+
+        xOn_Mouse_Move(event, ctx)
+        {
+          let res = false;
+
+          if (this.cmd)
+          {
+            /*const c_pt = this.To_Canvas_Pt(ctx, event.offsetX, event.offsetY);
+            if (this.cmd.id == "move_plant")
+            {
+              this.x = c_pt.x;
+              this.y = c_pt.y;
+            }
+            if (this.cmd.id == "scale_plant")
+            {
+              const m = new DOMMatrix();
+              m.translateSelf(this.x, this.y);
+              m.rotateSelf(this.To_Degrees(this.angle));
+              m.invertSelf();
+              const p = new DOMPoint(c_pt.x, c_pt.y);
+              const tp = p.matrixTransform(m);
+              this.x_scale = tp.x / (this.pot_size/2);
+              this.y_scale = tp.y / (this.pot_size/2);
+            }
+            if (this.cmd.id == "rotate_plant")
+            {
+              const x_sign = Math.sign(this.x_scale);
+              const y_sign = Math.sign(this.y_scale);
+              const m = new DOMMatrix();
+              m.translateSelf(this.x, this.y);
+              m.scaleSelf(x_sign, y_sign);
+              m.invertSelf();
+              const p = new DOMPoint(c_pt.x, c_pt.y);
+              const tp = p.matrixTransform(m);
+              this.angle = Math.atan2(tp.y, tp.x) - (Math.PI/2);
+              this.angle = this.angle * (x_sign*y_sign);
+            }
+            if (this.cmd.id == "time_plant")
+            {
+              this.sprout_time = c_pt.y / 10;
+            }*/
+          }
+          else if (this.selected)
+          {
+            res = this.On_Mouse_Move_Btn(ctx, event, this.btn_path, 50, 50);
+          }
+
+          return res;
+        }
+      }
+
+      class Shape_MoveTo extends Shape
+      {
+        Render(ctx)
+        {
+          super.Render(ctx);
+          ctx.moveTo(this.x, this.y);
+        }
+      }
+    </script>
+    <script type="module">
+      import {LitElement, html, css} from "./lib/lit-element/lit-element.js";
+
+      class Remote_Ctrl extends LitElement
+      {
+        constructor()
+        {
+          super();
+          this.objs = null;
+          this.on_change_fn = null;
+        }
+  
+        firstUpdated(changedProperties)
+        {
+          this.Set_Cmd(null);
+        }
+
+        Change_Obj(change_fn)
+        {
+          let has_change = false, obj;
+
+          if (this.objs && this.objs.length>0)
+          {
+            for (let i=0; i<this.objs.length; i++)
+            {
+              obj = this.objs[i];
+              if (obj.selected)
+              {
+                change_fn(obj);
+                has_change = true;
+              }
+            }
+          }
+
+          if (has_change && this.on_change_fn)
+          {
+            this.on_change_fn();
+          }
+        }
+
+        Disable_Buttons()
+        {
+          const btns = this.shadowRoot.querySelectorAll("button");
+          if (btns && btns.length>0)
+          {
+            btns.forEach((btn) => btn.disabled = true);
+          }
+          this.shadowRoot.getElementById("close").disabled = false;
+        }
+
+        Disable_Unused_Buttons()
+        {
+          this.shadowRoot.getElementById("u1").disabled = true;
+          this.shadowRoot.getElementById("u2").disabled = true;
+          this.shadowRoot.getElementById("u3").disabled = true;
+        }
+
+        Set_Disabled(disabled)
+        {
+          if (disabled)
+          {
+            this.Disable_Buttons();
+          }
+          else
+          {
+            this.Set_Cmd(this.cmd);
+          }
+        }
+
+        Show()
+        {
+          this.style.display = "inline-block";
+        }
+
+        OnClick_Left_Up()
+        {
+          if (this.cmd == "move")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x -= 1;
+              obj.y += 1;
+            }
+          }
+          else if (this.cmd == "scale")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x_scale -= 0.01;
+              obj.y_scale += 0.01;
+            }
+          }
+        }
+
+        OnClick_Up()
+        {
+          if (this.cmd == "move")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.y += 1;
+            }
+          }
+          else if (this.cmd == "scale")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.y_scale += 0.01;
+            }
+          }
+        }
+
+        OnClick_Right_Up()
+        {
+          if (this.cmd == "move")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x += 1;
+              obj.y += 1;
+            }
+          }
+          else if (this.cmd == "scale")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x_scale += 0.01;
+              obj.y_scale += 0.01;
+            }
+          }
+        }
+
+        OnClick_Left()
+        {
+          if (this.cmd == "move")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x -= 1;
+            }
+          }
+          else if (this.cmd == "scale")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x_scale -= 0.01;
+            }
+          }
+          else if (this.cmd == "rotate")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.angle += 0.01;
+            }
+          }
+        }
+
+        OnClick_Right()
+        {
+          if (this.cmd == "move")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x += 1;
+            }
+          }
+          else if (this.cmd == "scale")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x_scale += 0.01;
+            }
+          }
+          else if (this.cmd == "rotate")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.angle -= 0.01;
+            }
+          }
+        }
+
+        OnClick_Left_Down()
+        {
+          if (this.cmd == "move")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x -= 1;
+              obj.y -= 1;
+            }
+          }
+          else if (this.cmd == "scale")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x_scale -= 0.01;
+              obj.y_scale -= 0.01;
+            }
+          }
+        }
+
+        OnClick_Down()
+        {
+          if (this.cmd == "move")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.y -= 1;
+            }
+          }
+          else if (this.cmd == "scale")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.y_scale -= 0.01;
+            }
+          }
+        }
+
+        OnClick_Right_Down()
+        {
+          if (this.cmd == "move")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x += 1;
+              obj.y -= 1;
+            }
+          }
+          else if (this.cmd == "scale")
+          {
+            this.Change_Obj(Change);
+            function Change(obj)
+            {
+              obj.x_scale += 0.01;
+              obj.y_scale -= 0.01;
+            }
+          }
+        }
+
+        OnClick_Cmd(event)
+        {
+          this.Set_Cmd(event.currentTarget.id);
+        }
+
+        OnClick_Close()
+        {
+          this.style.display = "none";
+        }
+
+        Set_Cmd(cmd)
+        {
+          this.cmd = cmd;
+          this.Disable_Buttons();
+
+          this.shadowRoot.getElementById("move").classList.remove("selected");
+          this.shadowRoot.getElementById("rotate").classList.remove("selected");
+          this.shadowRoot.getElementById("scale").classList.remove("selected");
+          if (cmd)
+          {
+            this.shadowRoot.getElementById(cmd).classList.add("selected");
+          }
+
+          this.shadowRoot.getElementById("move").disabled = false;
+          this.shadowRoot.getElementById("rotate").disabled = false;
+          this.shadowRoot.getElementById("scale").disabled = false;
+          if (this.cmd == "rotate")
+          {
+            this.shadowRoot.getElementById("r").disabled = false;
+            this.shadowRoot.getElementById("l").disabled = false;
+          }
+          else if (this.cmd == "move" || this.cmd == "scale")
+          {
+            this.shadowRoot.getElementById("lu").disabled = false;
+            this.shadowRoot.getElementById("u").disabled = false;
+            this.shadowRoot.getElementById("ru").disabled = false;
+            this.shadowRoot.getElementById("r").disabled = false;
+            this.shadowRoot.getElementById("rd").disabled = false;
+            this.shadowRoot.getElementById("d").disabled = false;
+            this.shadowRoot.getElementById("ld").disabled = false;
+            this.shadowRoot.getElementById("l").disabled = false;
+          }
+        }
+
+        static get styles()
+        {
+          return css`
+            :host
+            {
+              display: none;
+              text-align: center;
+            }
+            .grid
+            {
+              display: grid;
+              grid-template-columns: 20% 20% 20% 20% 20%;
+              grid-template-rows: 33% 34% 33%;
+              column-gap: 5px;
+              row-gap: 5px;
+              align-items: center;
+              justify-items: center;
+            }
+            button
+            {
+              border-radius: 7px;
+              border: 1px solid #000;
+              padding: 5px;
+              cursor: pointer;
+              width: 36px;
+              height: 36px;
+              background-color: inherit;
+            }
+            button:disabled
+            {
+              opacity: 0.25;
+            }
+            button img
+            {
+              padding: 0;
+              margin: 0;
+              width: 24px;
+              height: 24px;
+            }
+            .selected
+            {
+              background-color: #0f0;
+            }
+            h2
+            {
+              font-weight: 100;
+              font-family: serif;
+              font-style: italic;
+              font-size: 20px;
+              box-shadow: 
+                rgb(0,0,0) 0px 1px 0px 0px, 
+                rgb(255,255,255) 0px 4px 0px 0px, 
+                rgb(0,0,0) 0px 7px 0px 0px;    
+              display: inline-block;
+              margin-bottom: 20px;      
+            }
+          `;
+        }
+
+        render()
+        {
+          return html`
+            <h2 class="title">Fine Control</h2>
+
+            <div class="grid">
+              <button id="lu" @click="${this.OnClick_Left_Up}"><img src="images/arrow-top-left-bold-outline.svg"></button>
+              <button id="u" @click="${this.OnClick_Up}"><img src="images/arrow-up-bold-outline.svg"></button>
+              <button id="ru" @click="${this.OnClick_Right_Up}"><img src="images/arrow-top-right-bold-outline.svg"></button>
+              <button id="move" @click="${this.OnClick_Cmd}"><img src="images/move-resize-variant.svg"></button>
+              <button id="close" @click="${this.OnClick_Close}"><img src="images/close.svg"></button>
+
+              <button id="l" @click="${this.OnClick_Left}"><img src="images/arrow-left-bold-outline.svg"></button>
+              <button id="u3"></button>
+              <button id="r" @click="${this.OnClick_Right}"><img src="images/arrow-right-bold-outline.svg"></button>
+              <button id="rotate" @click="${this.OnClick_Cmd}"><img src="images/rotate-left.svg"></button>
+              <button id="u2"></button>
+
+              <button id="ld" @click="${this.OnClick_Left_Down}"><img src="images/arrow-bottom-left-bold-outline.svg"></button>
+              <button id="d" @click="${this.OnClick_Down}"><img src="images/arrow-down-bold-outline.svg"></button>
+              <button id="rd" @click="${this.OnClick_Right_Down}"><img src="images/arrow-bottom-right-bold-outline.svg"></button>
+              <button id="scale" @click="${this.OnClick_Cmd}"><img src="images/move-resize.svg"></button>
+              <button id="u1"></button>
+            </div>
+          `;
+        }
+      }
+
+      customElements.define('remote-ctrl', Remote_Ctrl);
+    </script>
+  </head>
+
+  <body>
+    <h1>
+      <span class="hp">&#x1f337;</span>
+      <span class="h1">Plantimator Shape Editor</span>
+    </h1>
+
+    <shape-editor id="shape_editor"></shape-editor>
+
+    <div>
+      <button id="new_moveto" title="Move To"><img src="images/plus.svg"></button>
+      <button id="new_lineto" title="Line To"><img src="images/plus.svg"></button>
+      <button id="play_btn" title="Play Animation"><img src="images/play-pause.svg"></button>
+      <button id="design_btn" title="Switch to Design Mode"><img src="images/pencil-ruler.svg"></button>
+      <button id="remote_btn" title="Show Remote Control"><img src="images/remote.svg"></button>
+      <button id="undo_btn" title="Undo"><img src="images/undo.svg"></button>
+    </div>
+
+    <shape-list id="shapes"></shape-list>
+    <remote-ctrl id="remote_ctrl"></remote-ctrl>
+
+  </body>
+</html>
