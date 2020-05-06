@@ -83,8 +83,8 @@ class Shape_Editor extends LitElement
     //this.this_class = Plant;
 
     this.OnMouseMove_Canvas = this.OnMouseMove_Canvas.bind(this);
-    //this.OnMouseDown_Canvas = this.OnMouseDown_Canvas.bind(this);
-    //this.OnMouseUp_Canvas = this.OnMouseUp_Canvas.bind(this);
+    this.OnMouseDown_Canvas = this.OnMouseDown_Canvas.bind(this);
+    this.OnMouseUp_Canvas = this.OnMouseUp_Canvas.bind(this);
     this.Render = this.Render.bind(this);
     //this.OnFinish_Play = this.OnFinish_Play.bind(this);
   }
@@ -154,15 +154,15 @@ class Shape_Editor extends LitElement
   Disable_Events()
   {
     this.canvas.removeEventListener('mousemove', this.OnMouseMove_Canvas);
-    //this.canvas.removeEventListener('mousedown', this.OnMouseDown_Canvas);
-    //this.canvas.removeEventListener('mouseup', this.OnMouseUp_Canvas);
+    this.canvas.removeEventListener('mousedown', this.OnMouseDown_Canvas);
+    this.canvas.removeEventListener('mouseup', this.OnMouseUp_Canvas);
   }
 
   Enable_Events()
   {
     this.canvas.addEventListener('mousemove', this.OnMouseMove_Canvas);
-    //this.canvas.addEventListener('mousedown', this.OnMouseDown_Canvas);
-    //this.canvas.addEventListener('mouseup', this.OnMouseUp_Canvas);
+    this.canvas.addEventListener('mousedown', this.OnMouseDown_Canvas);
+    this.canvas.addEventListener('mouseup', this.OnMouseUp_Canvas);
   }
 
   Stop()
@@ -219,40 +219,40 @@ class Shape_Editor extends LitElement
 
   OnMouseDown_Canvas(event)
   {
-    let plant;
+    let shape;
 
-    if (this.plants && this.plants.length>0)
+    if (this.shapes && this.shapes.length>0)
     {
-      for (let i=0; i<this.plants.length; i++)
+      for (let i=0; i<this.shapes.length; i++)
       {
-        plant = this.plants[i];
-        if (plant.On_Mouse_Down)
+        shape = this.shapes[i];
+        if (shape.On_Mouse_Down)
         {
-          plant.On_Mouse_Down(event, this.ctx);
+          shape.On_Mouse_Down(event, this.ctx);
         }
       }
-      this.Render_Plants();
+      this.Render(this.ctx, this.shapes);
     }
   }
 
   OnMouseUp_Canvas(event)
   {
-    let plant, has_change;
+    let shape, has_change;
 
-    if (this.plants && this.plants.length>0)
+    if (this.shapes && this.shapes.length>0)
     {
-      for (let i=0; i<this.plants.length; i++)
+      for (let i=0; i<this.shapes.length; i++)
       {
-        plant = this.plants[i];
-        if (plant.On_Mouse_Up)
+        shape = this.shapes[i];
+        if (shape.On_Mouse_Up)
         {
-          has_change = plant.On_Mouse_Up(event, this.ctx);
+          has_change = shape.On_Mouse_Up(event, this.ctx);
           if (has_change && this.on_change_fn)
           {
-            this.on_change_fn(plant);
+            this.on_change_fn(shape);
           }
         }
-        this.Render_Plants();
+        this.Render(this.ctx, this.shapes);
       }
     }
   }
@@ -287,19 +287,17 @@ class Shape_Editor extends LitElement
       for (let i=0; i<shapes.length; i++)
       {
         shape = shapes[i];
-
-        //ctx.save();
-        //ctx.translate(plant.x, plant.y);
-        //ctx.rotate(plant.angle);
-        //ctx.scale(plant.x_scale, plant.y_scale);
-        //if (plant.Render_Design)
-          //plant.Render_Design(ctx);
-        //ctx.restore();
-
         if (shape.Render)
           shape.Render(ctx);
       }
       ctx.stroke();
+
+      for (let i=0; i<shapes.length; i++)
+      {
+        shape = shapes[i];
+        if (shape.selected && shape.Render_Design)
+          shape.Render_Design(ctx);
+      }
     }
   }
 

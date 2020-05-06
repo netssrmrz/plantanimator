@@ -19,7 +19,7 @@ class Shape_List extends LitElement
   
   firstUpdated(changedProperties)
   {
-    if (this.Load())
+    /*if (this.Load())
     {
       this.stem_plant = this.plants.find((p) => p.name == "Stem");
       if (this.stem_plant)
@@ -38,12 +38,12 @@ class Shape_List extends LitElement
     }
 
     const dlg = this.shadowRoot.getElementById("dlg");
-    dlg.onclick_edit_ok = this.OnClick_Edit_Ok;
+    dlg.onclick_edit_ok = this.OnClick_Edit_Ok;*/
   }
   
   Set_Code_Gen_Type(code_gen_type)
   {
-    this.code_gen_type = code_gen_type;
+    /*this.code_gen_type = code_gen_type;
     this.shadowRoot.getElementById("plant_code").classList.remove("selected");
     this.shadowRoot.getElementById("scene_code").classList.remove("selected");
 
@@ -72,7 +72,7 @@ class Shape_List extends LitElement
         this.requestUpdate();
         if (this.on_change_fn) this.on_change_fn();
       }
-    }
+    }*/
   }
 
   Save()
@@ -152,6 +152,11 @@ class Shape_List extends LitElement
     }
   }
 
+  Get_Last_Idx()
+  {
+    return this.shapes.length-1;
+  }
+
   // Utils ========================================================================================
 
   Get_Shape_Idx(shape_id)
@@ -178,6 +183,11 @@ class Shape_List extends LitElement
   Add(shape)
   {
     shape.id = Date.now();
+    if (this.shapes.length>0)
+    {
+      shape.prev_shape = this.shapes[this.shapes.length-1];
+    }
+
     this.shapes.push(shape);
     this.requestUpdate();
   }
@@ -198,6 +208,12 @@ class Shape_List extends LitElement
     if (do_delete)
     {
       i = this.Get_Shape_Idx(shape_id);
+      if (i != this.Get_Last_Idx())
+      {
+        const this_shape = this.shapes[i];
+        const next_shape = this.shapes[i+1];
+        next_shape.prev_shape = this_shape.prev_shape;
+      }
       this.shapes.splice(i, 1);
       this.requestUpdate();
     }
