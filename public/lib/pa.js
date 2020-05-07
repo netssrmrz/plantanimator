@@ -101,28 +101,6 @@ export class Base_Plant
     return false;
   }
 
-  /*Total_X_Scale()
-  {
-    var curr_plant, res = 1;
-
-    for (curr_plant = this; curr_plant != null; curr_plant = curr_plant.parent)
-    {
-      res = res * curr_plant.Get_X_Scale();
-    }
-
-    return res;
-  }*/
-
-  /*Total_Y_Scale()
-  {
-    var curr_plant, res = 1;
-
-    for (curr_plant = this; curr_plant != null; curr_plant = curr_plant.parent)
-      res = res * curr_plant.Get_Y_Scale();
-
-    return res;
-  }*/
-
   Reset()
   {
     this.branches = null;
@@ -1441,6 +1419,430 @@ export class Plant_Stem11 extends Base_Plant_Maturing2
       this.canvas_ctx.lineTo(this.curve_pts[c].x, this.curve_pts[c].y);
       this.canvas_ctx.stroke();
     }
+  }
+}
+
+// Shapes ===============================================================================
+
+export class Shape
+{
+  constructor()
+  {
+    this.Init_Shape();
+    this.pt = this.New_Btn_Path("pt", 0, 0);
+  }
+
+  Init_Shape()
+  {
+    this.class_name = "Shape";
+    this.name = "shape";
+    this.selected = false;
+    this.cmd = null;
+    this.btns = [];
+    this.prev_shape = null;
+    this.pt = null;
+  }
+
+  New_Btn_Path(id, x, y)
+  {
+    const r = 5;
+    const btn_path = new Path2D();
+    btn_path.hover = false;
+    btn_path.rect(-r, -r, r*2, r*2);
+    btn_path.id = id;
+    btn_path.x = x;
+    btn_path.y = y;
+    this.btns.push(btn_path);
+
+    return btn_path;
+  }
+
+  To_Canvas_Pt(ctx, sx, sy)
+  {
+    return {x: sx-ctx.canvas.width/2-4, y: -(sy-ctx.canvas.height/2-4)};
+  }
+
+  Pt_Translate(pt, ptd)
+  {
+    pt.x += ptd.x;
+    pt.y += ptd.y;
+  }
+
+  Pt_Difference(pta, ptb)
+  {
+    const x = pta.x-ptb.x;
+    const y = pta.y-ptb.y;
+    return {x, y};
+  }
+
+  On_Mouse_Up(event, ctx)
+  {
+    let res = false;
+
+    if (this.cmd)
+    {
+      this.cmd = null;
+      res = true;
+    }
+
+    return res;
+  }
+
+  On_Mouse_Move(event, ctx)
+  {
+    let res = false;
+
+    if (this.cmd)
+    {
+      const c_pt = this.To_Canvas_Pt(ctx, event.offsetX, event.offsetY);
+      this.On_Mouse_Move_Cmd(c_pt, this.cmd);
+    }
+    else if (this.selected)
+    {
+      for (let i=0; i<this.btns.length; i++)
+      {
+        res = res || this.On_Mouse_Move_Btn(ctx, event, this.btns[i]);
+      }
+    }
+
+    return res;
+  }
+
+  On_Mouse_Move_Cmd(c_pt, cmd)
+  {
+    cmd.x = c_pt.x;
+    cmd.y = c_pt.y;
+  }
+
+  On_Mouse_Move_Btn(ctx, event, path)
+  {
+    let res = false;
+
+    ctx.save();
+    ctx.translate(path.x, path.y);
+    const is_in_path = ctx.isPointInPath(path, event.offsetX, event.offsetY);
+    if (path.hover != is_in_path)
+    {
+      path.hover = is_in_path;
+      res = true;
+    }
+    ctx.restore();
+
+    return res;
+  }
+
+  On_Mouse_Down(event, ctx)
+  {
+    if (this.selected)
+    {
+      for (let i=0; i<this.btns.length; i++)
+      {
+        if (this.btns[i].hover)
+        {
+          this.cmd = this.btns[i];
+          break;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  Render(ctx)
+  {
+    if (this.selected)
+    {
+      for (let i=0; i<this.btns.length; i++)
+      {
+        this.Render_Btn(ctx, this.btns[i]);
+      }
+    }
+  }
+
+  Render_Btn(ctx, path)
+  {
+    const r = 5;
+
+    ctx.save();
+    ctx.translate(path.x, path.y);
+
+    if (path.hover)
+    {
+      ctx.fillStyle = "#0f0";
+    }
+    else
+    {
+      ctx.fillStyle = "deeppink";
+    }
+    ctx.fill(path);
+
+    ctx.restore();
+  }
+}
+
+export class Shape_Arc extends Shape
+{
+  constructor()
+  {
+    super();
+    this.cp = this.New_Btn_Path("cp", 100, 100);
+    this.sa = this.New_Btn_Path("sa", 100, 0);
+    this.ea = this.New_Btn_Path("ea", -120, 0);
+  }
+
+  On_Mouse_Move_Cmd(c_pt, cmd)
+  {
+    if (cmd.id == "pt")
+    {
+      const ptd = this.Pt_Difference(c_pt, cmd);
+      this.Pt_Translate(this.cp, ptd);
+      this.Pt_Translate(this.sa, ptd);
+      this.Pt_Translate(this.ea, ptd);
+    }
+    super.On_Mouse_Move_Cmd(c_pt, cmd);
+  }
+
+  Render(ctx)
+  {
+    super.Render(ctx);
+
+    const pta = this.Pt_Difference(this.sa, this.pt);
+    const sa = Math.atan2(pta.y, pta.x);
+
+    const ptb = this.Pt_Difference(this.ea, this.pt);
+    const ea = Math.atan2(ptb.y, ptb.x);
+
+    const r = Math.hypot(this.cp.x, this.cp.y);
+
+    ctx.arc(this.pt.x, this.pt.y, r, sa, ea); // [, anticlockwise]);
+  }
+
+  Render_Design(ctx)
+  {
+    ctx.save();
+    ctx.beginPath();
+    ctx.strokeStyle = "#aaa";
+    ctx.setLineDash([5, 5]);
+
+    const cp2 = {x: 2*this.pt.x-this.cp.x, y: 2*this.pt.y-this.cp.y};
+    ctx.moveTo(this.cp.x, this.cp.y);
+    ctx.lineTo(this.cp.x, cp2.y);
+    ctx.lineTo(cp2.x, cp2.y);
+    ctx.lineTo(cp2.x, this.cp.y);
+    ctx.lineTo(this.cp.x, this.cp.y);
+
+    ctx.moveTo(this.pt.x, this.pt.y);
+    ctx.lineTo(this.sa.x, this.sa.y);
+
+    ctx.moveTo(this.pt.x, this.pt.y);
+    ctx.lineTo(this.ea.x, this.ea.y);
+
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+export class Shape_Ellipse extends Shape
+{
+  constructor()
+  {
+    super();
+    this.cp = this.New_Btn_Path("cp", 100, 100);
+    this.sa = this.New_Btn_Path("sa", 100, 0);
+    this.ea = this.New_Btn_Path("ea", -120, 0);
+  }
+
+  On_Mouse_Move_Cmd(c_pt, cmd)
+  {
+    if (cmd.id == "pt")
+    {
+      const ptd = this.Pt_Difference(c_pt, cmd);
+      this.Pt_Translate(this.cp, ptd);
+      this.Pt_Translate(this.sa, ptd);
+      this.Pt_Translate(this.ea, ptd);
+    }
+    super.On_Mouse_Move_Cmd(c_pt, cmd);
+  }
+
+  Render(ctx)
+  {
+    super.Render(ctx);
+
+    const pta = this.Pt_Difference(this.sa, this.pt);
+    const sa = Math.atan2(pta.y, pta.x);
+
+    const ptb = this.Pt_Difference(this.ea, this.pt);
+    const ea = Math.atan2(ptb.y, ptb.x);
+
+    const rx = Math.abs(this.cp.x-this.pt.x);
+    const ry = Math.abs(this.cp.y-this.pt.y);
+
+    ctx.ellipse(this.pt.x, this.pt.y, rx, ry, 0, sa, ea); // [, anticlockwise]);
+  }
+
+  Render_Design(ctx)
+  {
+    ctx.save();
+    ctx.beginPath();
+    ctx.strokeStyle = "#aaa";
+    ctx.setLineDash([5, 5]);
+
+    const cp2 = {x: 2*this.pt.x-this.cp.x, y: 2*this.pt.y-this.cp.y};
+    ctx.moveTo(this.cp.x, this.cp.y);
+    ctx.lineTo(this.cp.x, cp2.y);
+    ctx.lineTo(cp2.x, cp2.y);
+    ctx.lineTo(cp2.x, this.cp.y);
+    ctx.lineTo(this.cp.x, this.cp.y);
+
+    ctx.moveTo(this.pt.x, this.pt.y);
+    ctx.lineTo(this.sa.x, this.sa.y);
+
+    ctx.moveTo(this.pt.x, this.pt.y);
+    ctx.lineTo(this.ea.x, this.ea.y);
+
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+export class Shape_Rect extends Shape
+{
+  constructor()
+  {
+    super();
+    this.cp = this.New_Btn_Path("cp", 100, 100);
+  }
+
+  Render(ctx)
+  {
+    super.Render(ctx);
+    ctx.rect(this.pt.x, this.pt.y, this.cp.x-this.pt.x, this.cp.y-this.pt.y);
+  }
+}
+
+export class Shape_ClosePath extends Shape
+{
+  constructor()
+  {
+    super();
+    this.Init_Shape();
+  }
+
+  Render(ctx)
+  {
+    ctx.closePath();
+  }
+}
+
+export class Shape_ArcTo extends Shape
+{
+  constructor()
+  {
+    super();
+    this.cp = this.New_Btn_Path("cp", 100, 100);
+    this.rp = this.New_Btn_Path("rp", 100, 0);
+  }
+
+  Render(ctx)
+  {
+    super.Render(ctx);
+    //const r = Math.sqrt(this.rp.x*this.rp.x+this.rp.y*this.rp.y);
+    const r = Math.hypot(this.rp.x, this.rp.y);
+    ctx.arcTo(this.pt.x, this.pt.y, this.cp.x, this.cp.y, r);
+  }
+
+  Render_Design(ctx)
+  {
+    ctx.save();
+    ctx.beginPath();
+    ctx.strokeStyle = "#aaa";
+    ctx.setLineDash([5, 5]);
+
+    ctx.moveTo(this.prev_shape.pt.x, this.prev_shape.pt.y);
+    ctx.lineTo(this.cp.x, this.cp.y);
+    ctx.lineTo(this.pt.x, this.pt.y);
+
+    ctx.moveTo(0, 0);
+    ctx.lineTo(this.rp.x, this.rp.y);
+
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+export class Shape_QuadraticCurveTo extends Shape
+{
+  constructor()
+  {
+    super();
+    this.cp = this.New_Btn_Path("cp", 100, 100);
+  }
+
+  Render(ctx)
+  {
+    super.Render(ctx);
+    ctx.quadraticCurveTo(this.cp.x, this.cp.y, this.pt.x, this.pt.y);
+  }
+
+  Render_Design(ctx)
+  {
+    ctx.save();
+    ctx.beginPath();
+    ctx.strokeStyle = "#aaa";
+    ctx.setLineDash([5, 5]);
+    ctx.moveTo(this.prev_shape.pt.x, this.prev_shape.pt.y);
+    ctx.lineTo(this.cp.x, this.cp.y);
+    ctx.lineTo(this.pt.x, this.pt.y);
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+export class Shape_BezierCurveTo extends Shape
+{
+  constructor()
+  {
+    super();
+    this.cp1 = this.New_Btn_Path("cp1", -100, -100);
+    this.cp2 = this.New_Btn_Path("cp2", 100, 100);
+  }
+
+  Render(ctx)
+  {
+    super.Render(ctx);
+    ctx.bezierCurveTo(this.cp1.x, this.cp1.y, this.cp2.x, this.cp2.y, this.pt.x, this.pt.y);
+  }
+
+  Render_Design(ctx)
+  {
+    ctx.save();
+    ctx.beginPath();
+    ctx.strokeStyle = "#aaa";
+    ctx.setLineDash([5, 5]);
+    ctx.moveTo(this.prev_shape.pt.x, this.prev_shape.pt.y);
+    ctx.lineTo(this.cp1.x, this.cp1.y);
+    ctx.moveTo(this.cp2.x, this.cp2.y);
+    ctx.lineTo(this.pt.x, this.pt.y);
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+export class Shape_LineTo extends Shape
+{
+  Render(ctx)
+  {
+    super.Render(ctx);
+    ctx.lineTo(this.pt.x, this.pt.y);
+  }
+}
+
+export class Shape_MoveTo extends Shape
+{
+  Render(ctx)
+  {
+    super.Render(ctx);
+    ctx.moveTo(this.pt.x, this.pt.y);
   }
 }
 

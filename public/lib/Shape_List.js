@@ -10,90 +10,45 @@ class Shape_List extends LitElement
   {
     super();
     this.on_change_fn = null;
-    //this.OnClick_Edit_Ok = this.OnClick_Edit_Ok.bind(this);
-    //this.this_class = null;
+    this.OnClick_Edit_Ok = this.OnClick_Edit_Ok.bind(this);
     this.shapes = [];
-    //this.stem_plant = null;
-    //this.code_gen_type = null;
+    this.code_gen_type = null;
   }
   
   firstUpdated(changedProperties)
   {
-    /*if (this.Load())
-    {
-      this.stem_plant = this.plants.find((p) => p.name == "Stem");
-      if (this.stem_plant)
-      {
-        this.Set_Code_Gen_Type("plant_code");
-      }
-      else
-      {
-        this.Set_Code_Gen_Type("scene_code");
-      }
-    }
-    else
-    {
-      this.plants = [];
-      this.Set_Code_Gen_Type("plant_code");
-    }
+    this.Load();
+    this.Set_Code_Gen_Type("plant_code");
 
-    const dlg = this.shadowRoot.getElementById("dlg");
-    dlg.onclick_edit_ok = this.OnClick_Edit_Ok;*/
+    //const dlg = this.shadowRoot.getElementById("dlg");
+    //dlg.onclick_edit_ok = this.OnClick_Edit_Ok;
   }
   
   Set_Code_Gen_Type(code_gen_type)
   {
-    /*this.code_gen_type = code_gen_type;
+    this.code_gen_type = code_gen_type;
     this.shadowRoot.getElementById("plant_code").classList.remove("selected");
-    this.shadowRoot.getElementById("scene_code").classList.remove("selected");
-
-    if (code_gen_type == "plant_code")
-    {
-      this.shadowRoot.getElementById("plant_code").classList.add("selected");
-      if (!this.stem_plant)
-      {
-        this.stem_plant = new pl.Plant_Bezier();
-        this.stem_plant.name = "Stem";
-        this.stem_plant.Set_Pts(0, 0, 0, 1000, -250, 200, 250, 800);
-        this.plants.forEach((p) => p.stem_plant = this.stem_plant);
-        this.Add_Plant(this.stem_plant, false, false);
-        this.requestUpdate();
-        if (this.on_change_fn) this.on_change_fn();
-      }
-    }
-    else if (code_gen_type == "scene_code")
-    {
-      this.shadowRoot.getElementById("scene_code").classList.add("selected");
-      if (this.stem_plant)
-      {
-        this.stem_plant = null;
-        this.plants = this.plants.filter((p) => p.name != "Stem");
-        this.plants.forEach((p) => p.stem_plant = null);
-        this.requestUpdate();
-        if (this.on_change_fn) this.on_change_fn();
-      }
-    }*/
+    this.shadowRoot.getElementById("canvas_code").classList.remove("selected");
+    this.shadowRoot.getElementById("path_code").classList.remove("selected");
+    this.shadowRoot.getElementById("android_code").classList.remove("selected");
+    this.shadowRoot.getElementById(code_gen_type).classList.add("selected");
   }
 
   Save()
   {
-    const plants_json = JSON.stringify(this.plants, this.JSON_Replacer);
-    localStorage.setItem("plants", plants_json);
+    const json = JSON.stringify(this.shapes, this.JSON_Replacer);
+    localStorage.setItem("shapes", json);
   }
 
   Load()
   {
     let res = false;
 
-    const plants_json = localStorage.getItem("plants");
-    if (plants_json)
+    const json = localStorage.getItem("shapes");
+    if (json)
     {
-      this.plants = JSON.parse(plants_json);
-      this.plants = this.plants.map((p) => this.Revive_Plant(p));
-
-      this.stem_plant = this.plants.find((p) => p.name == "Stem");
-      this.plants.forEach((p) => p.stem_plant = this.stem_plant);
-
+      this.shapes = JSON.parse(json);
+      this.shapes = this.shapes.map((p) => this.Revive_Shape(p));
       this.requestUpdate();
       res = true;
     }
@@ -101,20 +56,29 @@ class Shape_List extends LitElement
     return res;
   }
 
-  Revive_Plant(obj)
+  Revive_Shape(obj)
   {
-    const plant = new pl[obj.class_name];
-    Object.assign(plant, obj);
-    plant.Set_Paths();
-
+    const shape = new pl[obj.class_name];
+    Object.assign(shape, obj);
+    if (obj.btns && obj.btns.length>0)
+    {
+      shape.btns = [];
+      for (let i=0; i<obj.btns.length; ++i)
+      {
+        const obj_btn = obj.btns[i];
+        const btn = shape.New_Btn_Path(obj_btn.id, obj_btn.x, obj_btn.y);
+        shape[btn.id] = btn;
+      }
+    }
     return plant;
   }
 
   JSON_Replacer(key, value)
   {
-    if (key == "pt1_btn" || key == "pt2_btn" || key == "ctrl1_btn" || key == "ctrl2_btn" ||
-      key == "scale_btn_path" || key == "rotate_btn_path" ||
-      key == "move_btn_path" || key == "time_btn_path" || key == "stem_plant")
+    if (key == "prev_shape" || key == "pt" || 
+      key == "cp" || key == "sa" ||
+      key == "ea" || key == "rp" ||
+      key == "cp1" || key == "cp2")
     {
       value = "dynamic";
     }
@@ -265,19 +229,19 @@ class Shape_List extends LitElement
   OnClick_Edit(event)
   {
     const dlg = this.shadowRoot.getElementById("dlg");
-    const id = event.currentTarget.getAttribute("plant-id");
-    const i = this.Get_Plant_Idx(id);
-    const plant = this.plants[i];
+    const id = event.currentTarget.getAttribute("shape-id");
+    const i = this.Get_Shape_Idx(id);
+    const shape = this.shapes[i];
 
-    dlg.this_class = this.this_class;
+    //dlg.this_class = this.this_class;
     dlg.Show();
-    dlg.Edit(plant);
+    dlg.Edit(shape);
   }
 
-  OnClick_Edit_Ok(plant)
+  OnClick_Edit_Ok(shape)
   {
-    const i = this.Get_Plant_Idx(plant.id);
-    this.plants[i] = plant;
+    const i = this.Get_Shape_Idx(shape.id);
+    this.shapes[i] = shape;
     this.requestUpdate();
     if (this.on_change_fn)
       this.on_change_fn();
@@ -315,12 +279,14 @@ class Shape_List extends LitElement
 
   OnClick_Reset()
   {
-    localStorage.removeItem("plants");
-    this.plants = [];
-    this.stem_plant = null;
+    localStorage.removeItem("shapes");
+    this.shapes = [];
     this.requestUpdate();
     this.Set_Code_Gen_Type(this.code_gen_type);
-    if (this.on_change_fn) this.on_change_fn();
+    if (this.on_change_fn)
+    {
+      this.on_change_fn(this.shapes);
+    }
   }
 
   // Rendering ====================================================================================
@@ -439,9 +405,11 @@ class Shape_List extends LitElement
           <tr>
             <td id="btn_bar" colspan="8">
               <button id="gen_btn" @click="${this.OnClick_Gen_Code}" title="Generate Code"><img src="images/code-json.svg"></button>
-              <button id="plant_code" @click="${this.OnClick_Code_Type}" title="Switch to Plant Editing"><img src="images/flower-tulip-outline.svg"></button>
-              <button id="scene_code" @click="${this.OnClick_Code_Type}" title="Switch to Scene Editing"><img src="images/image.svg"></button>
-              <button id="reset" @click="${this.OnClick_Reset}" title="Reset"><img src="images/nuke.svg"></button>
+              <button id="plant_code" @click="${this.OnClick_Code_Type}" title="Plant Code"><img src="images/flower-tulip-outline.svg"></button>
+              <button id="canvas_code" @click="${this.OnClick_Code_Type}" title="Canvas Code"><img src="images/image.svg"></button>
+              <button id="path_code" @click="${this.OnClick_Code_Type}" title="Path Code"><img src="images/vector-polyline.svg"></button>
+              <button id="android_code" @click="${this.OnClick_Code_Type}" title="Android Code"><img src="images/android.svg"></button>
+              - <button id="reset" @click="${this.OnClick_Reset}" title="Reset"><img src="images/nuke.svg"></button>
             </td>
           </tr>
         </tfoot>
@@ -481,7 +449,7 @@ class Shape_List extends LitElement
     }
 
     return html`
-      <tr plant-id="${shape.id}">
+      <tr shape-id="${shape.id}">
         <td>
           ${this.Render_Button(shape.id, this.OnClick_Select, "target.svg", true, "Select", btn_class)}
           ${this.Render_Button(shape.id, this.OnClick_Edit, "pencil-outline.svg", shape.can_edit, "Edit", null)}
@@ -511,17 +479,3 @@ class Shape_List extends LitElement
 }
 
 customElements.define('shape-list', Shape_List);
-
-/*
-class Shape
-{
-  id: null,
-  name: null,
-  class_name: null,
-  x: null,
-  y: null,
-  selected: false,
-  can_edit: true,
-  can_delete: true
-}
-*/
