@@ -1468,6 +1468,12 @@ export class Shape
     pt.y += ptd.y;
   }
 
+  Pt_Scale(pt, pts)
+  {
+    pt.x = pt.x * pts.x;
+    pt.y = pt.y * pts.y;
+  }
+
   Pt_Difference(pta, ptb)
   {
     const x = pta.x-ptb.x;
@@ -1649,7 +1655,11 @@ export class Shape_Arc extends Shape
   {
     if (cmd.id == "pt")
     {
-      const ptd = this.Pt_Difference(c_pt, cmd);
+      const pts = {x: 1/ctx.x_scale, y: 1/ctx.y_scale};
+      const c_pt_s = {x: c_pt.x, y: c_pt.y};
+      this.Pt_Scale(c_pt_s, pts);
+      const ptd = this.Pt_Difference(c_pt_s, cmd);
+
       this.Pt_Translate(this.cp, ptd);
       this.Pt_Translate(this.sa, ptd);
       this.Pt_Translate(this.ea, ptd);
@@ -1742,7 +1752,11 @@ export class Shape_Ellipse extends Shape
   {
     if (cmd.id == "pt")
     {
-      const ptd = this.Pt_Difference(c_pt, cmd);
+      const pts = {x: 1/ctx.x_scale, y: 1/ctx.y_scale};
+      const c_pt_s = {x: c_pt.x, y: c_pt.y};
+      this.Pt_Scale(c_pt_s, pts);
+      const ptd = this.Pt_Difference(c_pt_s, cmd);
+      
       this.Pt_Translate(this.cp, ptd);
       this.Pt_Translate(this.sa, ptd);
       this.Pt_Translate(this.ea, ptd);

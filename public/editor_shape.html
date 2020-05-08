@@ -93,6 +93,10 @@
       {
         opacity: 0.25;
       }
+      .selected
+      {
+        background-color: #0f0;
+      }
     </style>
     <script type="module">
       import * as pl from "./lib/pa.js";
@@ -131,6 +135,8 @@
         //remote_ctrl = document.getElementById("remote_ctrl");
         //remote_ctrl.objs = sprout_list.plants;
         //remote_ctrl.on_change_fn = Remote_Change;
+
+        Set_Selected(document.getElementById("large_btn"));
       }
 
       // fires when a change is made on the shape list
@@ -159,20 +165,31 @@
         editor.Render_Plants();
       }
 
+      function Set_Selected(btn_elem)
+      {
+        document.getElementById("large_btn").classList.remove("selected");
+        document.getElementById("medium_btn").classList.remove("selected");
+        document.getElementById("small_btn").classList.remove("selected");
+        btn_elem.classList.add("selected");
+      }
+
       // button bar ===============================================================================
 
-      function OnClick_Large_Canvas()
+      function OnClick_Large_Canvas(event)
       {
+        Set_Selected(event.currentTarget);
         editor_elem.Set_Size(1000, 1000);
       }
 
       function OnClick_Medium_Canvas()
       {
-        editor_elem.Set_Size(500, 500);
+        Set_Selected(event.currentTarget);
+        editor_elem.Set_Size(300, 300);
       }
 
       function OnClick_Small_Canvas()
       {
+        Set_Selected(event.currentTarget);
         editor_elem.Set_Size(100, 100);
       }
 
@@ -263,9 +280,9 @@
       - <button id="remote_btn" title="Show Remote Control"><img src="images/remote.svg"></button>
       <button id="undo_btn" title="Undo"><img src="images/undo.svg"></button>
 
-      - <button id="large_btn" title="Large Canvas"><img src="images/image-size-select-actual.svg"></button>
-      <button id="medium_btn" title="Medium Canvas"><img src="images/image-size-select-large.svg"></button>
-      <button id="small_btn" title="Small Canvas"><img src="images/image-size-select-small.svg"></button>
+      - <button id="large_btn" title="1000x1000 Canvas"><img src="images/image-size-select-actual.svg"></button>
+      <button id="medium_btn" title="300x300 Canvas"><img src="images/image-size-select-large.svg"></button>
+      <button id="small_btn" title="100x100 Canvas"><img src="images/image-size-select-small.svg"></button>
     </div>
 
     <shape-list id="shapes"></shape-list>
