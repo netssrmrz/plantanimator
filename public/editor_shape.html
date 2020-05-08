@@ -114,13 +114,16 @@
         document.getElementById("new_arc").onclick=OnClick_Add_Arc;
         document.getElementById("new_ellipse").onclick=OnClick_Add_Ellipse;
         document.getElementById("new_closepath").onclick=OnClick_Add_ClosePath;
+        document.getElementById("large_btn").onclick=OnClick_Large_Canvas;
+        document.getElementById("medium_btn").onclick=OnClick_Medium_Canvas;
+        document.getElementById("small_btn").onclick=OnClick_Small_Canvas;
         //document.getElementById("remote_btn").onclick = OnClick_Show_Remote;
         
         shapes_elem = document.getElementById("shapes");
         shapes_elem.on_change_fn = Shapes_OnChange;
         
         editor_elem = document.getElementById("shape_editor");
-        //editor.on_change_fn = Editor_OnChange;
+        editor_elem.on_change_fn = Editor_OnChange;
         editor_elem.Set_Shapes(shapes_elem.shapes);
                 
         //sprout_list.this_class = editor.this_class;
@@ -143,8 +146,8 @@
       function Editor_OnChange(plant)
       {
         //console.log("Editor_OnChange()");
-        sprout_list.Save();
-        sprout_list.requestUpdate();
+        shapes_elem.Save();
+        shapes_elem.requestUpdate();
       }
 
       // fires when a change is made via the remote control
@@ -157,6 +160,21 @@
       }
 
       // button bar ===============================================================================
+
+      function OnClick_Large_Canvas()
+      {
+        editor_elem.Set_Size(1000, 1000);
+      }
+
+      function OnClick_Medium_Canvas()
+      {
+        editor_elem.Set_Size(500, 500);
+      }
+
+      function OnClick_Small_Canvas()
+      {
+        editor_elem.Set_Size(100, 100);
+      }
 
       function OnClick_Show_Remote()
       {
@@ -244,6 +262,10 @@
 
       - <button id="remote_btn" title="Show Remote Control"><img src="images/remote.svg"></button>
       <button id="undo_btn" title="Undo"><img src="images/undo.svg"></button>
+
+      - <button id="large_btn" title="Large Canvas"><img src="images/image-size-select-actual.svg"></button>
+      <button id="medium_btn" title="Medium Canvas"><img src="images/image-size-select-large.svg"></button>
+      <button id="small_btn" title="Small Canvas"><img src="images/image-size-select-small.svg"></button>
     </div>
 
     <shape-list id="shapes"></shape-list>

@@ -78,77 +78,29 @@ class Shape_Editor extends LitElement
   {
     super();
     this.shapes = null;
-    //this.is_playing = false;
-    //this.on_finish_play_fn = null;
-    //this.this_class = Plant;
-
     this.OnMouseMove_Canvas = this.OnMouseMove_Canvas.bind(this);
     this.OnMouseDown_Canvas = this.OnMouseDown_Canvas.bind(this);
     this.OnMouseUp_Canvas = this.OnMouseUp_Canvas.bind(this);
     this.Render = this.Render.bind(this);
-    //this.OnFinish_Play = this.OnFinish_Play.bind(this);
   }
   
   firstUpdated(changedProperties)
   {
     this.canvas = this.shadowRoot.getElementById("main_canvas");
     this.ctx = this.canvas.getContext("2d");
-    this.ctx.translate(this.canvas.width/2, this.canvas.height/2);
-    this.ctx.scale(1, -1);
-    this.ctx.strokeStyle="#000";
-    this.ctx.lineWidth = 1;
-    //this.Render_Plants();
+    this.Init_Canvas(1000, 1000);
     this.Enable_Events();
   }
 
-  Play_Plant(on_finish_play_fn)
+  Init_Canvas(w, h)
   {
-    this.is_playing = true;
-    this.on_finish_play_fn = on_finish_play_fn;
-    this.Disable_Events();
-
-    const stem = this.plants.find((p) => p.name=="Stem");
-
-    const plant = new Plant();
-    plant.pt1 = {x: stem.x1, y: stem.y1};
-    plant.pt2 = {x: stem.x2, y: stem.y2};
-    plant.ctrl1 = {x: stem.ctrl1_x, y: stem.ctrl1_y};
-    plant.ctrl2 = {x: stem.ctrl2_x, y: stem.ctrl2_y};
-    plant.sprouts = this.plants.filter((p) => p.name!="Stem");
-    plant.maturity_rate = 1;
-    plant.maturity = 0;
-    plant.x = 0;
-    plant.y = 0;
-    plant.x_scale = 1;
-    plant.y_scale = 1;
-    plant.angle = 0;
-    plant.canvas_ctx = this.ctx;
-
-    this.ctx.setLineDash([]);
+    this.ctx.x_scale = 1000/w;
+    this.ctx.y_scale = 1000/h;
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    this.ctx.translate(this.canvas.width/2, this.canvas.height/2);
+    this.ctx.scale(this.ctx.x_scale, -this.ctx.y_scale);
+    this.ctx.strokeStyle="#000";
     this.ctx.lineWidth = 1;
-    this.ctx.strokeStyle = "#000";
-
-    this.Clr(this.ctx);
-    pl.Animate(this.ctx, [plant], this.OnFinish_Play, this.Render_Plants, this.Clr);
-  }
-
-  Play_Scene(on_finish_play_fn)
-  {
-    let plant; 
-    this.is_playing = true;
-    this.on_finish_play_fn = on_finish_play_fn;
-    this.Disable_Events();
-
-    if (this.plants && this.plants.length>0)
-    {
-      for (let i=0; i<this.plants.length; i++)
-      {
-        plant = this.plants[i];
-        plant.Reset();
-      }
-      this.Clr(this.ctx);
-      pl.Animate(this.ctx, this.plants, this.OnFinish_Play, this.Render_Plants, this.Clr);
-    }
   }
 
   Disable_Events()
@@ -165,39 +117,19 @@ class Shape_Editor extends LitElement
     this.canvas.addEventListener('mouseup', this.OnMouseUp_Canvas);
   }
 
-  Stop()
-  {
-    if (this.is_playing)
-    {
-      this.ctx.stop = true;
-      this.is_playing = false;
-      this.Enable_Events();
-    }
-  }
-
-  Design_Mode()
-  {
-    this.Render_Plants();
-    this.Enable_Events();
-  }
-
   Set_Shapes(shapes)
   {
     this.shapes = shapes;
     this.Render(this.ctx, shapes);
   }
 
-  // Events =======================================================================================
-
-  OnFinish_Play()
+  Set_Size(w, h)
   {
-    this.is_playing = false;
-    if (this.on_finish_play_fn)
-    {
-      this.on_finish_play_fn();
-    }
-    this.Enable_Events();
+    this.Init_Canvas(w, h);
+    this.Render(this.ctx, this.shapes);
   }
+
+  // Events =======================================================================================
 
   OnMouseMove_Canvas(event)
   {
@@ -312,7 +244,9 @@ class Shape_Editor extends LitElement
           0px 0px 0px 4px rgb(255, 255, 255), 
           0px 0px 0px 7px rgb(0, 0, 0);
         margin: 7px;
-        padding: 3px;      
+        padding: 3px;   
+        width: 1000px;
+        height: 1000px;   
       }
     `;
   }

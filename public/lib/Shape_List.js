@@ -1,4 +1,5 @@
 import {LitElement, html, css} from "./lit-element/lit-element.js";
+import {unsafeHTML} from './lit-html/directives/unsafe-html.js';
 import "./Plant_Dialog.js";
 import "./Plant_Code_Gen.js";
 import "./Scene_Code_Gen.js";
@@ -49,6 +50,13 @@ class Shape_List extends LitElement
     {
       this.shapes = JSON.parse(json);
       this.shapes = this.shapes.map((p) => this.Revive_Shape(p));
+      if (this.shapes && this.shapes.length>1)
+      {
+        for (let i = 1; i<this.shapes.length; i++)
+        {
+          this.shapes[i].prev_shape = this.shapes[i-1];
+        }
+      }
       this.requestUpdate();
       res = true;
     }
@@ -70,7 +78,7 @@ class Shape_List extends LitElement
         shape[btn.id] = btn;
       }
     }
-    return plant;
+    return shape;
   }
 
   JSON_Replacer(key, value)
@@ -392,10 +400,8 @@ class Shape_List extends LitElement
           <tr>
             <th>Actions</th>
             <th>#</th>
-            <th>Name</th>
-            <th>Class</th>
-            <th>X</th>
-            <th>Y</th>
+            <th>Function</th>
+            <th>Parameters</th>
           </tr>
         </thead>
         <tbody>
@@ -457,9 +463,7 @@ class Shape_List extends LitElement
         </td>
         <td>${i+1}</td>
         <td>${shape.name}</td>
-        <td>${shape.class_name}</td>
-        <td>${shape.x}</td>
-        <td>${shape.y}</td>
+        <td>${unsafeHTML(shape.Params_Str())}</td>
       </tr>
       `;
   }

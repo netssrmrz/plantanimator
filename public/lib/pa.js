@@ -1475,6 +1475,18 @@ export class Shape
     return {x, y};
   }
 
+  Params_Str()
+  {
+    let res = "";
+
+    if (this.pt)
+    {
+      res = "x = "+Round(this.pt.x)+", y = "+Round(this.pt.y);
+    }
+
+    return res;
+  }
+
   On_Mouse_Up(event, ctx)
   {
     let res = false;
@@ -1495,7 +1507,7 @@ export class Shape
     if (this.cmd)
     {
       const c_pt = this.To_Canvas_Pt(ctx, event.offsetX, event.offsetY);
-      this.On_Mouse_Move_Cmd(c_pt, this.cmd);
+      this.On_Mouse_Move_Cmd(ctx, c_pt, this.cmd);
     }
     else if (this.selected)
     {
@@ -1508,10 +1520,10 @@ export class Shape
     return res;
   }
 
-  On_Mouse_Move_Cmd(c_pt, cmd)
+  On_Mouse_Move_Cmd(ctx, c_pt, cmd)
   {
-    cmd.x = c_pt.x;
-    cmd.y = c_pt.y;
+    cmd.x = c_pt.x*(1/ctx.x_scale);
+    cmd.y = c_pt.y*(1/ctx.y_scale);
   }
 
   On_Mouse_Move_Btn(ctx, event, path)
@@ -1590,7 +1602,50 @@ export class Shape_Arc extends Shape
     this.ea = this.New_Btn_Path("ea", -120, 0);
   }
 
-  On_Mouse_Move_Cmd(c_pt, cmd)
+  Params_Str()
+  {
+    const s = ", ";
+    let res = "";
+
+    res = Append_Str(res, "x = "+Round(this.pt.x), s);
+    res = Append_Str(res, "y = "+Round(this.pt.y), s);
+    res = Append_Str(res, "radius = "+Round(this.Calc_Radius()), s);
+    res = Append_Str(res, "<br>startAngle = "+Round(this.Calc_Start_Angle()), s);
+    res = Append_Str(res, "endAngle = "+Round(this.Calc_End_Angle()), s);
+
+    return res;
+  }
+
+  Calc_Radius()
+  {
+    let r = 0;
+    const ptc = this.Pt_Difference(this.cp, this.pt);
+    //const r = Math.hypot(ptc.x, ptc.y);
+    if (Math.abs(ptc.x)<Math.abs(ptc.y))
+    {
+      r = Math.abs(ptc.x);
+    }
+    else
+    {
+      r = Math.abs(ptc.y);
+    }
+
+    return r;
+  }
+
+  Calc_Start_Angle()
+  {
+    const pta = this.Pt_Difference(this.sa, this.pt);
+    return Math.atan2(pta.y, pta.x);
+  }
+
+  Calc_End_Angle()
+  {
+    const ptb = this.Pt_Difference(this.ea, this.pt);
+    return Math.atan2(ptb.y, ptb.x);
+  }
+
+  On_Mouse_Move_Cmd(ctx, c_pt, cmd)
   {
     if (cmd.id == "pt")
     {
@@ -1599,22 +1654,16 @@ export class Shape_Arc extends Shape
       this.Pt_Translate(this.sa, ptd);
       this.Pt_Translate(this.ea, ptd);
     }
-    super.On_Mouse_Move_Cmd(c_pt, cmd);
+    super.On_Mouse_Move_Cmd(ctx, c_pt, cmd);
   }
 
   Render(ctx)
   {
+    let r;
+
     super.Render(ctx);
-
-    const pta = this.Pt_Difference(this.sa, this.pt);
-    const sa = Math.atan2(pta.y, pta.x);
-
-    const ptb = this.Pt_Difference(this.ea, this.pt);
-    const ea = Math.atan2(ptb.y, ptb.x);
-
-    const r = Math.hypot(this.cp.x, this.cp.y);
-
-    ctx.arc(this.pt.x, this.pt.y, r, sa, ea); // [, anticlockwise]);
+    ctx.arc(this.pt.x, this.pt.y, this.Calc_Radius(), 
+      this.Calc_Start_Angle(), this.Calc_End_Angle()); // [, anticlockwise]);
   }
 
   Render_Design(ctx)
@@ -1652,7 +1701,44 @@ export class Shape_Ellipse extends Shape
     this.ea = this.New_Btn_Path("ea", -120, 0);
   }
 
-  On_Mouse_Move_Cmd(c_pt, cmd)
+  Params_Str()
+  {
+    const s = ", ";
+    let res = "";
+
+    res = Append_Str(res, "x = "+Round(this.pt.x), s);
+    res = Append_Str(res, "y = "+Round(this.pt.y), s);
+    res = Append_Str(res, "radiusx = "+Round(this.Calc_Radius_X()), s);
+    res = Append_Str(res, "radiusy = "+Round(this.Calc_Radius_Y()), s);
+    res = Append_Str(res, "<br>startAngle = "+Round(this.Calc_Start_Angle()), s);
+    res = Append_Str(res, "endAngle = "+Round(this.Calc_End_Angle()), s);
+
+    return res;
+  }
+
+  Calc_Radius_X()
+  {
+    return Math.abs(this.cp.x-this.pt.x);
+  }
+
+  Calc_Radius_Y()
+  {
+    return Math.abs(this.cp.y-this.pt.y);
+  }
+
+  Calc_Start_Angle()
+  {
+    const pta = this.Pt_Difference(this.sa, this.pt);
+    return Math.atan2(pta.y, pta.x);
+  }
+
+  Calc_End_Angle()
+  {
+    const ptb = this.Pt_Difference(this.ea, this.pt);
+    return Math.atan2(ptb.y, ptb.x);
+  }
+
+  On_Mouse_Move_Cmd(ctx, c_pt, cmd)
   {
     if (cmd.id == "pt")
     {
@@ -1661,23 +1747,15 @@ export class Shape_Ellipse extends Shape
       this.Pt_Translate(this.sa, ptd);
       this.Pt_Translate(this.ea, ptd);
     }
-    super.On_Mouse_Move_Cmd(c_pt, cmd);
+    super.On_Mouse_Move_Cmd(ctx, c_pt, cmd);
   }
 
   Render(ctx)
   {
     super.Render(ctx);
-
-    const pta = this.Pt_Difference(this.sa, this.pt);
-    const sa = Math.atan2(pta.y, pta.x);
-
-    const ptb = this.Pt_Difference(this.ea, this.pt);
-    const ea = Math.atan2(ptb.y, ptb.x);
-
-    const rx = Math.abs(this.cp.x-this.pt.x);
-    const ry = Math.abs(this.cp.y-this.pt.y);
-
-    ctx.ellipse(this.pt.x, this.pt.y, rx, ry, 0, sa, ea); // [, anticlockwise]);
+    ctx.ellipse(this.pt.x, this.pt.y, 
+      this.Calc_Radius_X(), this.Calc_Radius_Y(), 
+      0, this.Calc_Start_Angle(), this.Calc_End_Angle()); // [, anticlockwise]);
   }
 
   Render_Design(ctx)
@@ -1713,10 +1791,33 @@ export class Shape_Rect extends Shape
     this.cp = this.New_Btn_Path("cp", 100, 100);
   }
 
+  Params_Str()
+  {
+    const s = ", ";
+    let res = "";
+
+    res = Append_Str(res, "x = "+Round(this.pt.x), s);
+    res = Append_Str(res, "y = "+Round(this.pt.y), s);
+    res = Append_Str(res, "width = "+Round(this.Calc_Width()), s);
+    res = Append_Str(res, "height = "+Round(this.Calc_Height()), s);
+
+    return res;
+  }
+
+  Calc_Width()
+  {
+    return this.cp.x-this.pt.x;
+  }
+
+  Calc_Height()
+  {
+    return this.cp.y-this.pt.y;
+  }
+
   Render(ctx)
   {
     super.Render(ctx);
-    ctx.rect(this.pt.x, this.pt.y, this.cp.x-this.pt.x, this.cp.y-this.pt.y);
+    ctx.rect(this.pt.x, this.pt.y, this.Calc_Width(), this.Calc_Height());
   }
 }
 
@@ -1726,6 +1827,11 @@ export class Shape_ClosePath extends Shape
   {
     super();
     this.Init_Shape();
+  }
+
+  Params_Str()
+  {
+    return "";
   }
 
   Render(ctx)
@@ -1743,12 +1849,29 @@ export class Shape_ArcTo extends Shape
     this.rp = this.New_Btn_Path("rp", 100, 0);
   }
 
+  Params_Str()
+  {
+    const s = ", ";
+    let res = "";
+
+    res = Append_Str(res, "x1 = "+Round(this.pt.x), s);
+    res = Append_Str(res, "y1 = "+Round(this.pt.y), s);
+    res = Append_Str(res, "x2 = "+Round(this.cp.x), s);
+    res = Append_Str(res, "y2 = "+Round(this.cp.x), s);
+    res = Append_Str(res, "r = "+Round(this.Calc_Radius()), s);
+
+    return res;
+  }
+
+  Calc_Radius()
+  {
+    return Math.hypot(this.rp.x, this.rp.y);
+  }
+
   Render(ctx)
   {
     super.Render(ctx);
-    //const r = Math.sqrt(this.rp.x*this.rp.x+this.rp.y*this.rp.y);
-    const r = Math.hypot(this.rp.x, this.rp.y);
-    ctx.arcTo(this.pt.x, this.pt.y, this.cp.x, this.cp.y, r);
+    ctx.arcTo(this.pt.x, this.pt.y, this.cp.x, this.cp.y, this.Calc_Radius());
   }
 
   Render_Design(ctx)
@@ -1778,6 +1901,19 @@ export class Shape_QuadraticCurveTo extends Shape
     this.cp = this.New_Btn_Path("cp", 100, 100);
   }
 
+  Params_Str()
+  {
+    const s = ", ";
+    let res = "";
+
+    res = Append_Str(res, "cpx = "+Round(this.cp.x), s);
+    res = Append_Str(res, "cpy = "+Round(this.cp.y), s);
+    res = Append_Str(res, "x = "+Round(this.pt.x), s);
+    res = Append_Str(res, "y = "+Round(this.pt.x), s);
+
+    return res;
+  }
+
   Render(ctx)
   {
     super.Render(ctx);
@@ -1805,6 +1941,21 @@ export class Shape_BezierCurveTo extends Shape
     super();
     this.cp1 = this.New_Btn_Path("cp1", -100, -100);
     this.cp2 = this.New_Btn_Path("cp2", 100, 100);
+  }
+
+  Params_Str()
+  {
+    const s = ", ";
+    let res = "";
+
+    res = Append_Str(res, "cp1x = "+Round(this.cp1.x), s);
+    res = Append_Str(res, "cp1y = "+Round(this.cp1.y), s);
+    res = Append_Str(res, "cp2x = "+Round(this.cp2.x), s);
+    res = Append_Str(res, "cp2y = "+Round(this.cp2.y), s);
+    res = Append_Str(res, "<br>x = "+Round(this.pt.x), s);
+    res = Append_Str(res, "y = "+Round(this.pt.x), s);
+
+    return res;
   }
 
   Render(ctx)
@@ -1912,6 +2063,31 @@ export function Render(plants)
 function Random(base, delta)
 {
   return base + (Math.random() - 0.5) * delta;
+}
+
+function Append_Str(a, b, sep)
+{
+  let res = "";
+
+  if (a && b)
+  {
+    res = a+sep+b;
+  }
+  else if (!a && b)
+  {
+    res = b;
+  }
+  else if (a && !b)
+  {
+    res = a;
+  }
+
+  return res;
+}
+
+function Round(num)
+{
+  return Math.round((num + Number.EPSILON) * 10000) / 10000;
 }
 
 export class Plant_Bezier
