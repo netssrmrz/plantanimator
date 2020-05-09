@@ -3,6 +3,7 @@ import {unsafeHTML} from './lit-html/directives/unsafe-html.js';
 import "./Plant_Dialog.js";
 import "./Leaf_Code_Gen.js";
 import "./Canvas_Code_Gen.js";
+import "./Path_Code_Gen.js";
 import * as pl from "./pa.js";
 
 class Shape_List extends LitElement
@@ -263,7 +264,7 @@ class Shape_List extends LitElement
     const android_code_gen = this.shadowRoot.getElementById("android_code_gen");
     leaf_code_gen.Hide();
     canvas_code_gen.Hide();
-    //path_code_gen.Hide();
+    path_code_gen.Hide();
     //android_code_gen.Hide();
 
     if (this.code_gen_type == "plant_code")
@@ -275,6 +276,11 @@ class Shape_List extends LitElement
     {
       canvas_code_gen.Show();
       canvas_code_gen.Gen_Code(this.shapes);
+    }
+    else if (this.code_gen_type == "path_code")
+    {
+      path_code_gen.Show();
+      path_code_gen.Gen_Code(this.shapes);
     }
   }
 
