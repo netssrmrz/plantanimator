@@ -77,6 +77,7 @@ class Shape_Editor extends LitElement
   constructor()
   {
     super();
+    this.paint_style = "stroke";
     this.shapes = null;
     this.OnMouseMove_Canvas = this.OnMouseMove_Canvas.bind(this);
     this.OnMouseDown_Canvas = this.OnMouseDown_Canvas.bind(this);
@@ -126,6 +127,12 @@ class Shape_Editor extends LitElement
   Set_Size(w, h)
   {
     this.Init_Canvas(w, h);
+    this.Render(this.ctx, this.shapes);
+  }
+
+  Set_Paint(paint_style)
+  {
+    this.paint_style = paint_style;
     this.Render(this.ctx, this.shapes);
   }
 
@@ -222,7 +229,14 @@ class Shape_Editor extends LitElement
         if (shape.Render)
           shape.Render(ctx);
       }
-      ctx.stroke();
+      if (this.paint_style == "stroke")
+      {
+        ctx.stroke();
+      }
+      else
+      {
+        ctx.fill();
+      }
 
       for (let i=0; i<shapes.length; i++)
       {

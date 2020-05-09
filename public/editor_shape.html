@@ -121,6 +121,8 @@
         document.getElementById("large_btn").onclick=OnClick_Large_Canvas;
         document.getElementById("medium_btn").onclick=OnClick_Medium_Canvas;
         document.getElementById("small_btn").onclick=OnClick_Small_Canvas;
+        document.getElementById("stroke").onclick=OnClick_Stroke;
+        document.getElementById("fill").onclick=OnClick_Fill;
         //document.getElementById("remote_btn").onclick = OnClick_Show_Remote;
         
         shapes_elem = document.getElementById("shapes");
@@ -136,7 +138,8 @@
         //remote_ctrl.objs = sprout_list.plants;
         //remote_ctrl.on_change_fn = Remote_Change;
 
-        Set_Selected(document.getElementById("large_btn"));
+        Set_Canvas_Size(document.getElementById("large_btn"), 1000);
+        Set_Paint_Style(document.getElementById("stroke"));
       }
 
       // fires when a change is made on the shape list
@@ -165,32 +168,48 @@
         editor.Render_Plants();
       }
 
-      function Set_Selected(btn_elem)
+      function Set_Canvas_Size(btn_elem, size)
       {
         document.getElementById("large_btn").classList.remove("selected");
         document.getElementById("medium_btn").classList.remove("selected");
         document.getElementById("small_btn").classList.remove("selected");
         btn_elem.classList.add("selected");
+        editor_elem.Set_Size(size, size);
+      }
+
+      function Set_Paint_Style(btn_elem)
+      {
+        document.getElementById("stroke").classList.remove("selected");
+        document.getElementById("fill").classList.remove("selected");
+        btn_elem.classList.add("selected");
+        editor_elem.Set_Paint(btn_elem.id);
       }
 
       // button bar ===============================================================================
 
+      function OnClick_Stroke(event)
+      {
+        Set_Paint_Style(event.currentTarget);
+      }
+
+      function OnClick_Fill(event)
+      {
+        Set_Paint_Style(event.currentTarget);
+      }
+
       function OnClick_Large_Canvas(event)
       {
-        Set_Selected(event.currentTarget);
-        editor_elem.Set_Size(1000, 1000);
+        Set_Canvas_Size(event.currentTarget, 1000);
       }
 
       function OnClick_Medium_Canvas()
       {
-        Set_Selected(event.currentTarget);
-        editor_elem.Set_Size(300, 300);
+        Set_Canvas_Size(event.currentTarget, 300);
       }
 
       function OnClick_Small_Canvas()
       {
-        Set_Selected(event.currentTarget);
-        editor_elem.Set_Size(100, 100);
+        Set_Canvas_Size(event.currentTarget, 100);
       }
 
       function OnClick_Show_Remote()
@@ -283,6 +302,9 @@
       - <button id="large_btn" title="1000x1000 Canvas"><img src="images/image-size-select-actual.svg"></button>
       <button id="medium_btn" title="300x300 Canvas"><img src="images/image-size-select-large.svg"></button>
       <button id="small_btn" title="100x100 Canvas"><img src="images/image-size-select-small.svg"></button>
+
+      - <button id="stroke" title="Stroke"><img src="images/pentagon-outline.svg"></button>
+      <button id="fill" title="Fill"><img src="images/pentagon.svg"></button>
     </div>
 
     <shape-list id="shapes"></shape-list>
