@@ -1,8 +1,7 @@
 import {LitElement, html, css} from "./lit-element/lit-element.js";
 import {unsafeHTML} from './lit-html/directives/unsafe-html.js';
 import "./Plant_Dialog.js";
-import "./Plant_Code_Gen.js";
-import "./Scene_Code_Gen.js";
+import "./Leaf_Code_Gen.js";
 import * as pl from "./pa.js";
 
 class Shape_List extends LitElement
@@ -257,27 +256,31 @@ class Shape_List extends LitElement
 
   OnClick_Gen_Code()
   {
-    const plant_code_gen = this.shadowRoot.getElementById("plant_code_gen");
-    const scene_code_gen = this.shadowRoot.getElementById("scene_code_gen");
-    plant_code_gen.Hide();
-    scene_code_gen.Hide();
+    const leaf_code_gen = this.shadowRoot.getElementById("leaf_code_gen");
+    const canvas_code_gen = this.shadowRoot.getElementById("canvas_code_gen");
+    const path_code_gen = this.shadowRoot.getElementById("path_code_gen");
+    const android_code_gen = this.shadowRoot.getElementById("android_code_gen");
+    leaf_code_gen.Hide();
+    //canvas_code_gen.Hide();
+    //path_code_gen.Hide();
+    //android_code_gen.Hide();
 
     if (this.code_gen_type == "plant_code")
     {
-      plant_code_gen.Show();
-      const branches = this.plants.filter((p) => p.name!="Stem");
-      const pt1 = {x: this.stem_plant.x1, y: this.stem_plant.y1};
-      const pt2 = {x: this.stem_plant.x2, y: this.stem_plant.y2};
-      const ctrl1 = {x: this.stem_plant.ctrl1_x, y: this.stem_plant.ctrl1_y};
-      const ctrl2 = {x: this.stem_plant.ctrl2_x, y: this.stem_plant.ctrl2_y};
-      plant_code_gen.Gen_Code(branches, pt1, pt2, ctrl1, ctrl2);
+      leaf_code_gen.Show();
+      //const branches = this.plants.filter((p) => p.name!="Stem");
+      //const pt1 = {x: this.stem_plant.x1, y: this.stem_plant.y1};
+      //const pt2 = {x: this.stem_plant.x2, y: this.stem_plant.y2};
+      //const ctrl1 = {x: this.stem_plant.ctrl1_x, y: this.stem_plant.ctrl1_y};
+      //const ctrl2 = {x: this.stem_plant.ctrl2_x, y: this.stem_plant.ctrl2_y};
+      leaf_code_gen.Gen_Code(this.shapes);
     }
-    else
+    /*else
     {
       scene_code_gen.Show();
       const scene_plants = this.plants.filter((p) => p.name!="Stem");
       scene_code_gen.Gen_Scene(scene_plants);
-    }
+    }*/
   }
 
   OnClick_Code_Type(event)
@@ -420,9 +423,11 @@ class Shape_List extends LitElement
           </tr>
         </tfoot>
       </table>
-      <!--plant-dlg id="dlg"></plant-dlg>
-      <plant-code-gen id="plant_code_gen"></plant-code-gen>
-      <scene-code-gen id="scene_code_gen"></scene-code-gen-->
+      <!--plant-dlg id="dlg"></plant-dlg-->
+      <leaf-code-gen id="leaf_code_gen"></leaf-code-gen>
+      <canvas-code-gen id="canvas_code_gen"></canvas-code-gen>
+      <path-code-gen id="path_code_gen"></path-code-gen>
+      <android-code-gen id="android_code_gen"></android-code-gen>
       `;
   }
 

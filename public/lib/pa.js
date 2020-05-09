@@ -1446,15 +1446,19 @@ export class Shape
   New_Btn_Path(id, x, y)
   {
     const r = 5;
-    const btn_path = new Path2D();
-    btn_path.hover = false;
-    btn_path.rect(-r, -r, r*2, r*2);
-    btn_path.id = id;
-    btn_path.x = x;
-    btn_path.y = y;
-    this.btns.push(btn_path);
+    const p = new Path2D();
+    p.moveTo(-r, -r);
+    p.lineTo(-r, r);
+    p.lineTo(r, r);
+    p.lineTo(r, -r);
+    p.closePath();
+    p.hover = false;
+    p.id = id;
+    p.x = x;
+    p.y = y;
+    this.btns.push(p);
 
-    return btn_path;
+    return p;
   }
 
   To_Canvas_Pt(ctx, sx, sy)
@@ -1491,6 +1495,19 @@ export class Shape
     }
 
     return res;
+  }
+
+  To_Cmd_Str()
+  {
+    let params = "";
+    const s = ", ";
+    const x = this.pt.x;
+    const y = this.pt.y;
+
+    params = Append_Str(params, x, s);
+    params = Append_Str(params, y, s);
+
+    return "moveTo("+params+")";
   }
 
   On_Mouse_Up(event, ctx)
@@ -1649,6 +1666,24 @@ export class Shape_Arc extends Shape
   {
     const ptb = this.Pt_Difference(this.ea, this.pt);
     return Math.atan2(ptb.y, ptb.x);
+  }
+
+  To_Cmd_Str()
+  {
+    const s = ", ";
+    const x = this.pt.x;
+    const y = this.pt.y;
+    const radius = this.Calc_Radius();
+    const startAngle = this.Calc_Start_Angle();
+    const endAngle = this.Calc_End_Angle();
+
+    params = Append_Str(params, x, s);
+    params = Append_Str(params, y, s);
+    params = Append_Str(params, radius, s);
+    params = Append_Str(params, startAngle, s);
+    params = Append_Str(params, endAngle, s);
+
+    return "arc("+params+")";
   }
 
   On_Mouse_Move_Cmd(ctx, c_pt, cmd)
@@ -1972,6 +2007,21 @@ export class Shape_BezierCurveTo extends Shape
     return res;
   }
 
+  To_Cmd_Str()
+  {
+    const s = ", ";
+    let params;
+
+    params = Append_Str(params, this.cp1.x, s);
+    params = Append_Str(params, this.cp1.y, s);
+    params = Append_Str(params, this.cp2.x, s);
+    params = Append_Str(params, this.cp2.y, s);
+    params = Append_Str(params, this.pt.x, s);
+    params = Append_Str(params, this.pt.y, s);
+
+    return "bezierCurveTo("+params+")";
+  }
+
   Render(ctx)
   {
     super.Render(ctx);
@@ -2083,19 +2133,25 @@ function Append_Str(a, b, sep)
 {
   let res = "";
 
-  if (a && b)
+  if (!Empty(a) && !Empty(b))
   {
     res = a+sep+b;
   }
-  else if (!a && b)
+  else if (Empty(a) && !Empty(b))
   {
     res = b;
   }
-  else if (a && !b)
+  else if (!Empty(a) && Empty(b))
   {
     res = a;
   }
 
+  return res;
+}
+
+function Empty(v)
+{
+  const res = v == null || v == undefined || v === "";
   return res;
 }
 

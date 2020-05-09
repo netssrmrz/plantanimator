@@ -95,6 +95,7 @@ class Shape_Editor extends LitElement
 
   Init_Canvas(w, h)
   {
+    this.ctx.globalCompositeOperation = "difference";
     this.ctx.x_scale = 1000/w;
     this.ctx.y_scale = 1000/h;
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -222,6 +223,7 @@ class Shape_Editor extends LitElement
 
     if (shapes && shapes.length>0)
     {
+      ctx.save();
       ctx.beginPath();
       for (let i=0; i<shapes.length; i++)
       {
@@ -237,13 +239,21 @@ class Shape_Editor extends LitElement
       {
         ctx.fill();
       }
+      ctx.restore();
 
-      for (let i=0; i<shapes.length; i++)
-      {
-        shape = shapes[i];
-        if (shape.selected && shape.Render_Design)
-          shape.Render_Design(ctx);
-      }
+      this.Render_Design(ctx, shapes);
+    }
+  }
+
+  Render_Design(ctx, shapes)
+  {
+    let shape;
+
+    for (let i=0; i<shapes.length; i++)
+    {
+      shape = shapes[i];
+      if (shape.selected && shape.Render_Design)
+        shape.Render_Design(ctx);
     }
   }
 
