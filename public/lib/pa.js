@@ -471,6 +471,14 @@ export class Base_Plant_Maturing2 extends Base_Plant
     this.canvas_ctx.translate(this.x, this.y);
     this.canvas_ctx.rotate(this.angle);
     this.canvas_ctx.scale(this.Get_X_Scale(), this.Get_Y_Scale());
+    if (this.fill_style)
+    {
+      this.canvas_ctx.fillStyle = this.fill_style;
+    }
+    if (this.stroke_style)
+    {
+      this.canvas_ctx.strokeStyle = this.stroke_style;
+    }
 
     this.Render();
     if (this.branches)
@@ -851,6 +859,24 @@ export class Plant_Flower12 extends Base_Plant_Maturing
   }
 }
 
+export class Plant_Flower13 extends Base_Plant_Maturing
+{
+  Render()
+  {
+    this.canvas_ctx.scale(this.maturity/100, this.maturity/100);
+    this.canvas_ctx.beginPath();
+    this.canvas_ctx.moveTo(-92, 74);
+    this.canvas_ctx.arc(6, 96, 100, -2.925042348613704, -0.1571102653469605);
+    this.canvas_ctx.quadraticCurveTo(91, 125, 73, 78);
+    this.canvas_ctx.quadraticCurveTo(58, 123, 39, 79);
+    this.canvas_ctx.quadraticCurveTo(23, 127, 8, 79);
+    this.canvas_ctx.quadraticCurveTo(-14, 122, -24, 82);
+    this.canvas_ctx.quadraticCurveTo(-46, 121, -53, 82);
+    this.canvas_ctx.quadraticCurveTo(-74, 122, -92, 74);
+    this.canvas_ctx.fill();
+  }
+}
+
 // Sample Leaves ==================================================================================
 
 export class Plant_Leaf extends Base_Plant_Maturing
@@ -1061,6 +1087,72 @@ export class Plant_Leaf12 extends Base_Plant_Maturing
       size*0.1, size*0.8, 
       size*0.1, size*0.4, 
       0, 0);
+    this.canvas_ctx.fill();
+  }
+}
+
+export class Plant_Leaf13 extends Base_Plant_Maturing
+{
+  Render()
+  {
+    this.canvas_ctx.scale(this.maturity/100, this.maturity/100);
+    this.canvas_ctx.beginPath();
+    this.canvas_ctx.moveTo(0, 0);
+    this.canvas_ctx.bezierCurveTo(-5.5, 27.5, -5, 56.5, 11.3, 48.400000000000006);
+    this.canvas_ctx.bezierCurveTo(21.1, 41, 0.6000000000000001, 25.6, 0, 0.1);
+    this.canvas_ctx.fill();
+  }
+}
+
+export class Plant_Leaf14 extends Base_Plant_Maturing
+{
+  Render()
+  {
+    this.canvas_ctx.scale(this.maturity/100, this.maturity/100);
+    this.canvas_ctx.beginPath();
+    this.canvas_ctx.moveTo(0, 0);
+    this.canvas_ctx.quadraticCurveTo(9, 12, 12.6, 28.5);
+    this.canvas_ctx.bezierCurveTo(23.4, 46.8, 47.7, 55.8, 55.8, 90);
+    this.canvas_ctx.bezierCurveTo(59.4, 100.8, 61.2, 121.2, 64.2, 144.6);
+    this.canvas_ctx.bezierCurveTo(57.6, 126.3, 24.3, 106.8, 14.4, 86.4);
+    this.canvas_ctx.bezierCurveTo(6, 69.6, 11.1, 51, 11.4, 36.9);
+    this.canvas_ctx.quadraticCurveTo(14.1, 30.6, 0, 0);
+    this.canvas_ctx.fill();
+  }
+}
+
+export class Plant_Leaf15 extends Base_Plant_Maturing
+{
+  Render()
+  {
+    this.canvas_ctx.scale(this.maturity/100, this.maturity/100);
+    this.canvas_ctx.beginPath();
+    this.canvas_ctx.moveTo(0, 0);
+    this.canvas_ctx.bezierCurveTo(-2.7, 39.6, 71.1, 88.8, 34.2, 110.1);
+    this.canvas_ctx.bezierCurveTo(0.3, 123.6, -0.6, 51, 0, 0);
+    this.canvas_ctx.fill();
+  }
+}
+
+export class Plant_Leaf16 extends Base_Plant_Maturing
+{
+  Render()
+  {
+    this.canvas_ctx.scale(this.maturity/100, this.maturity/100);
+    this.canvas_ctx.beginPath();
+    this.canvas_ctx.moveTo(0, 0);
+    this.canvas_ctx.quadraticCurveTo(-38.4, 42, -20.7, 79.2);
+    this.canvas_ctx.arc(-11.4, 105.6, 27.9, -1.9017490754220399, 0.6533047162725802);
+    this.canvas_ctx.lineTo(21.6, 137.4);
+    this.canvas_ctx.lineTo(13.5, 136.5);
+    this.canvas_ctx.lineTo(12.9, 144);
+    this.canvas_ctx.lineTo(8.4, 140.7);
+    this.canvas_ctx.lineTo(4.5, 147);
+    this.canvas_ctx.lineTo(0.9, 144);
+    this.canvas_ctx.lineTo(-2.4, 148.8);
+    this.canvas_ctx.lineTo(-6.9, 133.8);
+    this.canvas_ctx.arc(-12.6, 105.9, 28.5, 1.3694792184202558, -2.025311769576292);
+    this.canvas_ctx.quadraticCurveTo(-41.1, 35.7, 0, 0);
     this.canvas_ctx.fill();
   }
 }
@@ -1422,6 +1514,165 @@ export class Plant_Stem11 extends Base_Plant_Maturing2
   }
 }
 
+export class Plant_Stem12 extends Base_Plant_Maturing2
+{
+  constructor()
+  {
+    super();
+    this.curve = new Bezier(0,0,-105,171,50,755,55,918);
+    this.curve_pts = this.curve.getLUT(100);
+  }
+
+  Init_Branches()
+  {
+    this.Add_Plant_Abs(28,-0.4576596566168929,new Plant_Leaf14(),2,2,-34,242);
+    this.Add_Plant_Abs(31,0.9352106199703458,new Plant_Leaf14(),2,2,-38,226);
+    this.Add_Plant_Abs(52.9,0.8318762947484513,new Plant_Leaf14(),2,2,-7,514);
+    this.Add_Plant_Abs(53.8,-0.5493744847715509,new Plant_Leaf14(),2,2,-5,528);
+    this.Add_Plant_Abs(47.9,0.21043020334647378,new Plant_Leaf14(),2,2,22,691);
+  }
+
+  Render()
+  {
+    for (let c = 1; c < this.maturity; c++)
+    {
+      this.canvas_ctx.beginPath();
+      this.canvas_ctx.lineWidth = (this.maturity - c) / 10;
+      this.canvas_ctx.moveTo(this.curve_pts[c - 1].x, this.curve_pts[c - 1].y);
+      this.canvas_ctx.lineTo(this.curve_pts[c].x, this.curve_pts[c].y);
+      this.canvas_ctx.stroke();
+    }
+  }
+}
+
+export class Plant_Stem13 extends Base_Plant_Maturing2
+{
+  constructor()
+  {
+    super();
+    this.curve = new Bezier(0,0,-178,243,-152,500,-4,770);
+    this.curve_pts = this.curve.getLUT(100);
+  }
+
+  Init_Branches()
+  {
+    this.Add_Plant_Abs(51.7,-0.3562196553961501,new Plant_Flower13(),2.207920314235605,2.0379126296251617,-55,666);
+    this.Add_Plant_Abs(3.3,-0.03682544972883206,new Plant_Leaf5(),1.6768060508329803,3.83096873752448,-28,42);
+    this.Add_Plant_Abs(17,0.402747400722818,new Plant_Leaf10(),-2.822002153974412,3.7242856822434804,-87,160);
+  }
+
+  Render()
+  {
+    for (let c = 1; c < this.maturity; c++)
+    {
+      this.canvas_ctx.beginPath();
+      this.canvas_ctx.lineWidth = (this.maturity - c) / 10;
+      this.canvas_ctx.moveTo(this.curve_pts[c - 1].x, this.curve_pts[c - 1].y);
+      this.canvas_ctx.lineTo(this.curve_pts[c].x, this.curve_pts[c].y);
+      this.canvas_ctx.stroke();
+    }
+  }
+}
+
+export class Plant_Stem14 extends Base_Plant_Maturing2
+{
+  constructor()
+  {
+    super();
+    this.curve = new Bezier(0,0,-173,228,-65,679,149,752);
+    this.curve_pts = this.curve.getLUT(100);
+  }
+
+  Init_Branches()
+  {
+    this.Add_Plant_Abs(72.8,-0.6885591581361412,new Plant_Leaf15(),2.395151131395851,3.4473832188738722,26,656);
+    this.Add_Plant_Abs(63,0,new Plant_Leaf15(),1.62,2.22,-20,585);
+    this.Add_Plant_Abs(33,0.4549142065923797,new Plant_Leaf15(),1.5748142747638534,2.0681295897501197,-86,310);
+    this.Add_Plant_Abs(11,1.09867434439112,new Plant_Leaf15(),1,1,-45,77);
+    this.Add_Plant_Abs(21,-0.33394507184489397,new Plant_Leaf15(),1.4576244869586312,1.839383281162082,-81,218);
+    this.Add_Plant_Abs(53.1,-0.690446457054692,new Plant_Leaf15(),2.2230514507786334,2.4590327869288386,-55,489);
+  }
+
+  Render()
+  {
+    for (let c = 1; c < this.maturity; c++)
+    {
+      this.canvas_ctx.beginPath();
+      this.canvas_ctx.lineWidth = (this.maturity - c) / 10;
+      this.canvas_ctx.moveTo(this.curve_pts[c - 1].x, this.curve_pts[c - 1].y);
+      this.canvas_ctx.lineTo(this.curve_pts[c].x, this.curve_pts[c].y);
+      this.canvas_ctx.stroke();
+    }
+  }
+}
+
+export class Plant_Stem15 extends Base_Plant_Maturing2
+{
+  constructor()
+  {
+    super();
+    this.curve = new Bezier(0,0,-226,335,154,452,-102,768);
+    this.curve_pts = this.curve.getLUT(100);
+  }
+
+  Init_Branches()
+  {
+    this.Add_Plant_Abs(70.7,-0.4547192748209694,new Plant_Leaf16(),2.760507402261943,2.866426151509404,-11,552);
+    this.Add_Plant_Abs(82,1.0303768265243125,new Plant_Leaf16(),-0.651694623541531,0.5419355290503267,-28,639);
+    this.Add_Plant_Abs(58,-1.1071487177940904,new Plant_Leaf16(),0.6260990336999407,0.6260990336999407,-18,464);
+    this.Add_Plant_Abs(64,0.9481255380378295,new Plant_Leaf16(),-1.4117769913548215,1.1776611255709883,-13,512);
+    this.Add_Plant_Abs(50,-1.2187520124794793,new Plant_Leaf16(),1.342872451880055,1.5095342255085347,-44,378);
+    this.Add_Plant_Abs(53.3,0.9827937232473292,new Plant_Leaf16(),-1,1,-25,434);
+    this.Add_Plant_Abs(38.7,-1.5707963267948966,new Plant_Leaf16(),0.58,0.6,-57,334);
+    this.Add_Plant_Abs(33.6,0.7853981633974483,new Plant_Leaf16(),-1.1455129855222068,1.145512985522207,-65,299);
+    this.Add_Plant_Abs(16.9,-1.0969449903001363,new Plant_Leaf16(),1.4729901384407773,1.4697959219076029,-69,171);
+    this.Add_Plant_Abs(18.7,0.9487643115057245,new Plant_Leaf16(),-0.8010423493928454,0.7053588834623059,-74,189);
+  }
+
+  Render()
+  {
+    for (let c = 1; c < this.maturity; c++)
+    {
+      this.canvas_ctx.beginPath();
+      this.canvas_ctx.lineWidth = (this.maturity - c) / 10;
+      this.canvas_ctx.moveTo(this.curve_pts[c - 1].x, this.curve_pts[c - 1].y);
+      this.canvas_ctx.lineTo(this.curve_pts[c].x, this.curve_pts[c].y);
+      this.canvas_ctx.stroke();
+    }
+  }
+}
+
+export class Plant_Stem16 extends Base_Plant_Maturing2
+{
+  constructor()
+  {
+    super();
+    this.curve = new Bezier(0,0,-250,200,112,443,3,730);
+    this.curve_pts = this.curve.getLUT(100);
+  }
+
+  Init_Branches()
+  {
+    this.Add_Plant_Abs(92,0.2629947316809196,new Plant_Leaf2(),1.4551086699553786,1.8658667580030168,15,693);
+    this.Add_Plant_Abs(80,-1.120135000714263,new Plant_Leaf2(),1,1,23,598);
+    this.Add_Plant_Abs(53,0.563316261491968,new Plant_Leaf2(),0.65209647851831,0.35492278414328327,-37,372);
+    this.Add_Plant_Abs(1.3,-0.23783592745745064,new Plant_Leaf2(),0.3845498061450867,0.7006578670034159,-16,15);
+    this.Add_Plant_Abs(23,0.7170118198069448,new Plant_Leaf2(),0.808662846649787,1.23193522575185,-91,166);
+  }
+
+  Render()
+  {
+    for (let c = 1; c < this.maturity; c++)
+    {
+      this.canvas_ctx.beginPath();
+      this.canvas_ctx.lineWidth = (this.maturity - c) / 10;
+      this.canvas_ctx.moveTo(this.curve_pts[c - 1].x, this.curve_pts[c - 1].y);
+      this.canvas_ctx.lineTo(this.curve_pts[c].x, this.curve_pts[c].y);
+      this.canvas_ctx.stroke();
+    }
+  }
+}
+
 // Shapes ===============================================================================
 
 export class Shape
@@ -1676,6 +1927,7 @@ export class Shape_Arc extends Shape
     const radius = this.Calc_Radius();
     const startAngle = this.Calc_Start_Angle();
     const endAngle = this.Calc_End_Angle();
+    let params;
 
     params = Append_Str(params, x, s);
     params = Append_Str(params, y, s);
@@ -1759,6 +2011,29 @@ export class Shape_Ellipse extends Shape
     res = Append_Str(res, "endAngle = "+Round(this.Calc_End_Angle()), s);
 
     return res;
+  }
+
+  To_Cmd_Str()
+  {
+    const s = ", ";
+    const x = this.pt.x;
+    const y = this.pt.y;
+    const radius_x = this.Calc_Radius_X();
+    const radius_y = this.Calc_Radius_Y();
+    const rotation = 0;
+    const startAngle = this.Calc_Start_Angle();
+    const endAngle = this.Calc_End_Angle();
+    let params;
+
+    params = Append_Str(params, x, s);
+    params = Append_Str(params, y, s);
+    params = Append_Str(params, radius_x, s);
+    params = Append_Str(params, radius_y, s);
+    params = Append_Str(params, rotation, s);
+    params = Append_Str(params, startAngle, s);
+    params = Append_Str(params, endAngle, s);
+
+    return "ellipse("+params+")";
   }
 
   Calc_Radius_X()
@@ -1853,6 +2128,19 @@ export class Shape_Rect extends Shape
     return res;
   }
 
+  To_Cmd_Str()
+  {
+    const s = ", ";
+    let params;
+
+    params = Append_Str(params, this.pt.x, s);
+    params = Append_Str(params, this.pt.y, s);
+    params = Append_Str(params, this.Calc_Width(), s);
+    params = Append_Str(params, this.Calc_Height(), s);
+
+    return "rect("+params+")";
+  }
+
   Calc_Width()
   {
     return this.cp.x-this.pt.x;
@@ -1883,6 +2171,11 @@ export class Shape_ClosePath extends Shape
     return "";
   }
 
+  To_Cmd_Str()
+  {
+    return "closePath()";
+  }
+
   Render(ctx)
   {
     ctx.closePath();
@@ -1906,10 +2199,24 @@ export class Shape_ArcTo extends Shape
     res = Append_Str(res, "x1 = "+Round(this.pt.x), s);
     res = Append_Str(res, "y1 = "+Round(this.pt.y), s);
     res = Append_Str(res, "x2 = "+Round(this.cp.x), s);
-    res = Append_Str(res, "y2 = "+Round(this.cp.x), s);
+    res = Append_Str(res, "y2 = "+Round(this.cp.y), s);
     res = Append_Str(res, "r = "+Round(this.Calc_Radius()), s);
 
     return res;
+  }
+
+  To_Cmd_Str()
+  {
+    const s = ", ";
+    let params;
+
+    params = Append_Str(params, this.pt.x, s);
+    params = Append_Str(params, this.pt.y, s);
+    params = Append_Str(params, this.cp.x, s);
+    params = Append_Str(params, this.cp.y, s);
+    params = Append_Str(params, this.Calc_Radius(), s);
+
+    return "arc("+params+")";
   }
 
   Calc_Radius()
@@ -1958,9 +2265,22 @@ export class Shape_QuadraticCurveTo extends Shape
     res = Append_Str(res, "cpx = "+Round(this.cp.x), s);
     res = Append_Str(res, "cpy = "+Round(this.cp.y), s);
     res = Append_Str(res, "x = "+Round(this.pt.x), s);
-    res = Append_Str(res, "y = "+Round(this.pt.x), s);
+    res = Append_Str(res, "y = "+Round(this.pt.y), s);
 
     return res;
+  }
+
+  To_Cmd_Str()
+  {
+    const s = ", ";
+    let params;
+
+    params = Append_Str(params, this.cp.x, s);
+    params = Append_Str(params, this.cp.y, s);
+    params = Append_Str(params, this.pt.x, s);
+    params = Append_Str(params, this.pt.y, s);
+
+    return "quadraticCurveTo("+params+")";
   }
 
   Render(ctx)
@@ -2045,6 +2365,17 @@ export class Shape_BezierCurveTo extends Shape
 
 export class Shape_LineTo extends Shape
 {
+
+  To_Cmd_Str()
+  {
+    const s = ", ";
+    let params;
+
+    params = Append_Str(params, this.pt.x, s);
+    params = Append_Str(params, this.pt.y, s);
+
+    return "lineTo("+params+")";
+  }
   Render(ctx)
   {
     super.Render(ctx);

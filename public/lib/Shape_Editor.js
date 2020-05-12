@@ -102,6 +102,7 @@ class Shape_Editor extends LitElement
     this.ctx.translate(this.canvas.width/2, this.canvas.height/2);
     this.ctx.scale(this.ctx.x_scale, -this.ctx.y_scale);
     this.ctx.strokeStyle="#000";
+    this.ctx.fillStyle="#000";
     this.ctx.lineWidth = 1;
   }
 

@@ -209,41 +209,7 @@ class Plant_Dialog extends LitElement
       <span>
         <select id="plant_class">
           <option>This</option>
-          <option>Plant_Flower</option>
-          <option>Plant_Flower2</option>
-          <option>Plant_Flower3</option>
-          <option>Plant_Flower4</option>
-          <option>Plant_Flower5</option>
-          <option>Plant_Flower6</option>
-          <option>Plant_Flower7</option>
-          <option>Plant_Flower8</option>
-          <option>Plant_Flower9</option>
-          <option>Plant_Flower10</option>
-          <option>Plant_Flower11</option>
-          <option>Plant_Flower12</option>
-          <option>Plant_Leaf</option>
-          <option>Plant_Leaf2</option>
-          <option>Plant_Leaf3</option>
-          <option>Plant_Leaf4</option>
-          <option>Plant_Leaf5</option>
-          <option>Plant_Leaf6</option>
-          <option>Plant_Leaf7</option>
-          <option>Plant_Leaf8</option>
-          <option>Plant_Leaf9</option>
-          <option>Plant_Leaf10</option>
-          <option>Plant_Leaf11</option>
-          <option>Plant_Leaf12</option>
-          <option>Plant_Stem1</option>
-          <option>Plant_Stem2</option>
-          <option>Plant_Stem3</option>
-          <option>Plant_Stem4</option>
-          <option>Plant_Stem5</option>
-          <option>Plant_Stem6</option>
-          <option>Plant_Stem7</option>
-          <option>Plant_Stem8</option>
-          <option>Plant_Stem9</option>
-          <option>Plant_Stem10</option>
-          <option>Plant_Stem11</option>
+          ${this.Render_Plant_Options()}
         </select>
       </span>
       <label>Sprout Time</label>
@@ -264,6 +230,20 @@ class Plant_Dialog extends LitElement
         <button id="new_plant_cancel_btn" @click="${this.OnClick_Cancel}"><img src="images/close.svg"></button>
       </div>
       `;
+  }
+
+  Render_Plant_Options()
+  {
+    let res = [];
+
+    for (const class_name in pl)
+    {
+      if (class_name.startsWith("Plant_"))
+      {
+        res.push(html`<option>${class_name}</option>`);
+      }
+    }
+    return res;
   }
 }
 

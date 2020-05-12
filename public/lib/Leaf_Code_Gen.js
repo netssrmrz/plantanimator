@@ -32,6 +32,7 @@ class Leaf_Code_Gen extends LitElement
         "\t\t\t{\n" +
         "\t\t\t\tRender()\n" +
         "\t\t\t\t{\n" +
+        "\t\t\t\t\tthis.canvas_ctx.scale(this.maturity/100, this.maturity/100);\n" +
         "\t\t\t\t\tthis.canvas_ctx.beginPath();\n" +
         this.Gen_Cmds(shapes) +
         "\t\t\t\t\tthis.canvas_ctx.stroke();\n" +
