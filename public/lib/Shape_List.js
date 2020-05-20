@@ -4,6 +4,7 @@ import "./Plant_Dialog.js";
 import "./Leaf_Code_Gen.js";
 import "./Canvas_Code_Gen.js";
 import "./Path_Code_Gen.js";
+import "./Android_Code_Gen.js";
 import * as pl from "./pa.js";
 
 class Shape_List extends LitElement
@@ -265,7 +266,7 @@ class Shape_List extends LitElement
     leaf_code_gen.Hide();
     canvas_code_gen.Hide();
     path_code_gen.Hide();
-    //android_code_gen.Hide();
+    android_code_gen.Hide();
 
     if (this.code_gen_type == "plant_code")
     {
@@ -281,6 +282,11 @@ class Shape_List extends LitElement
     {
       path_code_gen.Show();
       path_code_gen.Gen_Code(this.shapes);
+    }
+    else if (this.code_gen_type == "android_code")
+    {
+      android_code_gen.Show();
+      android_code_gen.Gen_Code(this.shapes);
     }
   }
 

@@ -2460,7 +2460,7 @@ function Random(base, delta)
   return base + (Math.random() - 0.5) * delta;
 }
 
-function Append_Str(a, b, sep)
+export function Append_Str(a, b, sep)
 {
   let res = "";
 
