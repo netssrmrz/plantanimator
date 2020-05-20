@@ -25,26 +25,12 @@ class Android_Code_Gen extends LitElement
 
     const data = this.Gen_Cmds(shapes);
     code = 
-      "public class Shape\n" +
+      "public class Shape implements Is_Drawable\n" +
       "{\n" +
-        "\tpublic rs.projecta.ogl.Color color;\n" +
-        "\tpublic static rs.projecta.ogl.Pt_Buffer points;\n" +
-        "\n" +
-
-        "\tpublic Shape(int col)\n" +
-        "\t{\n" +
-          "\t\tif (points==null)\n" +
-          "\t\t{\n" +
-          "\t\t\tpoints = new rs.projecta.ogl.Pt_Buffer(this.Get_Points());\n" +
-          "\t\t\tpoints.frames = new Buffer_Frame[1];\n" +
-          "\t\t\tpoints.frames[0] = new Buffer_Frame();\n" +
-          this.Gen_Segments(data.segments) +
-          "\t\t}\n" +
-          "\t\tthis.color = new rs.projecta.ogl.Color(col);\n" +
-        "\t};\n" +
+        "\tpublic static java.nio.FloatBuffer points = Context.New_Buffer(Get_Points());\n" +
         "\n" +
     
-        "\tpublic float[] Get_Points()\n" +
+        "\tpublic static float[] Get_Points()\n" +
         "\t{\n" +
           "\t\tfloat[] points=\n" +
           "\t\t{\n" +
@@ -54,10 +40,16 @@ class Android_Code_Gen extends LitElement
           "\t\treturn points;\n" +
         "\t};\n" +
         "\n" +
-
-        "\tpublic void Draw(Context ctx, float dx, float dy, float a_degrees, float x, float y, int frame_idx)\n" +
+    
+        "\tpublic java.nio.FloatBuffer Get_Points_Buffer()\n" +
         "\t{\n" +
-          "\t\tctx.Draw(dx, -dy, a_degrees, x, y, this.points, this.color, frame_idx);\n" +
+          "\t\treturn this.points;\n" +
+        "\t};\n" +
+        "\n" +
+
+        "\tpublic void Draw(Context ctx)\n" +
+        "\t{\n" +
+          this.Gen_Segments(data.segments) +
         "\t}\n" +
       "}\n";
 
@@ -70,11 +62,10 @@ class Android_Code_Gen extends LitElement
 
     if (segments && segments.length>0)
     {
-      res += "\t\t\tpoints.frames[0].segments = new Buffer_Segment[" + segments.length + "];\n";
       for (i=0; i<segments.length; i++)
       {
         segment = segments[i];
-        res += "\t\t\tpoints.frames[0].segments[" + i + "] = new Buffer_Segment(" + 
+        res += "\t\tandroid.opengl.GLES20.glDrawArrays(" + 
           segment.mode + ", " + segment.pt_start + ", " + segment.pt_count + ");\n";
       }
     }
