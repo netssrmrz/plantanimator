@@ -88,19 +88,23 @@ class Shape_Editor extends LitElement
   firstUpdated(changedProperties)
   {
     this.canvas = this.shadowRoot.getElementById("main_canvas");
+    this.debug = this.shadowRoot.getElementById("debug");
     this.ctx = this.canvas.getContext("2d");
-    this.Init_Canvas(1000, 1000);
+    this.Init_Canvas(1, 1000, 1000);
     this.Enable_Events();
   }
 
-  Init_Canvas(w, h)
+  Init_Canvas(zoom, width, height)
   {
+    this.canvas.width = width;
+    this.canvas.height = height;        
+    this.ctx.x_scale = zoom;
+    this.ctx.y_scale = zoom;
+
     this.ctx.globalCompositeOperation = "difference";
-    this.ctx.x_scale = 1000/w;
-    this.ctx.y_scale = 1000/h;
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     this.ctx.translate(this.canvas.width/2, this.canvas.height/2);
-    this.ctx.scale(this.ctx.x_scale, -this.ctx.y_scale);
+    this.ctx.scale(zoom, -zoom);
     this.ctx.strokeStyle="#000";
     this.ctx.fillStyle="#000";
     this.ctx.lineWidth = 1;
@@ -126,9 +130,9 @@ class Shape_Editor extends LitElement
     this.Render(this.ctx, shapes);
   }
 
-  Set_Size(w, h)
+  Set_Zoom(zoom)
   {
-    this.Init_Canvas(w, h);
+    this.Init_Canvas(zoom, this.canvas.width, this.canvas.height);
     this.Render(this.ctx, this.shapes);
   }
 
@@ -138,12 +142,19 @@ class Shape_Editor extends LitElement
     this.Render(this.ctx, this.shapes);
   }
 
+  Resize(width, height)
+  {
+    this.Init_Canvas(this.ctx.x_scale, width, height);
+    this.Render(this.ctx, this.shapes);
+  }
+
   // Events =======================================================================================
 
   OnMouseMove_Canvas(event)
   {
     let shape;
 
+    //this.debug.innerText = "x, y = " + event.offsetX + ", " + event.offsetY;
     if (this.shapes && this.shapes.length>0)
     {
       for (let i=0; i<this.shapes.length; i++)
@@ -244,6 +255,27 @@ class Shape_Editor extends LitElement
 
       this.Render_Design(ctx, shapes);
     }
+    this.Render_Origin(ctx);
+  }
+
+  Render_Origin(ctx)
+  {
+    ctx.save();
+    ctx.strokeStyle = "#dddddd";
+    ctx.lineWidth = 1;
+    //ctx.setLineDash([5, 5]);
+
+    const rx = this.canvas.width/2;
+    const ry = this.canvas.height/2;
+    ctx.beginPath();
+    ctx.moveTo(-rx, 0);
+    ctx.lineTo(rx, 0);
+    ctx.moveTo(0, -ry);
+    ctx.lineTo(0, ry);
+    ctx.stroke();
+
+    //ctx.setLineDash([]);
+    ctx.restore();
   }
 
   Render_Design(ctx, shapes)
@@ -268,17 +300,15 @@ class Shape_Editor extends LitElement
           0px 0px 0px 1px rgb(0,0,0), 
           0px 0px 0px 4px rgb(255, 255, 255), 
           0px 0px 0px 7px rgb(0, 0, 0);
-        margin: 7px;
+        margin: 17px;
         padding: 3px;   
-        width: 1000px;
-        height: 1000px;   
       }
     `;
   }
 
   render()
   {
-    return html`<canvas id="main_canvas" width="1000" height="1000"></canvas>`;
+    return html`<canvas id="main_canvas" width="1000" height="1000"></canvas><div id="debug"></div>`;
   }
 }
 

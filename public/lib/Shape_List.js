@@ -16,6 +16,7 @@ class Shape_List extends LitElement
     this.OnClick_Edit_Ok = this.OnClick_Edit_Ok.bind(this);
     this.shapes = [];
     this.code_gen_type = null;
+    this.style.display = "none";
   }
   
   firstUpdated(changedProperties)
@@ -129,6 +130,29 @@ class Shape_List extends LitElement
   Get_Last_Idx()
   {
     return this.shapes.length-1;
+  }
+
+  Hide()
+  {
+    this.style.display = "none";
+  }
+
+  Toggle_Show()
+  {
+    let res;
+
+    if (this.style.display == "none")
+    {
+      this.style.display = "block";
+      res = true;
+    }
+    else
+    {
+      this.style.display = "none";
+      res = false;
+    }
+
+    return res;
   }
 
   // Utils ========================================================================================
@@ -314,7 +338,6 @@ class Shape_List extends LitElement
     return css`
       :host
       {
-        display: block;  
         margin-top: 20px;
       }
       table

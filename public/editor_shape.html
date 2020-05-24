@@ -66,11 +66,16 @@
         font-size: 42px;
         font-weight: 100;
       }
-      body
+      html, body
       {
+        margin: 0;
+        padding: 0;
+        background-color: #fff;
+        width: 100%;
+        min-width: 800px;
+        height: 100%;
+        overflow: hidden;
         text-align: center;
-        margin: 0px 0px 20px 0px;
-        background-color: #fffff9;
       }
       button
       {
@@ -97,6 +102,11 @@
       {
         background-color: #0f0;
       }
+      #container
+      {
+        display: flex;
+        flex-direction: column;
+      }
     </style>
     <script type="module">
       import * as pl from "./lib/pa.js";
@@ -105,6 +115,7 @@
       import "./lib/Remote_Ctrl.js";
 
       window.onload = Main;
+      window.onresize = OnResize;
       let shapes_elem, editor_elem, remote_ctrl;
 
       function Main()
@@ -123,6 +134,9 @@
         document.getElementById("small_btn").onclick=OnClick_Small_Canvas;
         document.getElementById("stroke").onclick=OnClick_Stroke;
         document.getElementById("fill").onclick=OnClick_Fill;
+        document.getElementById("list_btn").onclick=OnClick_List;
+        document.getElementById("prev_btn").onclick=OnClick_Prev;
+        document.getElementById("next_btn").onclick=OnClick_Next;
         //document.getElementById("remote_btn").onclick = OnClick_Show_Remote;
         
         shapes_elem = document.getElementById("shapes");
@@ -138,8 +152,24 @@
         //remote_ctrl.objs = sprout_list.plants;
         //remote_ctrl.on_change_fn = Remote_Change;
 
-        Set_Canvas_Size(document.getElementById("large_btn"), 1000);
+        //Set_Canvas_Size(document.getElementById("large_btn"), 1);
         Set_Paint_Style(document.getElementById("stroke"));
+      }
+
+      function OnResize()
+      {
+        let width = window.innerWidth;
+        let height = window.innerHeight - 60;
+        if (width<height)
+        {
+          height = width;
+        }
+        else if (height<width)
+        {
+          width = height;
+        }
+
+        editor_elem.Resize(width-40, height-40);      
       }
 
       // fires when a change is made on the shape list
@@ -168,13 +198,13 @@
         editor.Render_Plants();
       }
 
-      function Set_Canvas_Size(btn_elem, size)
+      function Set_Canvas_Size(btn_elem, z)
       {
         document.getElementById("large_btn").classList.remove("selected");
         document.getElementById("medium_btn").classList.remove("selected");
         document.getElementById("small_btn").classList.remove("selected");
         btn_elem.classList.add("selected");
-        editor_elem.Set_Size(size, size);
+        editor_elem.Set_Zoom(z);
       }
 
       function Set_Paint_Style(btn_elem)
@@ -186,6 +216,28 @@
       }
 
       // button bar ===============================================================================
+
+      function OnClick_Prev()
+      {
+
+      }
+
+      function OnClick_Next()
+      {
+
+      }
+
+      function OnClick_List(event)
+      {
+        if (shapes_elem.Toggle_Show())
+        {
+          document.getElementById("list_btn").classList.add("selected");
+        }
+        else
+        {
+          document.getElementById("list_btn").classList.remove("selected");
+        }
+      }
 
       function OnClick_Stroke(event)
       {
@@ -199,17 +251,17 @@
 
       function OnClick_Large_Canvas(event)
       {
-        Set_Canvas_Size(event.currentTarget, 1000);
+        Set_Canvas_Size(event.currentTarget, 1);
       }
 
       function OnClick_Medium_Canvas()
       {
-        Set_Canvas_Size(event.currentTarget, 300);
+        Set_Canvas_Size(event.currentTarget, 3);
       }
 
       function OnClick_Small_Canvas()
       {
-        Set_Canvas_Size(event.currentTarget, 100);
+        Set_Canvas_Size(event.currentTarget, 10);
       }
 
       function OnClick_Show_Remote()
@@ -278,37 +330,37 @@
   </head>
 
   <body>
-    <h1>
-      <span class="hp">&#x1f337;</span>
-      <span class="h1">Plantimator Shape Editor</span>
-    </h1>
+    <div id="container">
+      <shape-editor id="shape_editor"></shape-editor>
 
-    <shape-editor id="shape_editor"></shape-editor>
-
-    <div>
-      <button id="new_moveto" title="Move To"><img src="images/vector-point.svg"></button>
-      <button id="new_lineto" title="Line To"><img src="images/vector-line.svg"></button>
-      <button id="new_bezierto" title="Bezier To"><img src="images/vector-bezier.svg"></button>
-      <button id="new_quadraticto" title="Quadratic To"><img src="images/vector-curve.svg"></button>
-      <button id="new_arcto" title="Arc To"><img src="images/vector-radius.svg"></button>
-      <button id="new_arc" title="Arc"><img src="images/vector-circle.svg"></button>
-      <button id="new_ellipse" title="Ellipse"><img src="images/vector-ellipse.svg"></button>
-      <button id="new_rect" title="Rect"><img src="images/vector-rectangle.svg"></button>
-      <button id="new_closepath" title="ClosePath"><img src="images/vector-polygon.svg"></button>
-
-      - <button id="remote_btn" title="Show Remote Control"><img src="images/remote.svg"></button>
-      <button id="undo_btn" title="Undo"><img src="images/undo.svg"></button>
-
-      - <button id="large_btn" title="1000x1000 Canvas"><img src="images/image-size-select-actual.svg"></button>
-      <button id="medium_btn" title="300x300 Canvas"><img src="images/image-size-select-large.svg"></button>
-      <button id="small_btn" title="100x100 Canvas"><img src="images/image-size-select-small.svg"></button>
-
-      - <button id="stroke" title="Stroke"><img src="images/pentagon-outline.svg"></button>
-      <button id="fill" title="Fill"><img src="images/pentagon.svg"></button>
+      <div>
+        <button id="new_moveto" title="Move To"><img src="images/vector-point.svg"></button>
+        <button id="new_lineto" title="Line To"><img src="images/vector-line.svg"></button>
+        <button id="new_bezierto" title="Bezier To"><img src="images/vector-bezier.svg"></button>
+        <button id="new_quadraticto" title="Quadratic To"><img src="images/vector-curve.svg"></button>
+        <button id="new_arcto" title="Arc To"><img src="images/vector-radius.svg"></button>
+        <button id="new_arc" title="Arc"><img src="images/vector-circle.svg"></button>
+        <button id="new_ellipse" title="Ellipse"><img src="images/vector-ellipse.svg"></button>
+        <button id="new_rect" title="Rect"><img src="images/vector-rectangle.svg"></button>
+        <button id="new_closepath" title="ClosePath"><img src="images/vector-polygon.svg"></button>
+  
+        - <button id="remote_btn" title="Show Remote Control"><img src="images/remote.svg"></button>
+        <button id="list_btn" title="Show Shape List"><img src="images/format-list-bulleted-square.svg"></button>
+        <button id="prev_btn" title="Previous Shape"><img src="images/skip-previous.svg"></button>
+        <button id="next_btn" title="Next Shape"><img src="images/skip-next.svg"></button>
+        <button id="undo_btn" title="Undo"><img src="images/undo.svg"></button>
+  
+        - <button id="large_btn" title="1000x1000 Canvas"><img src="images/image-size-select-actual.svg"></button>
+        <button id="medium_btn" title="300x300 Canvas"><img src="images/image-size-select-large.svg"></button>
+        <button id="small_btn" title="100x100 Canvas"><img src="images/image-size-select-small.svg"></button>
+  
+        - <button id="stroke" title="Stroke"><img src="images/pentagon-outline.svg"></button>
+        <button id="fill" title="Fill"><img src="images/pentagon.svg"></button>
+      </div>
+  
+      <shape-list id="shapes"></shape-list>
+      <remote-ctrl id="remote_ctrl"></remote-ctrl>    
     </div>
-
-    <shape-list id="shapes"></shape-list>
-    <remote-ctrl id="remote_ctrl"></remote-ctrl>
 
   </body>
 </html>
