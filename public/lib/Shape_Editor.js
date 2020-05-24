@@ -144,7 +144,9 @@ class Shape_Editor extends LitElement
 
   Resize(width, height)
   {
-    this.Init_Canvas(this.ctx.x_scale, width, height);
+    this.style.width = width + "px";
+    this.style.height = height + "px";
+    this.Init_Canvas(this.ctx.x_scale, width-40, height-40);
     this.Render(this.ctx, this.shapes);
   }
 
@@ -293,6 +295,16 @@ class Shape_Editor extends LitElement
   static get styles()
   {
     return css`
+      :host
+      {
+        display: inline-block;
+        xborder: 1px solid #f00;
+        overflow: hidden;
+        position: absolute;
+        left: 0px;
+        bottom: 0px;
+        z-index: 0;
+      }
       canvas
       {
         border: 0;

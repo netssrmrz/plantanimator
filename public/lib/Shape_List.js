@@ -339,6 +339,15 @@ class Shape_List extends LitElement
       :host
       {
         margin-top: 20px;
+        display: block;
+        position: absolute;
+        z-index: 2;
+        background-color: rgb(255, 255, 255);
+        bottom: 0px;
+        right: 0px;
+        width: 880px;
+        height: 40%;
+        overflow: auto      
       }
       table
       {

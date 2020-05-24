@@ -77,6 +77,17 @@
         overflow: hidden;
         text-align: center;
       }
+      #btn_bar
+      {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        padding: 10px;
+        background-color: #fff;
+        display: inline-block;
+        xborder: 1px solid #f00;
+        z-index: 1;
+      }
       button
       {
         border-radius: 7px;
@@ -104,8 +115,6 @@
       }
       #container
       {
-        display: flex;
-        flex-direction: column;
       }
     </style>
     <script type="module">
@@ -153,23 +162,25 @@
         //remote_ctrl.on_change_fn = Remote_Change;
 
         //Set_Canvas_Size(document.getElementById("large_btn"), 1);
+        OnResize();
         Set_Paint_Style(document.getElementById("stroke"));
       }
 
       function OnResize()
       {
+        let size;
         let width = window.innerWidth;
-        let height = window.innerHeight - 60;
+        let height = window.innerHeight;
         if (width<height)
         {
-          height = width;
+          size = width;
         }
         else if (height<width)
         {
-          width = height;
+          size = height;
         }
 
-        editor_elem.Resize(width-40, height-40);      
+        editor_elem.Resize(width, height);      
       }
 
       // fires when a change is made on the shape list
@@ -330,37 +341,34 @@
   </head>
 
   <body>
-    <div id="container">
-      <shape-editor id="shape_editor"></shape-editor>
+    <shape-editor id="shape_editor"></shape-editor>
 
-      <div>
-        <button id="new_moveto" title="Move To"><img src="images/vector-point.svg"></button>
-        <button id="new_lineto" title="Line To"><img src="images/vector-line.svg"></button>
-        <button id="new_bezierto" title="Bezier To"><img src="images/vector-bezier.svg"></button>
-        <button id="new_quadraticto" title="Quadratic To"><img src="images/vector-curve.svg"></button>
-        <button id="new_arcto" title="Arc To"><img src="images/vector-radius.svg"></button>
-        <button id="new_arc" title="Arc"><img src="images/vector-circle.svg"></button>
-        <button id="new_ellipse" title="Ellipse"><img src="images/vector-ellipse.svg"></button>
-        <button id="new_rect" title="Rect"><img src="images/vector-rectangle.svg"></button>
-        <button id="new_closepath" title="ClosePath"><img src="images/vector-polygon.svg"></button>
-  
-        - <button id="remote_btn" title="Show Remote Control"><img src="images/remote.svg"></button>
-        <button id="list_btn" title="Show Shape List"><img src="images/format-list-bulleted-square.svg"></button>
-        <button id="prev_btn" title="Previous Shape"><img src="images/skip-previous.svg"></button>
-        <button id="next_btn" title="Next Shape"><img src="images/skip-next.svg"></button>
-        <button id="undo_btn" title="Undo"><img src="images/undo.svg"></button>
-  
-        - <button id="large_btn" title="1000x1000 Canvas"><img src="images/image-size-select-actual.svg"></button>
-        <button id="medium_btn" title="300x300 Canvas"><img src="images/image-size-select-large.svg"></button>
-        <button id="small_btn" title="100x100 Canvas"><img src="images/image-size-select-small.svg"></button>
-  
-        - <button id="stroke" title="Stroke"><img src="images/pentagon-outline.svg"></button>
-        <button id="fill" title="Fill"><img src="images/pentagon.svg"></button>
-      </div>
-  
-      <shape-list id="shapes"></shape-list>
-      <remote-ctrl id="remote_ctrl"></remote-ctrl>    
+    <div id="btn_bar">
+      <button id="new_moveto" title="Move To"><img src="images/vector-point.svg"></button>
+      <button id="new_lineto" title="Line To"><img src="images/vector-line.svg"></button>
+      <button id="new_bezierto" title="Bezier To"><img src="images/vector-bezier.svg"></button>
+      <button id="new_quadraticto" title="Quadratic To"><img src="images/vector-curve.svg"></button>
+      <button id="new_arcto" title="Arc To"><img src="images/vector-radius.svg"></button>
+      <button id="new_arc" title="Arc"><img src="images/vector-circle.svg"></button>
+      <button id="new_ellipse" title="Ellipse"><img src="images/vector-ellipse.svg"></button>
+      <button id="new_rect" title="Rect"><img src="images/vector-rectangle.svg"></button>
+      <button id="new_closepath" title="ClosePath"><img src="images/vector-polygon.svg"></button>
+
+      - <button id="remote_btn" title="Show Remote Control"><img src="images/remote.svg"></button>
+      <button id="list_btn" title="Show Shape List"><img src="images/format-list-bulleted-square.svg"></button>
+      <button id="prev_btn" title="Previous Shape"><img src="images/skip-previous.svg"></button>
+      <button id="next_btn" title="Next Shape"><img src="images/skip-next.svg"></button>
+      <button id="undo_btn" title="Undo"><img src="images/undo.svg"></button>
+
+      - <button id="large_btn" title="Zoom x1"><img src="images/image-size-select-actual.svg"></button>
+      <button id="medium_btn" title="Zoom x3"><img src="images/image-size-select-large.svg"></button>
+      <button id="small_btn" title="Zoom x10"><img src="images/image-size-select-small.svg"></button>
+
+      - <button id="stroke" title="Stroke"><img src="images/pentagon-outline.svg"></button>
+      <button id="fill" title="Fill"><img src="images/pentagon.svg"></button>
     </div>
 
+    <shape-list id="shapes"></shape-list>
+    <remote-ctrl id="remote_ctrl"></remote-ctrl>    
   </body>
 </html>
