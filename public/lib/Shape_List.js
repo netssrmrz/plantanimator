@@ -16,7 +16,6 @@ class Shape_List extends LitElement
     this.OnClick_Edit_Ok = this.OnClick_Edit_Ok.bind(this);
     this.shapes = [];
     this.code_gen_type = null;
-    this.style.display = "none";
   }
   
   firstUpdated(changedProperties)
@@ -24,8 +23,8 @@ class Shape_List extends LitElement
     this.Load();
     this.Set_Code_Gen_Type("plant_code");
 
-    //const dlg = this.shadowRoot.getElementById("dlg");
-    //dlg.onclick_edit_ok = this.OnClick_Edit_Ok;
+    const table_elem = this.shadowRoot.getElementById("shapes");
+    table_elem.style.display = "none";
   }
   
   Set_Code_Gen_Type(code_gen_type)
@@ -102,20 +101,6 @@ class Shape_List extends LitElement
     return Math.round((num + Number.EPSILON) * 10000) / 10000;
   }
 
-  Get_Selected_Plant()
-  {
-    let res;
-
-    const checkbox = this.shadowRoot.querySelector("input[type=checkbox]:checked");
-    if (checkbox)
-    {
-      const i = Number.parseInt(checkbox.value);
-      res = this.plants[i];
-    }
-
-    return res;
-  }
-
   Set_Disabled(disabled)
   {
     let btns, i;
@@ -127,28 +112,24 @@ class Shape_List extends LitElement
     }
   }
 
-  Get_Last_Idx()
-  {
-    return this.shapes.length-1;
-  }
-
   Hide()
   {
-    this.style.display = "none";
+    table_elem.style.display = "none";
   }
 
   Toggle_Show()
   {
     let res;
 
-    if (this.style.display == "none")
+    const table_elem = this.shadowRoot.getElementById("shapes");
+    if (table_elem.style.display == "none")
     {
-      this.style.display = "block";
+      table_elem.style.display = "table";
       res = true;
     }
     else
     {
-      this.style.display = "none";
+      table_elem.style.display = "none";
       res = false;
     }
 
@@ -156,6 +137,45 @@ class Shape_List extends LitElement
   }
 
   // Utils ========================================================================================
+
+  Get_Last_Idx()
+  {
+    return this.shapes.length-1;
+  }
+
+  Get_Selected_Shape()
+  {
+    let res;
+
+    const i = this.Get_Selected_Idx();
+    if (i >= 0)
+    {
+      res = this.shapes[i];
+    }
+
+    return res;
+  }
+
+  Get_Selected_Idx()
+  {
+    let shape;
+    let res = -1;
+
+    if (this.shapes && this.shapes.length>0)
+    {
+      for (let i=0; i<this.shapes.length; i++)
+      {
+        shape = this.shapes[i];
+        if (shape.selected)
+        {
+          res = i;
+          break;
+        }
+      }
+    }
+
+    return res;
+  }
 
   Get_Shape_Idx(shape_id)
   {
@@ -236,6 +256,38 @@ class Shape_List extends LitElement
       }
       this.requestUpdate();
     }
+  }
+
+  Select_Next()
+  {
+    const i = this.Get_Selected_Idx();
+    const last_i = this.Get_Last_Idx();
+    this.shapes[i].selected = false;
+    if (i >= 0 && i < last_i)
+    {
+      this.shapes[i+1].selected = true;
+    }
+    else
+    {
+      this.shapes[0].selected = true;
+    }
+    this.requestUpdate();
+  }
+
+  Select_Prev()
+  {
+    const i = this.Get_Selected_Idx();
+    const last_i = this.Get_Last_Idx();
+    this.shapes[i].selected = false;
+    if (i > 0 && i <= last_i)
+    {
+      this.shapes[i-1].selected = true;
+    }
+    else
+    {
+      this.shapes[last_i].selected = true;
+    }
+    this.requestUpdate();
   }
 
   // Events =======================================================================================
@@ -338,6 +390,9 @@ class Shape_List extends LitElement
     return css`
       :host
       {
+      }
+      table
+      {
         margin-top: 20px;
         display: block;
         position: absolute;
@@ -347,10 +402,8 @@ class Shape_List extends LitElement
         right: 0px;
         width: 880px;
         height: 40%;
-        overflow: auto      
-      }
-      table
-      {
+        overflow: auto;
+
         border-collapse: collapse;
         margin-left:auto; 
         margin-right:auto;
@@ -431,13 +484,25 @@ class Shape_List extends LitElement
       .msg
       {
       }
+      #summary
+      {
+        display: inline-block;
+        position: absolute;
+        z-index: 2;
+        background-color: rgb(255, 255, 255);
+        left: 0px;
+        font-family: monospace;
+        top: 46px;
+        padding: 5px 5px 10px 10px;
+        font-size: 12px;
+      }
     `;
   }
 
   render()
   {
     return html`
-      <table>
+      <table id="shapes">
         <thead>
           <tr>
             <th>Actions</th>
@@ -458,10 +523,15 @@ class Shape_List extends LitElement
               <button id="path_code" @click="${this.OnClick_Code_Type}" title="Path Code"><img src="images/vector-polyline.svg"></button>
               <button id="android_code" @click="${this.OnClick_Code_Type}" title="Android Code"><img src="images/android.svg"></button>
               - <button id="reset" @click="${this.OnClick_Reset}" title="Reset"><img src="images/nuke.svg"></button>
+              <button id="upload" @click="${this.OnClick_Upload}" title="Upload"><img src="images/upload.svg"></button>
+              <button id="download" @click="${this.OnClick_Download}" title="Download"><img src="images/download.svg"></button>
             </td>
           </tr>
         </tfoot>
       </table>
+
+      <div id="summary"></div>
+
       <!--plant-dlg id="dlg"></plant-dlg-->
       <leaf-code-gen id="leaf_code_gen"></leaf-code-gen>
       <canvas-code-gen id="canvas_code_gen"></canvas-code-gen>
@@ -496,6 +566,7 @@ class Shape_List extends LitElement
     if (shape.selected)
     {
       btn_class = "selected";
+      this.Render_Summary(shape);
     }
 
     return html`
@@ -523,6 +594,12 @@ class Shape_List extends LitElement
       res = html`<button shape-id="${id}" @click="${on_click_fn}" title="${title}" class="${btn_class}"><img src="images/${image}"></button>`;
     }
     return res;
+  }
+
+  Render_Summary(shape)
+  {
+    const summ_element = this.shadowRoot.getElementById("summary");
+    summ_element.innerText = shape.name + " " + shape.Params_Str();
   }
 }
 

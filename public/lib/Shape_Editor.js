@@ -150,6 +150,11 @@ class Shape_Editor extends LitElement
     this.Render(this.ctx, this.shapes);
   }
 
+  Update()
+  {
+    this.Render(this.ctx, this.shapes);
+  }
+  
   // Events =======================================================================================
 
   OnMouseMove_Canvas(event)
