@@ -10,9 +10,9 @@ Plantimator is a library for animating floral patterns, an editor for building a
 https://www.plantimator.com.au/
 
 ## Sample Animations
-- https://www.plantimator.com.au/sample1.html  
-- https://www.plantimator.com.au/sample2.html  
-- https://www.plantimator.com.au/sample3.html  
+- Use as top and bottom borders: https://www.plantimator.com.au/sample1.html  
+- Use as circular borders: https://www.plantimator.com.au/sample2.html  
+- Use as colour background: https://www.plantimator.com.au/sample3.html  
 
 ## Dependencies
 - Chrome
