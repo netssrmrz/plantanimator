@@ -23,8 +23,8 @@ class Shape_List extends LitElement
     this.Load();
     this.Set_Code_Gen_Type("plant_code");
 
-    const table_elem = this.shadowRoot.getElementById("shapes");
-    table_elem.style.display = "none";
+    this.table_elem = this.shadowRoot.getElementById("shapes");
+    this.table_elem.style.display = "none";
   }
   
   Set_Code_Gen_Type(code_gen_type)
@@ -114,22 +114,26 @@ class Shape_List extends LitElement
 
   Hide()
   {
-    table_elem.style.display = "none";
+    this.table_elem.style.display = "none";
+  }
+
+  Show()
+  {
+    this.table_elem.style.display = "initial";
   }
 
   Toggle_Show()
   {
     let res;
 
-    const table_elem = this.shadowRoot.getElementById("shapes");
-    if (table_elem.style.display == "none")
+    if (this.table_elem.style.display == "none")
     {
-      table_elem.style.display = "table";
+      this.Show();
       res = true;
     }
     else
     {
-      table_elem.style.display = "none";
+      this.Hide();
       res = false;
     }
 
@@ -335,6 +339,8 @@ class Shape_List extends LitElement
 
   OnClick_Gen_Code()
   {
+    //this.Hide();
+
     const leaf_code_gen = this.shadowRoot.getElementById("leaf_code_gen");
     const canvas_code_gen = this.shadowRoot.getElementById("canvas_code_gen");
     const path_code_gen = this.shadowRoot.getElementById("path_code_gen");
@@ -383,6 +389,16 @@ class Shape_List extends LitElement
     }
   }
 
+  OnClick_Upload()
+  {
+
+  }
+
+  OnClick_Download()
+  {
+
+  }
+
   // Rendering ====================================================================================
 
   static get styles()
@@ -393,17 +409,7 @@ class Shape_List extends LitElement
       }
       table
       {
-        margin-top: 20px;
-        display: block;
-        position: absolute;
-        z-index: 2;
-        background-color: rgb(255, 255, 255);
-        bottom: 0px;
-        right: 0px;
-        width: 880px;
-        height: 40%;
-        overflow: auto;
-
+        width: 100%;
         border-collapse: collapse;
         margin-left:auto; 
         margin-right:auto;
@@ -484,6 +490,20 @@ class Shape_List extends LitElement
       .msg
       {
       }
+
+      #shapes
+      {
+        display: block;
+        position: absolute;
+        z-index: 2;
+        background-color: rgb(255, 255, 255);
+        bottom: 0px;
+        right: 0px;
+        width: 880px;
+        height: 40%;
+        overflow: auto;
+        border: 10px solid #fff;
+      }
       #summary
       {
         display: inline-block;
@@ -496,13 +516,26 @@ class Shape_List extends LitElement
         padding: 5px 5px 10px 10px;
         font-size: 12px;
       }
+      .code_gen
+      {
+        position: absolute;
+        z-index: 2;
+        background-color: rgb(255, 255, 255);
+        bottom: 0px;
+        right: 0px;
+        width: 880px;
+        height: 40%;
+        overflow: auto;
+        border: 10px solid #fff;
+      }
     `;
   }
 
   render()
   {
     return html`
-      <table id="shapes">
+      <div id="shapes">
+      <table>
         <thead>
           <tr>
             <th>Actions</th>
@@ -529,14 +562,16 @@ class Shape_List extends LitElement
           </tr>
         </tfoot>
       </table>
+      </div>
 
       <div id="summary"></div>
 
       <!--plant-dlg id="dlg"></plant-dlg-->
-      <leaf-code-gen id="leaf_code_gen"></leaf-code-gen>
-      <canvas-code-gen id="canvas_code_gen"></canvas-code-gen>
-      <path-code-gen id="path_code_gen"></path-code-gen>
-      <android-code-gen id="android_code_gen"></android-code-gen>
+
+      <leaf-code-gen id="leaf_code_gen" class="code_gen"></leaf-code-gen>
+      <canvas-code-gen id="canvas_code_gen" class="code_gen"></canvas-code-gen>
+      <path-code-gen id="path_code_gen" class="code_gen"></path-code-gen>
+      <android-code-gen id="android_code_gen" class="code_gen"></android-code-gen>
       `;
   }
 

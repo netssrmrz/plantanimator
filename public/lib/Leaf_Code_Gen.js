@@ -166,10 +166,12 @@ class Leaf_Code_Gen extends LitElement
         margin-top: 20px;
         background-color: inherit;
         border: 1px solid #000;
-        padding: 16px;
+        padding: 5px;
         font-family: monospace;
-        font-size: 16px;
+        font-size: 11px;
         tab-size: 2;
+        width: 800px;
+        height: 50%;
       }
       #hdr
       {
@@ -186,7 +188,7 @@ class Leaf_Code_Gen extends LitElement
         <button @click="${this.OnClick_Run}"><img src="images/play-outline.svg"></button>
         <button @click="${this.OnClick_Close}"><img src="images/close.svg"></button>
       </div>
-      <textarea id="txt_area" rows="20" cols="100"></textarea>
+      <textarea id="txt_area"></textarea>
     `;
   }
 }
