@@ -14,6 +14,7 @@ class Shape_List extends LitElement
     super();
     this.on_change_fn = null;
     this.OnClick_Edit_Ok = this.OnClick_Edit_Ok.bind(this);
+    this.OnChange_File = this.OnChange_File.bind(this);
     this.shapes = [];
     this.code_gen_type = null;
   }
@@ -45,9 +46,16 @@ class Shape_List extends LitElement
 
   Load()
   {
+    const json = localStorage.getItem("shapes");
+    const res = this.Load_JSON(json);
+
+    return res;
+  }
+
+  Load_JSON(json)
+  {
     let res = false;
 
-    const json = localStorage.getItem("shapes");
     if (json)
     {
       this.shapes = JSON.parse(json);
@@ -391,12 +399,34 @@ class Shape_List extends LitElement
 
   OnClick_Upload()
   {
+    this.file_elem = document.createElement("input");
+    this.file_elem.type = "file";
+    this.file_elem.addEventListener("change", this.OnChange_File);
+    this.file_elem.click();
+  }
 
+  OnChange_File()
+  {
+    const reader = new FileReader();
+    reader.onload = () => this.OnLoad_File(reader.result);
+    reader.readAsText(this.file_elem.files[0]);
+  }
+
+  OnLoad_File(json)
+  {
+    this.Load_JSON(json);
+    this.Save();
+    if (this.on_change_fn)
+    {
+      this.on_change_fn(this.shapes);
+    }
   }
 
   OnClick_Download()
   {
-
+    const json = JSON.stringify(this.shapes, this.JSON_Replacer);
+    const href = "data:text/json;charset=utf-8," + encodeURIComponent(json);
+    this.shadowRoot.getElementById("download").setAttribute("href", href);
   }
 
   // Rendering ====================================================================================
@@ -462,7 +492,7 @@ class Shape_List extends LitElement
       {
         text-align: left;
       }
-      button
+      .button
       {
         border-radius: 7px;
         border: 1px solid #000;
@@ -471,12 +501,14 @@ class Shape_List extends LitElement
         width: 36px;
         height: 36px;
         background-color: inherit;
+        display: inline-block;
+        box-sizing: border-box;
       }
-      button:disabled
+      .button:disabled
       {
         opacity: 0.25;
       }
-      button img
+      .button img
       {
         padding: 0;
         margin: 0;
@@ -550,14 +582,14 @@ class Shape_List extends LitElement
         <tfoot>
           <tr>
             <td id="btn_bar" colspan="8">
-              <button id="gen_btn" @click="${this.OnClick_Gen_Code}" title="Generate Code"><img src="images/code-json.svg"></button>
-              <button id="plant_code" @click="${this.OnClick_Code_Type}" title="Plant Code"><img src="images/flower-tulip-outline.svg"></button>
-              <button id="canvas_code" @click="${this.OnClick_Code_Type}" title="Canvas Code"><img src="images/image.svg"></button>
-              <button id="path_code" @click="${this.OnClick_Code_Type}" title="Path Code"><img src="images/vector-polyline.svg"></button>
-              <button id="android_code" @click="${this.OnClick_Code_Type}" title="Android Code"><img src="images/android.svg"></button>
-              - <button id="reset" @click="${this.OnClick_Reset}" title="Reset"><img src="images/nuke.svg"></button>
-              <button id="upload" @click="${this.OnClick_Upload}" title="Upload"><img src="images/upload.svg"></button>
-              <button id="download" @click="${this.OnClick_Download}" title="Download"><img src="images/download.svg"></button>
+              <button class="button" id="gen_btn" @click="${this.OnClick_Gen_Code}" title="Generate Code"><img src="images/code-json.svg"></button>
+              <button class="button" id="plant_code" @click="${this.OnClick_Code_Type}" title="Plant Code"><img src="images/flower-tulip-outline.svg"></button>
+              <button class="button" id="canvas_code" @click="${this.OnClick_Code_Type}" title="Canvas Code"><img src="images/image.svg"></button>
+              <button class="button" id="path_code" @click="${this.OnClick_Code_Type}" title="Path Code"><img src="images/vector-polyline.svg"></button>
+              <button class="button" id="android_code" @click="${this.OnClick_Code_Type}" title="Android Code"><img src="images/android.svg"></button>
+              - <button class="button" id="reset" @click="${this.OnClick_Reset}" title="Reset"><img src="images/nuke.svg"></button>
+              <button class="button" id="upload" @click="${this.OnClick_Upload}" title="Upload"><img src="images/upload.svg"></button>
+              <a class="button" id="download" href="" download="shape.json" @click="${this.OnClick_Download}" title="Download"><img src="images/download.svg"></a>
             </td>
           </tr>
         </tfoot>
@@ -596,11 +628,11 @@ class Shape_List extends LitElement
 
   Render_Item(i, shape)
   {
-    let btn_class;
+    let btn_class = "button";
 
     if (shape.selected)
     {
-      btn_class = "selected";
+      btn_class = "button selected";
       this.Render_Summary(shape);
     }
 
@@ -608,8 +640,8 @@ class Shape_List extends LitElement
       <tr shape-id="${shape.id}">
         <td>
           ${this.Render_Button(shape.id, this.OnClick_Select, "target.svg", true, "Select", btn_class)}
-          ${this.Render_Button(shape.id, this.OnClick_Edit, "pencil-outline.svg", shape.can_edit, "Edit", null)}
-          ${this.Render_Button(shape.id, this.OnClick_Delete, "delete-outline.svg", shape.can_delete, "Delete", null)}
+          ${this.Render_Button(shape.id, this.OnClick_Edit, "pencil-outline.svg", shape.can_edit, "Edit", "button")}
+          ${this.Render_Button(shape.id, this.OnClick_Delete, "delete-outline.svg", shape.can_delete, "Delete", "button")}
         </td>
         <td>${i+1}</td>
         <td>${shape.name}</td>
