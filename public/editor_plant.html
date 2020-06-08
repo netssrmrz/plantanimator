@@ -133,9 +133,9 @@
         sprout_list.on_change_fn = Plants_OnChange;
         
         editor = document.getElementById("sprout_editor");
-        editor.plants = sprout_list.plants;
+        editor.shapes = sprout_list.plants;
         editor.on_change_fn = Editor_OnChange;
-        editor.Render_Plants();
+        editor.Update();
                 
         sprout_list.this_class = editor.this_class;
 
@@ -169,9 +169,9 @@
         //console.log("Plants_OnChange()");
         sprout_list.Save();
 
-        editor.plants = sprout_list.plants;
+        editor.shapes = sprout_list.plants;
         editor.Design_Mode();
-        editor.Render_Plants();
+        editor.Update();
 
         remote_ctrl.plants = sprout_list.plants;
       }
@@ -190,7 +190,7 @@
         //console.log("Remote_Change()");
         sprout_list.Save();
         sprout_list.requestUpdate();
-        editor.Render_Plants();
+        editor.Update();
       }
 
       // button bar ===============================================================================
@@ -232,7 +232,7 @@
         sprout_list.Save();
 
         editor.Design_Mode();
-        editor.Render_Plants();
+        editor.Update();
       }
     
       function OnClick_Play()
