@@ -127,7 +127,7 @@ export class Base_Plant
 
   To_Canvas_Pt(ctx, sx, sy)
   {
-    return {x: sx-ctx.canvas.width/2-4, y: ctx.canvas.height-sy+4};
+    return {x: sx-ctx.canvas.width/2-4, y: -(sy-ctx.canvas.height/2-4)};
   }
 
   To_Degrees(r)
@@ -146,8 +146,8 @@ export class Base_Plant
       const c_pt = this.To_Canvas_Pt(ctx, event.offsetX, event.offsetY);
       if (this.cmd.id == "move_plant")
       {
-        this.x = c_pt.x;
-        this.y = c_pt.y;
+        this.x = c_pt.x*(1/ctx.x_scale);
+        this.y = c_pt.y*(1/ctx.y_scale);
       }
       if (this.cmd.id == "scale_plant")
       {

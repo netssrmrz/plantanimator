@@ -66,11 +66,27 @@
         font-size: 42px;
         font-weight: 100;
       }
-      body
+      html, body
       {
-        text-align: center;
-        margin: 0px;
+        margin: 0;
+        padding: 0;
         background-color: #fffff9;
+        width: 100%;
+        min-width: 800px;
+        height: 100%;
+        overflow: hidden;
+        text-align: center;
+      }
+      #btn_bar
+      {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        padding: 10px;
+        background-color: #fff;
+        display: inline-block;
+        xborder: 1px solid #f00;
+        z-index: 1;
       }
       button
       {
@@ -100,6 +116,7 @@
       import "./lib/Plant_List.js";
 
       window.onload = Main;
+      window.onresize = OnResize;
       let sprout_list, editor, remote_ctrl;
 
       function Main()
@@ -108,7 +125,10 @@
         document.getElementById("play_btn").onclick = OnClick_Play;
         document.getElementById("design_btn").onclick = OnClick_Design;
         document.getElementById("remote_btn").onclick = OnClick_Show_Remote;
-        
+        document.getElementById("list_btn").onclick=OnClick_List;
+        document.getElementById("prev_btn").onclick=OnClick_Prev;
+        document.getElementById("next_btn").onclick=OnClick_Next;
+
         sprout_list = document.getElementById("sprout_list");
         sprout_list.on_change_fn = Plants_OnChange;
         
@@ -122,6 +142,25 @@
         remote_ctrl = document.getElementById("remote_ctrl");
         remote_ctrl.objs = sprout_list.plants;
         remote_ctrl.on_change_fn = Remote_Change;
+
+        OnResize();
+      }
+
+      function OnResize()
+      {
+        let size;
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        if (width<height)
+        {
+          size = width;
+        }
+        else if (height<width)
+        {
+          size = height;
+        }
+
+        editor.Resize(width, height);      
       }
 
       // fires when a change is made on the plant list
@@ -155,6 +194,30 @@
       }
 
       // button bar ===============================================================================
+
+      function OnClick_Prev()
+      {
+        sprout_list.Select_Prev();
+        editor.Update();
+      }
+
+      function OnClick_Next()
+      {
+        sprout_list.Select_Next();
+        editor.Update();
+      }
+
+      function OnClick_List(event)
+      {
+        if (sprout_list.Toggle_Show())
+        {
+          document.getElementById("list_btn").classList.add("selected");
+        }
+        else
+        {
+          document.getElementById("list_btn").classList.remove("selected");
+        }
+      }
 
       function OnClick_Show_Remote()
       {
@@ -626,18 +689,16 @@
   </head>
 
   <body>
-    <h1>
-      <span class="hp">&#x1f337;</span>
-      <span class="h1">Plantimator Editor</span>
-    </h1>
-
     <sprout-editor id="sprout_editor"></sprout-editor>
 
-    <div>
+    <div id="btn_bar">
       <button id="new_plant_btn" title="Add Plant"><img src="images/plus.svg"></button>
       <button id="play_btn" title="Play Animation"><img src="images/play-pause.svg"></button>
       <button id="design_btn" title="Switch to Design Mode"><img src="images/pencil-ruler.svg"></button>
       <button id="remote_btn" title="Show Remote Control"><img src="images/remote.svg"></button>
+      <button id="list_btn" title="Show Plant List"><img src="images/format-list-bulleted-square.svg"></button>
+      <button id="prev_btn" title="Previous Plant"><img src="images/skip-previous.svg"></button>
+      <button id="next_btn" title="Next Plant"><img src="images/skip-next.svg"></button>
       <button id="undo_btn" title="Undo"><img src="images/undo.svg"></button>
     </div>
 

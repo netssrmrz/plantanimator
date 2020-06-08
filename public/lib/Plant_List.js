@@ -39,6 +39,9 @@ class Plant_List extends LitElement
 
     const dlg = this.shadowRoot.getElementById("dlg");
     dlg.onclick_edit_ok = this.OnClick_Edit_Ok;
+
+    this.table_elem = this.shadowRoot.getElementById("shapes");
+    this.table_elem.style.display = "none";
   }
   
   Set_Code_Gen_Type(code_gen_type)
@@ -125,6 +128,62 @@ class Plant_List extends LitElement
   Round(num)
   {
     return Math.round((num + Number.EPSILON) * 10000) / 10000;
+  }
+
+  Hide()
+  {
+    this.table_elem.style.display = "none";
+  }
+
+  Show()
+  {
+    this.table_elem.style.display = "initial";
+  }
+
+  Toggle_Show()
+  {
+    let res;
+
+    if (this.table_elem.style.display == "none")
+    {
+      this.Show();
+      res = true;
+    }
+    else
+    {
+      this.Hide();
+      res = false;
+    }
+
+    return res;
+  }
+
+  // API ==========================================================================================
+
+  Get_Last_Idx()
+  {
+    return this.plants.length-1;
+  }
+
+  Get_Selected_Idx()
+  {
+    let shape;
+    let res = -1;
+
+    if (this.plants && this.plants.length>0)
+    {
+      for (let i=0; i<this.plants.length; i++)
+      {
+        shape = this.plants[i];
+        if (shape.selected)
+        {
+          res = i;
+          break;
+        }
+      }
+    }
+
+    return res;
   }
 
   Get_Selected_Plant()
@@ -233,6 +292,40 @@ class Plant_List extends LitElement
     return res;
   }
 
+  Select_Next()
+  {
+    const i = this.Get_Selected_Idx();
+    const last_i = this.Get_Last_Idx();
+    this.plants[i].selected = false;
+    if (i >= 0 && i < last_i)
+    {
+      this.plants[i+1].selected = true;
+    }
+    else
+    {
+      this.plants[0].selected = true;
+    }
+    this.requestUpdate();
+  }
+
+  Select_Prev()
+  {
+    const i = this.Get_Selected_Idx();
+    const last_i = this.Get_Last_Idx();
+    this.plants[i].selected = false;
+    if (i > 0 && i <= last_i)
+    {
+      this.plants[i-1].selected = true;
+    }
+    else
+    {
+      this.plants[last_i].selected = true;
+    }
+    this.requestUpdate();
+  }
+
+  // Events =======================================================================================
+
   OnClick_Delete_Plant(event)
   {
     const plant_id = event.currentTarget.getAttribute("plant-id");
@@ -314,13 +407,13 @@ class Plant_List extends LitElement
     if (this.on_change_fn) this.on_change_fn();
   }
 
+  // Rendering ====================================================================================
+
   static get styles()
   {
     return css`
       :host
       {
-        display: block;  
-        margin-top: 20px;
       }
       table
       {
@@ -401,8 +494,56 @@ class Plant_List extends LitElement
       {
         background-color: #0f0;
       }
-      .msg
+
+      #shapes
       {
+        display: block;
+        position: absolute;
+        z-index: 2;
+        background-color: rgb(255, 255, 249);
+        bottom: 0px;
+        right: 0px;
+        width: 880px;
+        height: 40%;
+        overflow: auto;
+        border: 10px solid #fffff9;
+      }
+      #summary
+      {
+        display: inline-block;
+        position: absolute;
+        z-index: 2;
+        background-color: rgb(255, 255, 249);
+        left: 0px;
+        font-family: monospace;
+        top: 46px;
+        padding: 5px 5px 10px 10px;
+        font-size: 12px;
+      }
+      .code_gen
+      {
+        position: absolute;
+        z-index: 2;
+        background-color: rgb(255, 255, 249);
+        bottom: 0px;
+        right: 0px;
+        width: 880px;
+        height: 40%;
+        overflow: auto;
+        border: 10px solid #fffff9;
+      }
+
+      #dlg
+      {
+        position: absolute;
+        z-index: 2;
+        background-color: rgb(255, 255, 249);
+        bottom: 0px;
+        right: 0px;
+        width: 500px;
+        height: 350px;
+        overflow: auto;
+        border: 10px solid #fffff9;
       }
     `;
   }
@@ -410,38 +551,43 @@ class Plant_List extends LitElement
   render()
   {
     return html`
-      <table>
-        <thead>
-          <tr>
-            <th>Actions</th>
-            <th>#</th>
-            <th>Name</th>
-            <th>Class</th>
-            <th>X</th>
-            <th>Y</th>
-            <th>X Scale</th>
-            <th>Y Scale</th>
-            <th>Angle</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${this.Render_Items()}
-        </tbody>
-        <tfoot>
-          <tr>
-            <td id="btn_bar" colspan="8">
-              <button id="gen_btn" @click="${this.OnClick_Gen_Code}" title="Generate Code"><img src="images/code-json.svg"></button>
-              <button id="plant_code" @click="${this.OnClick_Code_Type}" title="Switch to Plant Editing"><img src="images/flower-tulip-outline.svg"></button>
-              <button id="scene_code" @click="${this.OnClick_Code_Type}" title="Switch to Scene Editing"><img src="images/image.svg"></button>
-              <button id="reset" @click="${this.OnClick_Reset}" title="Reset"><img src="images/nuke.svg"></button>
-            </td>
-          </tr>
-        </tfoot>
-      </table>
+      <div id="shapes">
+        <table>
+          <thead>
+            <tr>
+              <th>Actions</th>
+              <th>#</th>
+              <th>Name</th>
+              <th>Class</th>
+              <th>X</th>
+              <th>Y</th>
+              <th>X Scale</th>
+              <th>Y Scale</th>
+              <th>Angle</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${this.Render_Items()}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td id="btn_bar" colspan="8">
+                <button id="gen_btn" @click="${this.OnClick_Gen_Code}" title="Generate Code"><img src="images/code-json.svg"></button>
+                <button id="plant_code" @click="${this.OnClick_Code_Type}" title="Switch to Plant Editing"><img src="images/flower-tulip-outline.svg"></button>
+                <button id="scene_code" @click="${this.OnClick_Code_Type}" title="Switch to Scene Editing"><img src="images/image.svg"></button>
+                <button id="reset" @click="${this.OnClick_Reset}" title="Reset"><img src="images/nuke.svg"></button>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div id="summary"></div>
+
       <plant-dlg id="dlg"></plant-dlg>
-      <plant-code-gen id="plant_code_gen"></plant-code-gen>
-      <scene-code-gen id="scene_code_gen"></scene-code-gen>
-      `;
+      <plant-code-gen id="plant_code_gen" class="code_gen"></plant-code-gen>
+      <scene-code-gen id="scene_code_gen" class="code_gen"></scene-code-gen>
+    `;
   }
 
   Render_Items()

@@ -528,20 +528,20 @@ class Shape_List extends LitElement
         display: block;
         position: absolute;
         z-index: 2;
-        background-color: rgb(255, 255, 255);
+        background-color: rgb(255, 255, 249);
         bottom: 0px;
         right: 0px;
         width: 880px;
         height: 40%;
         overflow: auto;
-        border: 10px solid #fff;
+        border: 10px solid #fffff9;
       }
       #summary
       {
         display: inline-block;
         position: absolute;
         z-index: 2;
-        background-color: rgb(255, 255, 255);
+        background-color: rgb(255, 255, 249);
         left: 0px;
         font-family: monospace;
         top: 46px;
@@ -552,13 +552,13 @@ class Shape_List extends LitElement
       {
         position: absolute;
         z-index: 2;
-        background-color: rgb(255, 255, 255);
+        background-color: rgb(255, 255, 249);
         bottom: 0px;
         right: 0px;
         width: 880px;
         height: 40%;
         overflow: auto;
-        border: 10px solid #fff;
+        border: 10px solid #fffff9;
       }
     `;
   }
@@ -567,33 +567,33 @@ class Shape_List extends LitElement
   {
     return html`
       <div id="shapes">
-      <table>
-        <thead>
-          <tr>
-            <th>Actions</th>
-            <th>#</th>
-            <th>Function</th>
-            <th>Parameters</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${this.Render_Items()}
-        </tbody>
-        <tfoot>
-          <tr>
-            <td id="btn_bar" colspan="8">
-              <button class="button" id="gen_btn" @click="${this.OnClick_Gen_Code}" title="Generate Code"><img src="images/code-json.svg"></button>
-              <button class="button" id="plant_code" @click="${this.OnClick_Code_Type}" title="Plant Code"><img src="images/flower-tulip-outline.svg"></button>
-              <button class="button" id="canvas_code" @click="${this.OnClick_Code_Type}" title="Canvas Code"><img src="images/image.svg"></button>
-              <button class="button" id="path_code" @click="${this.OnClick_Code_Type}" title="Path Code"><img src="images/vector-polyline.svg"></button>
-              <button class="button" id="android_code" @click="${this.OnClick_Code_Type}" title="Android Code"><img src="images/android.svg"></button>
-              - <button class="button" id="reset" @click="${this.OnClick_Reset}" title="Reset"><img src="images/nuke.svg"></button>
-              <button class="button" id="upload" @click="${this.OnClick_Upload}" title="Upload"><img src="images/upload.svg"></button>
-              <a class="button" id="download" href="" download="shape.json" @click="${this.OnClick_Download}" title="Download"><img src="images/download.svg"></a>
-            </td>
-          </tr>
-        </tfoot>
-      </table>
+        <table>
+          <thead>
+            <tr>
+              <th>Actions</th>
+              <th>#</th>
+              <th>Function</th>
+              <th>Parameters</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${this.Render_Items()}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td id="btn_bar" colspan="8">
+                <button class="button" id="gen_btn" @click="${this.OnClick_Gen_Code}" title="Generate Code"><img src="images/code-json.svg"></button>
+                <button class="button" id="plant_code" @click="${this.OnClick_Code_Type}" title="Plant Code"><img src="images/flower-tulip-outline.svg"></button>
+                <button class="button" id="canvas_code" @click="${this.OnClick_Code_Type}" title="Canvas Code"><img src="images/image.svg"></button>
+                <button class="button" id="path_code" @click="${this.OnClick_Code_Type}" title="Path Code"><img src="images/vector-polyline.svg"></button>
+                <button class="button" id="android_code" @click="${this.OnClick_Code_Type}" title="Android Code"><img src="images/android.svg"></button>
+                - <button class="button" id="reset" @click="${this.OnClick_Reset}" title="Reset"><img src="images/nuke.svg"></button>
+                <button class="button" id="upload" @click="${this.OnClick_Upload}" title="Upload"><img src="images/upload.svg"></button>
+                <a class="button" id="download" href="" download="shape.json" @click="${this.OnClick_Download}" title="Download"><img src="images/download.svg"></a>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
       </div>
 
       <div id="summary"></div>
@@ -604,7 +604,7 @@ class Shape_List extends LitElement
       <canvas-code-gen id="canvas_code_gen" class="code_gen"></canvas-code-gen>
       <path-code-gen id="path_code_gen" class="code_gen"></path-code-gen>
       <android-code-gen id="android_code_gen" class="code_gen"></android-code-gen>
-      `;
+    `;
   }
 
   Render_Items()
