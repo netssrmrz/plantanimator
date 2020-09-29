@@ -7,10 +7,13 @@
   <style>
     body
     {
-      margin: 0px;
+      margin: 30px;
+      padding: 30px;
+      box-shadow: rgb(0, 0, 0) 0px 0px 0px 1px, rgb(255, 255, 255) 0px 0px 0px 4px, rgb(0, 0, 0) 0px 1px 0px 7px;
       background-color: #fffff9;
       font-family: monospace;
       font-size: 16px;
+      position: relative;
     }
     .hp
     {
@@ -21,13 +24,12 @@
     }
     h1
     {
-      margin: 10px;
+      margin: 0px 0px 20px 0px;
       font-family: serif;
       font-style: italic;
       font-size: 40px;
       text-transform: uppercase;
       font-weight: 100;
-      margin: 10px;
       text-align: center;
     }
     h2
@@ -35,27 +37,76 @@
       font-family: serif;
       font-style: italic;
       font-weight: 100;
-      font-size: 20px;
-    }
-    h2 a
-    {
-      box-shadow: rgb(0, 0, 0) 0px 1px 0px 0px, rgb(255, 255, 255) 0px 4px 0px 0px, rgb(0, 0, 0) 0px 7px 0px 0px;
-      text-decoration: none;
+      font-size: 23px;
+      margin: 15px 0px 0px 0px;
     }
     ul
     {
       list-style-type: none;
       padding: 0;
-      margin: 40px;      
+      margin: 0px 0px 25px 0px;      
+    }
+    p
+    {
+      margin: 0px 0px 10px 0px;
+    }
+    #canvas
+    {
+      xborder: 1px solid #f00;
+      position: absolute;
+      right: 0px;
+      bottom: 0px;
+    }
+    #blogger
+    {
+      margin: 0px 0px -2px -5px;
+      padding: 0px;      
     }
   </style>
   <script type="module">
     import * as pl from "./lib/pa.js";
 
     window.onload = Main;
-
     function Main()
     {
+      var plants, canvas, canvas_ctx;
+
+      canvas = document.getElementById("canvas");
+      canvas_ctx = canvas.getContext("2d");
+      canvas_ctx.strokeStyle = "#000";
+      canvas_ctx.fillStyle = "#000";
+      canvas_ctx.lineWidth = 4;
+      canvas_ctx.lineCap = 'round';
+      canvas_ctx.lineJoin = 'round';
+
+      plants = [];
+      plants.push(p1(canvas_ctx));
+      plants.push(p2(canvas_ctx));
+      pl.Animate(canvas_ctx, plants);
+    }
+
+    function p1(canvas_ctx)
+    {
+      var plant = new pl.Plant_Stem8();
+      plant.maturity_rate = 0.5;
+      plant.x = 390;
+      plant.y = 390;
+      plant.x_scale = 0.35;
+      plant.y_scale = 0.35;
+      plant.angle = Math.PI/2+0.1;
+      return plant;
+    }
+
+    function p2(canvas_ctx)
+    {
+      var plant = new pl.Plant_Stem8();
+      plant.maturity_rate = 0.5;
+      plant.x = 390;
+      plant.y = 390;
+      plant.x_scale = 0.35;
+      plant.y_scale = -0.35;
+      plant.angle = 0-0.1;
+      return plant;
     }
   </script>
 </head>
@@ -65,10 +116,16 @@
     <span class="hp">&#x1f337;</span>
     <span class="h1">Plantimator</span>
   </h1>
+  <canvas id="canvas" width="400" height="400"></canvas>
   <ul>
-    Plantimator is a suite of tools geared towards generating animated floral scenes. These can be used
+    Plantimator is my private set of tools for generating animated floral scenes. These can be used
     as page borders, page backgrounds, text borders, text underlines, and for generally decorative
     purposes.
+    
+    <p>Also, Plantimator has been designed for Chrome only.</p>
+
+    <p>Tech used to build this site includes VS Code, Vanilla JS, Javascript, Firebase.</p>
+
     <li>
       <h2><a href="editor_plant.html">Plant Editor</a></h2>
       <p>Used to define scenes or individual plants.
@@ -94,5 +151,9 @@
       <h2><a href="sample3.html">Sample Scene 3</a></h2>
     </li>
   </ul>
+
+  <p id="signature">Sincerely - <a href="https://www.linkedin.com/in/esteban-ramirez-91a66b14/">Esteban (Steven) Ramirez</a>
+  <a href="https://www.linkedin.com/in/esteban-ramirez-91a66b14" target="_blank"><img src="/images/In-2C-14px.png" /></a>
+  <a href="http://ramirezsystems.blogspot.com" target="_blank"><img id="blogger" src="/images/icons8-blogger-18.png" /></a></p>
 </body>
 </html>
