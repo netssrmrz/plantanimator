@@ -62,6 +62,10 @@
       margin: 0px 0px -2px -5px;
       padding: 0px;      
     }
+    #title_icon
+    {
+      xdisplay: none;
+    }
   </style>
   <script type="module">
     import * as pl from "./lib/pa.js";
@@ -113,7 +117,7 @@
 
 <body>
   <h1>
-    <span class="hp">&#x1f337;</span>
+    <img id="title_icon" src="images/apple-touch-icon.png" height="33px">
     <span class="h1">Plantimator</span>
   </h1>
   <canvas id="canvas" width="400" height="400"></canvas>
@@ -122,7 +126,7 @@
     as page borders, page backgrounds, text borders, text underlines, and for generally decorative
     purposes.
     
-    <p>Also, Plantimator has been designed for Chrome only.</p>
+    <p>Also, Plantimator currently only supports Desktop Chrome.</p>
 
     <p>Tech used to build this site includes VS Code, Vanilla JS, Javascript, Firebase.</p>
 
