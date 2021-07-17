@@ -4,6 +4,8 @@
 <head>
   <meta charset="utf-8" />
   <title>Plantimator - Home</title>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase.js"></script>
+  <script defer src="https://decms-6dc54.firebaseapp.com/components/index_ext.js" type="module"></script>
   <style>
     body
     {
@@ -116,34 +118,27 @@
 </head>
 
 <body>
+  <de-project id="p1" key="plantimator"></de-project>
+
   <h1>
     <img id="title_icon" src="images/apple-touch-icon.png" height="33px">
     <span class="h1">Plantimator</span>
   </h1>
   <canvas id="canvas" width="400" height="400"></canvas>
   <ul>
-    Plantimator is my private set of tools for generating animated floral scenes. These can be used
-    as page borders, page backgrounds, text borders, text underlines, and for generally decorative
-    purposes.
-    
-    <p>Also, Plantimator currently only supports Desktop Chrome.</p>
-
-    <p>Tech used to build this site includes VS Code, Vanilla JS, Javascript, Firebase.</p>
+    <de-text key="h_p1" project-id="p1"></de-text>
 
     <li>
       <h2><a href="editor_plant.html">Plant Editor</a></h2>
-      <p>Used to define scenes or individual plants.
-      Individual plants are composed of a stem, leaves, and flowers.
-      Floral scenes consisting of any number of predefined plant animations.</p>
+      <de-text key="h_pe" project-id="p1"></de-text>
     </li>
     <li>
       <h2><a href="editor_shape.html">Leaf Editor</a></h2>
-      <p>Used to define free form shapes that can be used as leaves and flowers.</p>
+      <de-text key="h_le" project-id="p1"></de-text>
     </li>
     <li>
       <h2><a href="library.html">Library</a></h2>
-      List of leaf and flower patterns that can be
-      used when compositing a plant.
+      <de-text key="h_l" project-id="p1"></de-text>
     </li>
     <li>
       <h2><a href="sample1.html">Sample Scene 1</a></h2>
